@@ -41,5 +41,18 @@ namespace Data.Helpers
             var a1 = (new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeSeconds();
             return Convert.ToInt64(a1);
         }
+
+        public static long MemoryUsedInBytes
+        {
+            get
+            {
+                // clear memory
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                return GC.GetTotalMemory(true);
+            }
+        }
+
     }
 }

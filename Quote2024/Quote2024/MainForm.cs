@@ -22,8 +22,8 @@ namespace Quote2024
         {
             InitializeComponent();
 
-            /*dataGridView1.Paint += new PaintEventHandler(dataGridView1_Paint);
-            dataGridView1.DataSource = Data.Models.LoaderItem.DataGridLoaderItems;*/
+            dataGridView1.Paint += new PaintEventHandler(dataGridView1_Paint);
+            dataGridView1.DataSource = Data.Models.LoaderItem.DataGridLoaderItems;
 
             //=========================
             StatusLabel.Text = "";
@@ -32,9 +32,9 @@ namespace Quote2024
             for (var item = 0; item < clbIntradayDataList.Items.Count; item++)
             {
                 clbIntradayDataList.SetItemChecked(item, true);
-            }
+            }*/
 
-            StartImageAnimation();*/
+            StartImageAnimation();
 
             // Logger.MessageAdded += (sender, args) => StatusLabel.Text = args.FullMessage;
             Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() => StatusLabel.Text = args.FullMessage));
@@ -124,13 +124,57 @@ namespace Quote2024
             CefSharp.Cef.Shutdown();
         }
 
+        #region ===========  Image Animation  ============
+        // taken from https://social.msdn.microsoft.com/Forums/windows/en-US/0d9e790e-6816-40e7-96fe-bbf333a4abc0/show-animated-gif-in-datagridview?forum=winformsdatacontrols
+        void dataGridView1_Paint(object sender, PaintEventArgs e)
+        {
+            //Update the frames. The cell would paint the next frame of the image late on.
+            ImageAnimator.UpdateFrames();
+        }
+        private void StartImageAnimation()
+        {
+            var image = Data.Models.LoaderItem.GetAnimatedImage();
+            ImageAnimator.Animate(image, new EventHandler(this.OnFrameChanged));
+        }
+        private void OnFrameChanged(object o, EventArgs e)
+        {
+            if (dataGridView1.Columns.Count > 4)
+            {
+                //Force a call to the Paint event handler.
+                dataGridView1.InvalidateColumn(1);
+                dataGridView1.InvalidateColumn(4);
+            }
+        }
+        #endregion
+
+        #region ==========  EventHandlers of controls  ===========
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e) => dataGridView1.ClearSelection();
+        #endregion
+
+        private async void btnRunMultiItemsLoader_Click(object sender, EventArgs e)
+        {
+            ((Control)sender).Enabled = false;
+            dataGridView1.ReadOnly = true;
+
+            foreach (var item in Data.Models.LoaderItem.DataGridLoaderItems)
+                item.Reset();
+
+            foreach (var item in Data.Models.LoaderItem.DataGridLoaderItems.Where(a => a.Checked))
+                await item.Start();
+
+            dataGridView1.ReadOnly = false;
+            ((Control)sender).Enabled = true;
+        }
+
         private async void btnTest_Click(object sender, EventArgs e)
         {
             btnTest.Enabled = false;
-            
+
             await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
 
             btnTest.Enabled = true;
         }
+
+
     }
 }
