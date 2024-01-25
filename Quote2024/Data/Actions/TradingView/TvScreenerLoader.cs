@@ -4,7 +4,6 @@ using System.IO.Compression;
 using System.Linq;
 using Data.Helpers;
 using Data.Models;
-// using Newtonsoft.Json;
 
 namespace Data.Actions.TradingView
 {
@@ -13,7 +12,7 @@ namespace Data.Actions.TradingView
         private const string URL = @"https://scanner.tradingview.com/america/scan";
         private const string parameters = @"{""filter"":[{""left"":""exchange"",""operation"":""in_range"",""right"":[""AMEX"",""NASDAQ"",""NYSE""]}],""options"":{""lang"":""en""},""markets"":[""america""],""symbols"":{""query"":{""types"":[]},""tickers"":[]},""columns"":[""minmov"",""name"",""close"",""change"",""change_abs"",""Recommend.All"",""volume"",""Value.Traded"",""market_cap_basic"",""price_earnings_ttm"",""earnings_per_share_basic_ttm"",""number_of_employees"",""sector"",""industry"",""description"",""type"",""subtype""],""sort"":{""sortBy"":""name"",""sortOrder"":""asc""},""range"":[0,20000]}";
 
-       /* public static void Start()
+        public static void Start()
         {
             Logger.AddMessage($"Started");
 
@@ -42,7 +41,7 @@ namespace Data.Actions.TradingView
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
-                    var o = JsonConvert.DeserializeObject<ScreenerTradingView>(entry.GetContentOfZipEntry());
+                    var o = ZipUtils.DeserializeJson<ScreenerTradingView>(entry);
                     var items = o.data.Select(a => a.GetDbItem(entry.LastWriteTime.DateTime)).ToArray();
 
                     if (items.Length > 0)
@@ -57,6 +56,6 @@ namespace Data.Actions.TradingView
                 }
 
             return itemCount;
-        }*/
+        }
     }
 }

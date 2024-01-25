@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.OffScreen;
+using Data.Helpers;
 using Quote2024.Helpers;
 
 namespace Quote2024
@@ -21,6 +22,8 @@ namespace Quote2024
         public MainForm()
         {
             InitializeComponent();
+
+            if (CsUtils.IsInDesignMode) return;
 
             dataGridView1.Paint += new PaintEventHandler(dataGridView1_Paint);
             dataGridView1.DataSource = Data.Models.LoaderItem.DataGridLoaderItems;
@@ -39,11 +42,8 @@ namespace Quote2024
             // Logger.MessageAdded += (sender, args) => StatusLabel.Text = args.FullMessage;
             Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() => StatusLabel.Text = args.FullMessage));
 
-            if (LicenseManager.UsageMode == LicenseUsageMode.Runtime)
-            {
-                browser = new ChromiumWebBrowser("www.eoddata.com");
-                browser.FrameLoadEnd += Browser_FrameLoadEnd;
-            }
+            browser = new ChromiumWebBrowser("www.eoddata.com");
+            browser.FrameLoadEnd += Browser_FrameLoadEnd;
         }
 
         private async void Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
@@ -170,7 +170,8 @@ namespace Quote2024
         {
             btnTest.Enabled = false;
 
-            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
+            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
+            Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\NasdaqScreener_20240120.zip");
 
             btnTest.Enabled = true;
         }

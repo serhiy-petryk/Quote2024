@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace Data.Helpers
 {
     public static class CsUtils
     {
+        public static bool IsInDesignMode => LicenseManager.UsageMode == LicenseUsageMode.Designtime;
+
         public static string[] GetApiKeys(string dataProvider)
         {
             const string filename = @"E:\Quote\WebData\ApiKeys.txt";
@@ -41,6 +44,12 @@ namespace Data.Helpers
             var a1 = (new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeSeconds();
             return Convert.ToInt64(a1);
         }
+
+        public static Tuple<DateTime, string, string> GetTimeStamp(int hourOffset = -9) => Tuple.Create(
+            DateTime.Now.AddHours(hourOffset), DateTime.Now.AddHours(hourOffset).ToString("yyyyMMdd"),
+            DateTime.Now.AddHours(0).ToString("yyyyMMddHHmmss"));
+
+        public static int GetFileSizeInKB(string filename) => Convert.ToInt32(new FileInfo(filename).Length / 1024.0);
 
         public static long MemoryUsedInBytes
         {
