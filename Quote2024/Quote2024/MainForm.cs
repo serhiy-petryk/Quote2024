@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
@@ -171,7 +167,7 @@ namespace Quote2024
             btnTest.Enabled = false;
 
             // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
-            Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\NasdaqScreener_20240120.zip");
+            Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\GithubNasdaqStockScreener.zip");
 
             btnTest.Enabled = true;
         }

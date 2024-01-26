@@ -67,16 +67,13 @@ namespace Data.Actions.Nasdaq
                     if (entry.LastWriteTime.DateTime < new DateTime(2021, 2, 6)) // 3 very old files have old symbol format => don't save in database
                         continue;
 
-                    var stockItems = new List<cStockRow>();
-                    var etfItems = new List<cEtfRow>();
+                    var stockItems = new List<DbStockRow>();
+                    var etfItems = new List<DbEtfRow>();
 
                     if (Path.GetExtension(entry.FullName) == ".json" && entry.Name.IndexOf("Etf", StringComparison.InvariantCultureIgnoreCase) != -1)
                     {
                         var oEtf = ZipUtils.DeserializeJson<cEtfRoot>(entry);
-                        etfItems = oEtf.data.data.rows.ToList();
-
-                        foreach (var item in etfItems)
-                            item.TimeStamp = entry.LastWriteTime.DateTime;
+                        etfItems = oEtf.data.data.rows.Select(a=>new DbEtfRow(entry.LastWriteTime.DateTime, a)).ToList();
                     }
                     else if (Path.GetExtension(entry.FullName) == ".json" && entry.Name.IndexOf("Stock", StringComparison.InvariantCultureIgnoreCase) != -1)
                     {
@@ -85,11 +82,14 @@ namespace Data.Actions.Nasdaq
                         var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
                         var exchange = ss[ss.Length - 2];
                         if (content.StartsWith("[")) // Github version
-                            stockItems = ZipUtils.DeserializeJson<cStockRow[]>(content).ToList();
+                        {
+                            var oo = ZipUtils.DeserializeJson<cStockRow[]>(content);
+                            stockItems.AddRange(oo.Select(a => new DbStockRow(exchange, entry.LastWriteTime.DateTime, a)));
+                        }
                         else
                         {
                             var oo = ZipUtils.DeserializeJson<cStockRoot>(content);
-                            stockItems.AddRange(oo.data.rows);
+                            stockItems.AddRange(oo.data.rows.Select(a=>new DbStockRow(exchange, entry.LastWriteTime.DateTime, a)));
                         }
 
                         foreach (var item in stockItems)
@@ -103,16 +103,16 @@ namespace Data.Actions.Nasdaq
 
                     if (stockItems.Count > 0)
                     {
-                        DbUtils.ClearAndSaveToDbTable(stockItems, "dbQ2023Others..Bfr_ScreenerNasdaqStock", "symbol", "Exchange",
-                            "Name", "LastSale", "Volume", "netChange", "Change", "MarketCap", "Country", "ipoYear",
+                        DbUtils.ClearAndSaveToDbTable(stockItems, "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
+                            "Name", "LastSale", "Volume", "NetChange", "Change", "MarketCap", "Country", "IpoYear",
                             "Sector", "Industry", "TimeStamp");
                         DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqStock");
                     }
 
                     if (etfItems.Count > 0)
                     {
-                        DbUtils.ClearAndSaveToDbTable(etfItems, "dbQ2023Others..Bfr_ScreenerNasdaqEtf", "symbol", "Name",
-                            "LastSale", "netChange", "Change", "TimeStamp");
+                        DbUtils.ClearAndSaveToDbTable(etfItems, "dbQ2023Others..Bfr_ScreenerNasdaqEtf", "Symbol", "Name",
+                            "LastSale", "NetChange", "Change", "TimeStamp");
                         DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqEtf");
                     }
                     itemCount += stockItems.Count + etfItems.Count;
@@ -137,47 +137,42 @@ namespace Data.Actions.Nasdaq
         }
         private class cStockRow
         {
-            // "symbol", "name", "LastSale", "Volume", "netChange", "Change", "MarketCap", "country", "ipoYear", "sector", "industry", "timeStamp"
-            // github: symbol, name, lastsale, volume, netchange, pctchange, marketCap, country, ipoyear, industry, sector, url
             public string symbol;
             public string name;
-            public string lastSale;
-            public long volume;
-            public float? netChange;
-            public string pctChange;
-            public float? marketCap;
+            public string lastsale;
+            public string volume;
+            public string netchange;
+            public string pctchange;
+            public string marketCap;
             public string country;
-            public short? ipoYear;
+            public string ipoyear;
             public string sector;
             public string industry;
+        }
+
+        private class DbStockRow
+        {
+            // "Symbol", "Exchange", "Name", "LastSale", "Volume", "NetChange", "Change", "MarketCap", "Country", "IpoYear", "Sector", "Industry", "TimeStamp"
+            private cStockRow Row;
+            public string Symbol => Row.symbol;
+            public string Exchange;
+            public string Name => NullCheck(Row.name);
+            public float? LastSale => Row.lastsale == "NA" ? (float?)null : float.Parse(Row.lastsale, NumberStyles.Any, culture);
+            public float Volume => Convert.ToSingle(Math.Round(float.Parse(Row.volume, NumberStyles.Any, culture) / 1000000.0, 3));
+            public float? NetChange => string.IsNullOrEmpty(Row.netchange) ? (float?)null : float.Parse(Row.netchange, NumberStyles.Any, culture);
+            public float? Change => string.IsNullOrEmpty(Row.pctchange) ? (float?)null : float.Parse(Row.pctchange.Replace("%", ""), NumberStyles.Any, culture);
+            public float? MarketCap => string.IsNullOrEmpty(Row.marketCap) ? (float?)null : Convert.ToSingle(Math.Round(float.Parse(Row.marketCap, NumberStyles.Any, culture) / 1000000.0, 3));
+            public string Country => NullCheck(Row.country);
+            public short? IpoYear => string.IsNullOrEmpty(Row.ipoyear) ? (short?)null : short.Parse(Row.ipoyear, NumberStyles.Any, culture);
+            public string Sector => NullCheck(Row.sector);
+            public string Industry => NullCheck(Row.industry);
             public DateTime TimeStamp;
 
-            public string Exchange;
-            public string Name => NullCheck(name);
-            public float? LastSale => lastSale == "NA" ? (float?)null : float.Parse(lastSale, NumberStyles.Any, culture);
-            public float Volume => Convert.ToSingle(Math.Round(volume / 1000000.0, 3));
-            public float? Change => string.IsNullOrEmpty(pctChange) ? (float?)null : float.Parse(pctChange.Replace("%", ""), culture);
-            public float? MarketCap => marketCap.HasValue
-                ? Convert.ToSingle(Math.Round(marketCap.Value / 1000000.0, 3))
-                : (float?)null;
-            public string Country => NullCheck(country);
-            public string Sector => NullCheck(sector);
-            public string Industry => NullCheck(industry);
-
-            public cStockRow() { }
-
-            public cStockRow(string fileLine)
+            public DbStockRow(string exchange, DateTime timeStamp, cStockRow row)
             {
-                var ss = fileLine.Split(',');
-                symbol = NullCheck(ss[0]);
-                name = ss[1];
-                lastSale = ss[2];
-                marketCap = NullCheck(ss[5]) == null ? (long?)null : Convert.ToInt64(decimal.Parse(ss[5], culture));
-                country = ss[6];
-                ipoYear = NullCheck(ss[7]) == null ? (short?)null : short.Parse(ss[7]);
-                volume = long.Parse(ss[8], culture);
-                sector = ss[9];
-                industry = ss[10];
+                Exchange = exchange;
+                TimeStamp = timeStamp;
+                Row = row;
             }
         }
 
@@ -201,16 +196,29 @@ namespace Data.Actions.Nasdaq
         }
         private class cEtfRow
         {
-            // "symbol", "name", "LastSale", "netChange", "Change", "TimeStamp"
             public string symbol;
             public string companyName;
             public string lastSalePrice;
-            public float netChange;
+            public string netChange;
             public string percentageChange;
+        }
+
+        private class DbEtfRow
+        {
+            // "symbol", "name", "LastSale", "netChange", "Change", "TimeStamp"
+            private cEtfRow Row;
+            public string Symbol => Row.symbol;
+            public string Name=> NullCheck(Row.companyName);
+            public float LastSale => float.Parse(Row.lastSalePrice, NumberStyles.Any, culture);
+            public float NetChange => float.Parse(Row.netChange, NumberStyles.Any, culture);
+            public float? Change => string.IsNullOrEmpty(Row.percentageChange) ? (float?)null : float.Parse(Row.percentageChange.Replace("%", ""), culture);
             public DateTime TimeStamp;
-            public string Name => NullCheck(companyName);
-            public float LastSale => float.Parse(lastSalePrice, NumberStyles.Any, culture);
-            public float? Change => string.IsNullOrEmpty(percentageChange) ? (float?)null : float.Parse(percentageChange.Replace("%", ""), culture);
+
+            public DbEtfRow(DateTime timeStamp, cEtfRow row)
+            {
+                Row = row;
+                TimeStamp = timeStamp;
+            }
         }
 
         //=====================
