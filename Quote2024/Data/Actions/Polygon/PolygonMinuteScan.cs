@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 using Data.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -19,6 +20,110 @@ namespace Data.Actions.Polygon
         private const string DataFolder = @"E:\Quote\WebData\Minute\Polygon2003\Data\";
 
         public static void Start()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var itemCount = 0;
+            long byteCount = 0;
+            // SevenZipBase.SetLibraryPath(@"7z2301x64.dll");
+
+            Logger.AddMessage($"Started");
+
+            foreach (var oo in GetData())
+            {
+                if (itemCount % 100 == 0)
+                    Logger.AddMessage($"Items: {itemCount}");
+                var o = oo;
+                itemCount++;
+                foreach (var item in o.Item2)
+                    byteCount += item.Item2.Length;
+            }
+            sw.Stop();
+
+            Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}. Bytes: {byteCount:N0}");
+        }
+
+        public static IEnumerable<(string, List<(DateTime, PolygonCommon.cMinuteItem[])>)> GetData()
+        {
+            Task<(string, List<(DateTime, PolygonCommon.cMinuteItem[])>)> task = null;
+            foreach (var oo in GetBytes_ZipFile())
+            {
+                if (task != null)
+                    yield return task.Result;
+
+                task = Task.Run(() =>
+                {
+
+                    var jsonData = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<PolygonCommon.cMinuteRoot>(oo.Item2);
+                    var result = new List<(DateTime, PolygonCommon.cMinuteItem[])>();
+                    foreach (var date in oo.Item3)
+                    {
+                        var fromTicks = CsUtils.GetUnixSecondsFromEstDateTime(date) * 1000;
+                        var toTicks = CsUtils.GetUnixSecondsFromEstDateTime(date.AddDays(1)) * 1000;
+
+                        var data = jsonData.results.Where(a => a.t >= fromTicks && a.t < toTicks).ToArray();
+                        result.Add((date, data));
+                    }
+
+                    return (oo.Item1, result);
+                });
+            }
+
+            if (task != null)
+                yield return task.Result;
+        }
+
+        public static IEnumerable<(string, Byte[], List<DateTime>)> GetBytes_ZipFile()
+        {
+            var foldersAndSymbolsAndDates = new Dictionary<string, Dictionary<string, List<DateTime>>>();
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+                cmd.CommandTimeout = 300;
+                cmd.CommandText = $"SELECT * FROM dbQ2024Minute..MinutePolygonLog WHERE RowStatus IN (2, 3, 4, 5) " +
+                                  $"AND Date BETWEEN '{From:yyyy-MM-dd}' AND '{To:yyyy-MM-dd}' AND " +
+                                  $"[Close]*[Volume]>={MinTurnover * 1000000} AND TradeCount>={MinTradeCount}";
+                using (var rdr = cmd.ExecuteReader())
+                    while (rdr.Read())
+                    {
+                        var folder = ((string)rdr["Folder"]).ToUpper();
+                        var symbol = ((string)rdr["Symbol"]).ToUpper();
+                        var date = (DateTime)rdr["Date"];
+                        if (!foldersAndSymbolsAndDates.ContainsKey(folder))
+                            foldersAndSymbolsAndDates.Add(folder, new Dictionary<string, List<DateTime>>());
+                        var folderData = foldersAndSymbolsAndDates[folder];
+                        if (!folderData.ContainsKey(symbol))
+                            folderData.Add(symbol, new List<DateTime>());
+                        folderData[symbol].Add(date);
+                    }
+            }
+
+            foreach (var kvpFolderAndSymbolAndDate in foldersAndSymbolsAndDates)
+            {
+                var folder = kvpFolderAndSymbolAndDate.Key;
+                var zipFileName = DataFolder + folder + ".zip";
+                var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read);
+                foreach (var kvpSymbolAndDate in kvpFolderAndSymbolAndDate.Value)
+                {
+                    var symbol = kvpSymbolAndDate.Key;
+                    var entry = zip.Entries.First(a => a.Name.Contains("_" + symbol + "_20", StringComparison.InvariantCultureIgnoreCase));
+
+                    using (var entryStream = entry.Open())
+                    {
+                        using (var memstream = new MemoryStream())
+                        {
+                            entryStream.CopyTo(memstream);
+                            yield return (symbol, memstream.ToArray(), kvpSymbolAndDate.Value);
+                        }
+                    }
+                }
+            }
+        }
+
+        #region =========  Old code  =========
+        public static void StartOld()
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -108,5 +213,6 @@ namespace Data.Actions.Polygon
             sw1.Stop();
             Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. {sw1.Elapsed.TotalSeconds:N0} seconds. Items: {counter}. Entries: {counter1}. Recs: {recs:N0}. Bytes: {byteCount:N0}");
         }
+        #endregion
     }
 }
