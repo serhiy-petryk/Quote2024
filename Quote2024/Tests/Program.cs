@@ -17,6 +17,9 @@ namespace Tests
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            Zip.ZipFolderCompressor.Start();
+
             Application.Run(new TestMainForm());
         }
     }

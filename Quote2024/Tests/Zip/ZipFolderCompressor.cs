@@ -13,8 +13,8 @@ namespace Tests.Zip
     {
         public static void Start()
         {
-            // SevenZipCompressor.SetLibraryPath(@"7z2301\x64-dll\7z.dll");
-            SevenZipCompressor.SetLibraryPath(@"7z1900\x64-dll\7z.dll");
+            SevenZipCompressor.SetLibraryPath(@"7z2400\x64-dll\7z.dll");
+            // SevenZipCompressor.SetLibraryPath(@"7z1900\x64-dll\7z.dll");
 
             var sw = new Stopwatch();
             sw.Start();
@@ -98,7 +98,7 @@ namespace Tests.Zip
 
         }
 
-        public static void CreateZip(string sourceName, string targetZipFileName)
+        private  static void CreateZip(string sourceName, string targetZipFileName)
         {
             var p = new ProcessStartInfo();
             // p.FileName = "7za-x64.exe";
@@ -115,7 +115,7 @@ namespace Tests.Zip
             x.WaitForExit();
         }
 
-        public static void CreateZipFromFile(string sourceFileName, string targetZipFileName)
+        private static void CreateZipFromFile(string sourceFileName, string targetZipFileName)
         {
             var sourceName = Path.GetFileName(sourceFileName);
 
@@ -152,7 +152,7 @@ namespace Tests.Zip
             }*/
         }
 
-        public static string ZipFolder(string folderName)
+        private static string ZipFolder(string folderName)
         {
             var zipFn = (folderName.EndsWith("\\") || folderName.EndsWith("/")
                             ? folderName.Substring(0, folderName.Length - 1)

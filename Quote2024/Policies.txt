@@ -21,6 +21,8 @@ CREATE ZIP FROM DISK FOLDER: Use SevenZipSharp (7z.dll) -> better compression, f
 Test results for CreateZip from disk folder (~6 GB data, ~1 GB zip file):
 	- 64 bits (1900 7-zip version, 2019-02-21): 7za.exe, 7z.exe, 7z.dll (SevenZipSharp): 215 secs (first run, disk cache empty), 180 secs (second run with full disk cache)
 	- 64 bits (2301 7-zip version, 2023-06-20): 7za.exe, 7z.exe, 7z.dll (SevenZipSharp): 270 secs (first run, disk cache empty), 175 secs (second run with full disk cache)
+	- 64 bits (2400 7-zip version, 2024-01-30): 7z.dll (SevenZipSharp): 270 secs (first run, disk cache empty), 218 secs (second run with full disk cache)
+	- 0920 (2009 year), 1604 (2016 year) versions of 7-zip were also tested
 	- System.IO.Compression.ZipFile: 336 secs, zip file is 20% bigger than 7zip archive
 
 Performance doesn't depend on 7z method type (7za.exe, 7z.exe, 7z.dll (Squid-Box.SevenZipSharp or Squid-Box.SevenZipSharp.Lite)). It depends on 7zip version only.
