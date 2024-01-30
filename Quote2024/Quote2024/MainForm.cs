@@ -166,8 +166,8 @@ namespace Quote2024
         {
             btnTest.Enabled = false;
 
-            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
-            Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\GithubNasdaqStockScreener.zip");
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
+            // Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\GithubNasdaqStockScreener.zip");
 
             btnTest.Enabled = true;
         }

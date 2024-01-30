@@ -28,6 +28,9 @@ namespace Data.Helpers
 
         public static void ZipVirtualFileEntries(string zipFileName, IEnumerable<VirtualFileEntry> entries)
         {
+            // -- Very slowly: another way for 7za -> use Process/ProcessStartInfo class
+            // see https://stackoverflow.com/questions/71343454/how-do-i-use-redirectstandardinput-when-running-a-process-with-administrator-pri
+
             using (var zipArchive = System.IO.Compression.ZipFile.Open(zipFileName, ZipArchiveMode.Update))
                 foreach (var entry in entries)
                 {
@@ -43,12 +46,23 @@ namespace Data.Helpers
                 }
         }
 
+        #region =========  Extensions for ZipArchiveEntry  ===========
+        public static IEnumerable<string> GetLinesOfZipEntry(this ZipArchiveEntry entry)
+        {
+            using (var entryStream = entry.Open())
+            using (var reader = new StreamReader(entryStream, System.Text.Encoding.UTF8, true))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                    yield return line;
+            }
+        }
         public static string GetContentOfZipEntry(this ZipArchiveEntry entry)
         {
             using (var entryStream = entry.Open())
             using (var reader = new StreamReader(entryStream, System.Text.Encoding.UTF8, true))
                 return reader.ReadToEnd();
         }
-
+        #endregion
     }
 }

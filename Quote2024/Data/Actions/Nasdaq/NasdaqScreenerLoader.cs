@@ -10,6 +10,8 @@ namespace Data.Actions.Nasdaq
 {
     public class NasdaqScreenerLoader
     {
+        // Nasdaq screener history (from Feb 2, 2021): https://github.com/rreichel3/US-Stock-Symbols
+
         // Exchanges: 'AMEX','BAT','DUAL LISTED','NASDAQ','NASDAQ-CM','NASDAQ-GM','NASDAQ-GS','NYSE','PSE'
         // 'NASDAQ-CM','NASDAQ-GM','NASDAQ-GS' are part of 'NASDAQ'
         // 'PSE' is empty
