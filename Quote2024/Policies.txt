@@ -9,6 +9,9 @@ Use SpanJson -> https://github.com/Tornhoof/SpanJson -> Very fast, simple -> Ben
 Libraries:
 7-Zip.CommandLine -> fastest write and better compression -> only save from disk folder
 https://github.com/squid-box/SevenZipSharp -> .NetCore wrapper for 7-zip -> fastest write and better compression -> best for save from disk folder and from RAM
+Examples of code: https://github.com/tomap/SevenZipSharp/blob/master/SevenZipTest/Program.cs (for .Net Framework 4.5)
+SevenZipSharp has event for execution progress ant others (SevenZipCompressor.FileCompressionStarted, ..)
+
 System.IO.Compression.ZipFile -> fastest read
 
 READ: Use  System.IO.Compression -> faster then 7za, SevenZipExtractor (wrapper of 7-Zip for read only)
@@ -20,6 +23,6 @@ Test results for CreateZip from disk folder (~6 GB data, ~1 GB zip file):
 	- 64 bits (2301 7-zip version, 2023-06-20): 7za.exe, 7z.exe, 7z.dll (SevenZipSharp): 270 secs (first run, disk cache empty), 175 secs (second run with full disk cache)
 	- System.IO.Compression.ZipFile: 336 secs, zip file is 20% bigger than 7zip archive
 
-Performance doesn't depend on 7z method type (7za.exe, 7z.exe, 7z.dll (SevenZipSharp)). It depends on 7zip version only.
+Performance doesn't depend on 7z method type (7za.exe, 7z.exe, 7z.dll (Squid-Box.SevenZipSharp or Squid-Box.SevenZipSharp.Lite)). It depends on 7zip version only.
 
 
