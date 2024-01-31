@@ -67,7 +67,28 @@ namespace Data.Actions.Polygon
 
         public class cMinuteItem
         {
-            public long t;
+            /*private const long MillisecondsInDay = 24 * 3600 * 1000;
+            private static readonly DateTime OffsetDateTime = new DateTime(1970, 1, 1);
+
+            private long _t;
+            public DateTime _dateTime;
+            public short _date; // day from 1/1/1970
+            public short _time; // time offset in minutes
+
+            public long t
+            {
+                get => _t;
+                set
+                {
+                    _t = value;
+                    _dateTime = CsUtils.GetEstDateTimeFromUnixSeconds(value / 1000);
+                    var ticks = (_dateTime - OffsetDateTime).Ticks;
+                    _date = Convert.ToInt16(ticks / TimeSpan.TicksPerDay);
+                    _time = Convert.ToInt16((ticks - _date * TimeSpan.TicksPerDay) / TimeSpan.TicksPerMinute);
+                }
+            }*/
+
+            public long t; // unix utc milliseconds
             public float o;
             public float h;
             public float l;
@@ -76,19 +97,9 @@ namespace Data.Actions.Polygon
             public float vw;
             public int n;
 
-            /*private DateTime? _date;
-
-            public DateTime Date
-            {
-                get
-                {
-                    if (!_date.HasValue)
-                        _date = CsUtils.GetEstDateTimeFromUnixSeconds(t / 1000).Date;
-                    return _date.Value;
-                }
-            }
-            */
-            public DateTime DateTime => CsUtils.GetEstDateTimeFromUnixSeconds(t / 1000);
+            /*public short Date => _date; // day from 1/1/1970
+            public short Time => _time; // time offset in minutes
+            public DateTime DateTime => _dateTime;*/
         }
         #endregion
     }

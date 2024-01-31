@@ -21,30 +21,35 @@ namespace Data.Helpers
             return keys;
         }
 
-        private static readonly DateTime OffsetWebTime = new DateTime(1970, 1, 1);
         private static readonly TimeZoneInfo EstTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-        // private static readonly TimeZoneInfo EstTimeZone = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time");
+        /// <summary>
+        /// Get NewYork time from Unix UTC milliseconds
+        /// </summary>
+        /// <param name="unixTimeInSeconds"></param>
+        /// <returns></returns>
         public static DateTime GetEstDateTimeFromUnixSeconds(long unixTimeInSeconds)
         {
             var aa2 = DateTimeOffset.FromUnixTimeSeconds(unixTimeInSeconds);
-            var aa3 = aa2 + EstTimeZone.GetUtcOffset(aa2);
-            return aa3.DateTime;
+            var dateTimeOffset = aa2 + EstTimeZone.GetUtcOffset(aa2);
+            return dateTimeOffset.DateTime;
         }
 
-        public static long GetUnixSecondsFromEtcDateTime(DateTime dt)
-        {
-            var seconds = (dt - OffsetWebTime).TotalSeconds + (EstTimeZone.GetUtcOffset(dt)).TotalSeconds;
-            var a1 = (new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeSeconds();
-            return Convert.ToInt64(seconds);
-        }
-
+        /// <summary>
+        /// Get Unix UTC milliseconds from NewYork time
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static long GetUnixSecondsFromEstDateTime(DateTime dt)
         {
-            // var seconds = (dt - OffsetWebTime).TotalSeconds + (EstTimeZone.GetUtcOffset(dt)).TotalSeconds;
-            var a1 = (new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeSeconds();
-            return Convert.ToInt64(a1);
+            var unixTimeSeconds = (new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeSeconds();
+            return Convert.ToInt64(unixTimeSeconds);
         }
 
+        /// <summary>
+        /// For date id in downloaded filenames
+        /// </summary>
+        /// <param name="hourOffset"></param>
+        /// <returns></returns>
         public static Tuple<DateTime, string, string> GetTimeStamp(int hourOffset = -9) => Tuple.Create(
             DateTime.Now.AddHours(hourOffset), DateTime.Now.AddHours(hourOffset).ToString("yyyyMMdd"),
             DateTime.Now.AddHours(0).ToString("yyyyMMddHHmmss"));
