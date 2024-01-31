@@ -65,8 +65,9 @@ namespace Data.Helpers
             }
         }
 
-        private static bool IsJsonFormat(byte[] response) =>
-            !(response.Length < 2 || response[0] != 0x7b || response[response.Length - 1] != 0x7d);
+        private static bool IsJsonFormat(byte[] response) => response.Length > 1 &&
+            ((response[0] == '{' && response[response.Length - 1] == '}') ||
+             (response[0] == '[' && response[response.Length - 1] == ']'));
 
         public class WebClientEx : WebClient
         {
