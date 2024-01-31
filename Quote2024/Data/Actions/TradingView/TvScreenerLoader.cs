@@ -21,11 +21,11 @@ namespace Data.Actions.TradingView
             var zipFileName = $@"E:\Quote\WebData\Screener\TradingView\TVScreener_{timeStamp}.zip";
 
             Logger.AddMessage($"Download data from {URL}");
-            var o = Download.PostToString(URL, parameters);
+            var o = Download.PostToBytes(URL, parameters, true);
             if (o is Exception ex)
                 throw new Exception($"TvScreenerLoader: Error while download from {URL}. Error message: {ex.Message}");
 
-            var entry = new VirtualFileEntryOld( $"{Path.GetFileNameWithoutExtension(zipFileName)}.json", (string)o);
+            var entry = new VirtualFileEntry( $"{Path.GetFileNameWithoutExtension(zipFileName)}.json", (byte[])o);
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
             
             // Parse and save data to database

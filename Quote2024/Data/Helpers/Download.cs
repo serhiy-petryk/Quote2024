@@ -7,7 +7,7 @@ namespace Data.Helpers
 {
     public static class Download
     {
-        public static object DownloadToBytes(string url, bool isXmlHttpRequest = false, CookieContainer cookies = null)
+        public static object DownloadToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieContainer cookies = null)
         {
             using (var wc = new WebClientEx())
             {
@@ -17,7 +17,10 @@ namespace Data.Helpers
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
                 try
                 {
-                    return wc.DownloadData(url);
+                    var response = wc.DownloadData(url);
+                    if (isJson && !IsJsonFormat(response))
+                        throw new Exception($"Downloaded content is not in JSON format");
+                    return response;
                 }
                 catch (Exception ex)
                 {
@@ -59,7 +62,7 @@ namespace Data.Helpers
             }
         }
 
-        public static object PostToString(string url, string parameters, bool isXmlHttpRequest = false)
+        public static object PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false)
         {
             // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
             using (var wc = new WebClientEx())
@@ -71,7 +74,9 @@ namespace Data.Helpers
 
                 try
                 {
-                    var response = wc.UploadString(url, "POST", parameters);
+                    var response = wc.UploadData(url, "POST", wc.Encoding.GetBytes(parameters));
+                    if (isJson && (response.Length < 2 || response[0] != 0x7b || response[response.Length - 1] != 0x7d))
+                        throw new Exception($"Downloaded content is not in JSON format");
                     return response;
                 }
                 catch (Exception ex)
@@ -86,6 +91,9 @@ namespace Data.Helpers
                 }
             }
         }
+
+        private static bool IsJsonFormat(byte[] response) =>
+            !(response.Length < 2 || response[0] != 0x7b || response[response.Length - 1] != 0x7d);
 
         public class WebClientEx : WebClient
         {
