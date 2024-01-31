@@ -12,11 +12,6 @@ namespace Data.Helpers
 
         public static bool IsInDesignMode => LicenseManager.UsageMode == LicenseUsageMode.Designtime;
 
-        public static void DisposeAllItems(IEnumerable<IDisposable> items)
-        {
-            foreach (var item in items) item?.Dispose();
-        }
-
         public static string[] GetApiKeys(string dataProvider)
         {
             const string filename = @"E:\Quote\WebData\ApiKeys.txt";

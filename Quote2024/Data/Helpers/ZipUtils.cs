@@ -35,7 +35,8 @@ namespace Data.Helpers
             var tmp = new SevenZipCompressor {ArchiveFormat = OutArchiveFormat.Zip};
             var dict = entries.ToDictionary(a=>a.Name, a=> a.Stream);
             tmp.CompressStreamDictionary(dict, zipFileName);
-            CsUtils.DisposeAllItems(entries);
+
+            foreach (var item in entries) item?.Dispose();
         }
 
         #region =========  Extensions for ZipArchiveEntry  ===========
