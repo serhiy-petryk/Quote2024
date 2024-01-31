@@ -99,7 +99,5 @@ namespace Data.Helpers
                 return request;
             }
         }
-
-
     }
 }

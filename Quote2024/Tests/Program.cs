@@ -18,7 +18,7 @@ namespace Tests
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Zip.ZipFolderCompressor.Start();
+            // Zip.ZipFolderCompressor.Start();
 
             Application.Run(new TestMainForm());
         }
