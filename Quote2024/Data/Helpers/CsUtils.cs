@@ -27,11 +27,10 @@ namespace Data.Helpers
         /// </summary>
         /// <param name="unixTimeInSeconds"></param>
         /// <returns></returns>
-        public static DateTime GetEstDateTimeFromUnixSeconds(long unixTimeInSeconds)
+        public static DateTime GetEstDateTimeFromUnixMilliseconds(long unixTimeInSeconds)
         {
-            var aa2 = DateTimeOffset.FromUnixTimeSeconds(unixTimeInSeconds);
-            var dateTimeOffset = aa2 + EstTimeZone.GetUtcOffset(aa2);
-            return dateTimeOffset.DateTime;
+            var aa2 = DateTimeOffset.FromUnixTimeMilliseconds(unixTimeInSeconds);
+            return (aa2 + EstTimeZone.GetUtcOffset(aa2)).DateTime;
         }
 
         /// <summary>
@@ -39,11 +38,10 @@ namespace Data.Helpers
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
-        public static long GetUnixSecondsFromEstDateTime(DateTime dt)
-        {
-            var unixTimeSeconds = (new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeSeconds();
-            return Convert.ToInt64(unixTimeSeconds);
-        }
+        public static long GetUnixMillisecondsFromEstDateTime(DateTime dt) =>
+            Convert.ToInt64((new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeMilliseconds());
+
+        public const long UnixMillisecondsForOneDay = 86400000L;
 
         /// <summary>
         /// For date id in downloaded filenames

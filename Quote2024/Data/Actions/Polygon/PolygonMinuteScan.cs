@@ -19,14 +19,13 @@ namespace Data.Actions.Polygon
 
         private const string DataFolder = @"E:\Quote\WebData\Minute\Polygon2003\Data\";
 
-        public static void Start()
+        public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetQuotes()
         {
             var sw = new Stopwatch();
             sw.Start();
 
             var itemCount = 0;
             long byteCount = 0;
-            // SevenZipBase.SetLibraryPath(@"7z2301x64.dll");
 
             Logger.AddMessage($"Started");
 
@@ -34,9 +33,34 @@ namespace Data.Actions.Polygon
             {
                 if (itemCount % 100 == 0)
                     Logger.AddMessage($"Items: {itemCount}");
-                var o = oo;
                 itemCount++;
-                foreach (var item in o.Item2)
+                foreach (var item in oo.Item2)
+                {
+                    // byteCount += item.Item2.Length;
+                    yield return (oo.Item1, item.Item1, item.Item2);
+                }
+            }
+            sw.Stop();
+
+            Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}. Bytes: {byteCount:N0}");
+        }
+
+        public static void Start()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var itemCount = 0;
+            long byteCount = 0;
+
+            Logger.AddMessage($"Started");
+
+            foreach (var oo in GetData())
+            {
+                if (itemCount % 100 == 0)
+                    Logger.AddMessage($"Items: {itemCount}");
+                itemCount++;
+                foreach (var item in oo.Item2)
                     byteCount += item.Item2.Length;
             }
             sw.Stop();
@@ -54,14 +78,12 @@ namespace Data.Actions.Polygon
 
                 task = Task.Run(() =>
                 {
-
                     var jsonData = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<PolygonCommon.cMinuteRoot>(oo.Item2);
                     var result = new List<(DateTime, PolygonCommon.cMinuteItem[])>();
                     foreach (var date in oo.Item3)
                     {
-                        var fromTicks = CsUtils.GetUnixSecondsFromEstDateTime(date) * 1000;
-                        var toTicks = CsUtils.GetUnixSecondsFromEstDateTime(date.AddDays(1)) * 1000;
-
+                        var fromTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date);
+                        var toTicks = fromTicks + CsUtils.UnixMillisecondsForOneDay; // next day
                         var data = jsonData.results.Where(a => a.t >= fromTicks && a.t < toTicks).ToArray();
                         result.Add((date, data));
                     }
@@ -74,145 +96,67 @@ namespace Data.Actions.Polygon
                 yield return task.Result;
         }
 
-        public static IEnumerable<(string, Byte[], List<DateTime>)> GetBytes_ZipFile()
+        public static IEnumerable<(string, byte[], List<DateTime>)> GetBytes_ZipFile()
         {
-            var foldersAndSymbolsAndDates = new Dictionary<string, Dictionary<string, List<DateTime>>>();
-            using (var conn = new SqlConnection(Settings.DbConnectionString))
-            using (var cmd = conn.CreateCommand())
-            {
-                conn.Open();
-                cmd.CommandTimeout = 300;
-                cmd.CommandText = $"SELECT * FROM dbQ2024Minute..MinutePolygonLog WHERE RowStatus IN (2, 3, 4, 5) " +
-                                  $"AND Date BETWEEN '{From:yyyy-MM-dd}' AND '{To:yyyy-MM-dd}' AND " +
-                                  $"[Close]*[Volume]>={MinTurnover * 1000000} AND TradeCount>={MinTradeCount}";
-                using (var rdr = cmd.ExecuteReader())
-                    while (rdr.Read())
-                    {
-                        var folder = ((string)rdr["Folder"]).ToUpper();
-                        var symbol = ((string)rdr["Symbol"]).ToUpper();
-                        var date = (DateTime)rdr["Date"];
-                        if (!foldersAndSymbolsAndDates.ContainsKey(folder))
-                            foldersAndSymbolsAndDates.Add(folder, new Dictionary<string, List<DateTime>>());
-                        var folderData = foldersAndSymbolsAndDates[folder];
-                        if (!folderData.ContainsKey(symbol))
-                            folderData.Add(symbol, new List<DateTime>());
-                        folderData[symbol].Add(date);
-                    }
-            }
-
-            foreach (var kvpFolderAndSymbolAndDate in foldersAndSymbolsAndDates)
-            {
-                var folder = kvpFolderAndSymbolAndDate.Key;
-                var zipFileName = DataFolder + folder + ".zip";
-                var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read);
-                foreach (var kvpSymbolAndDate in kvpFolderAndSymbolAndDate.Value)
-                {
-                    var symbol = kvpSymbolAndDate.Key;
-                    var entry = zip.Entries.First(a => a.Name.Contains("_" + symbol + "_20", StringComparison.InvariantCultureIgnoreCase));
-
-                    using (var entryStream = entry.Open())
-                    {
-                        using (var memstream = new MemoryStream())
-                        {
-                            entryStream.CopyTo(memstream);
-                            yield return (symbol, memstream.ToArray(), kvpSymbolAndDate.Value);
-                        }
-                    }
-                }
-            }
-        }
-
-        #region =========  Old code  =========
-        public static void StartOld()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            Logger.AddMessage($"Started");
-
-            var ids = new Dictionary<string, Dictionary<string, List<DateTime>>>();
-            var counter = 0;
-            var counter1 = 0;
-            var recs = 0;
-            var byteCount = 0;
-            Stopwatch sw1 = null;
-            ZipArchive zip = null;
+            // var foldersAndSymbolsAndDates = new Dictionary<string, Dictionary<string, List<DateTime>>>();
             string lastFolder = null;
             string lastSymbol = null;
-            PolygonCommon.cMinuteRoot jsonData = null;
+            byte[] lastBytes = null;
+            List<DateTime> lastDates = null;
+            ZipArchive zip = null;
 
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
                 cmd.CommandTimeout = 300;
-                cmd.CommandText = $"SELECT * FROM dbQ2024Minute..MinutePolygonLog WHERE RowStatus IN (2, 3, 4, 5) " +
+                cmd.CommandText = $"SELECT * FROM dbQ2024Minute..MinutePolygonLog WHERE RowStatus IN (2, 5) " +
                                   $"AND Date BETWEEN '{From:yyyy-MM-dd}' AND '{To:yyyy-MM-dd}' AND " +
-                                  $"[Close]*[Volume]>={MinTurnover * 1000000} AND TradeCount>={MinTradeCount}" +
-                                  $"ORDER BY Folder, Symbol, Date";
+                                  $"[Close]*[Volume]>={MinTurnover * 1000000} AND TradeCount>={MinTradeCount} " +
+                                  "ORDER BY Folder, Symbol, Date";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
-                        counter++;
-                        if (sw1 == null)
-                        {
-                            sw1 = new Stopwatch();
-                            sw1.Start();
-                        }
                         var folder = ((string)rdr["Folder"]).ToUpper();
                         var symbol = ((string)rdr["Symbol"]).ToUpper();
                         var date = (DateTime)rdr["Date"];
-                        //var fromTicks = CsUtils.GetUnixSecondsFromEstDateTime(date)*1000;
-                        //var toTicks = CsUtils.GetUnixSecondsFromEstDateTime(date.AddDays(1))*1000;
 
-                        if (!string.Equals(folder, lastFolder))
+                        if (!string.Equals(lastFolder, folder))
                         {
-                            Logger.AddMessage($"Data: {symbol}/{date:yyyy-MM-dd}.");
-                            zip?.Dispose();
                             lastSymbol = null;
+                            lastFolder = folder;
+
                             var zipFileName = DataFolder + folder + ".zip";
                             zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read);
                         }
 
-                        if (!string.Equals(symbol, lastSymbol))
+                        if (!string.Equals(lastSymbol, symbol))
                         {
-                            counter1++;
-                            var entry = zip.Entries.First(a =>a.Name.Contains("_" + symbol + "_20", StringComparison.InvariantCultureIgnoreCase));
+                            if (lastBytes != null)
+                                yield return GetResults();
 
+                            lastSymbol = symbol;
+                            lastDates = new List<DateTime>();
+                            var entry = zip.Entries.First(a => a.Name.Contains("_" + symbol + "_20", StringComparison.InvariantCultureIgnoreCase));
                             using (var entryStream = entry.Open())
-                            using (var reader = new StreamReader(entryStream, System.Text.Encoding.UTF8, true))
                             {
                                 using (var memstream = new MemoryStream())
                                 {
-                                    reader.BaseStream.CopyTo(memstream);
-                                    var bytes = memstream.ToArray();
-                                    jsonData = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<PolygonCommon.cMinuteRoot>(bytes);
-                                    byteCount += bytes.Length;
+                                    entryStream.CopyTo(memstream);
+                                    lastBytes = memstream.ToArray();
                                 }
                             }
-                            if (jsonData.adjusted || jsonData.status != "OK")
-                                    throw new Exception("Check parser");
                         }
 
-                        // var data = jsonData.results.Where(a => a.Date == date).ToArray();
-                        //var data = jsonData.results.Where(a => a.t>=fromTicks && a.t<toTicks).ToArray();
-                        // recs += data.Length;
-                        /*var data = new List<PolygonCommon.cMinuteItem2>();
-                        foreach(var item in jsonData.results)
-                            if (item.DateTime.Date == date)
-                                data.Add(item);*/
-
-                        lastFolder = folder;
-                        lastSymbol = symbol;
+                        lastDates.Add(date);
                     }
             }
 
-            zip?.Dispose();
+            if (lastBytes != null)
+                yield return GetResults();
 
-            sw.Stop();
-            sw1.Stop();
-            Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. {sw1.Elapsed.TotalSeconds:N0} seconds. Items: {counter}. Entries: {counter1}. Recs: {recs:N0}. Bytes: {byteCount:N0}");
+            (string, byte[], List<DateTime>) GetResults() => (lastSymbol, lastBytes, lastDates);
         }
-        #endregion
+
     }
 }
