@@ -35,33 +35,6 @@ namespace Data.Helpers
             }
         }
 
-        public static object DownloadToString(string url, bool isXmlHttpRequest = false, CookieContainer cookies = null)
-        {
-            using (var wc = new WebClientEx())
-            {
-                wc.Encoding = System.Text.Encoding.UTF8;
-                wc.Cookies = cookies;
-                wc.IsXmlHttpRequest = isXmlHttpRequest;
-                wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                try
-                {
-                    var bb = wc.DownloadData(url);
-                    var response = Encoding.UTF8.GetString(bb);
-                    return response;
-                }
-                catch (Exception ex)
-                {
-                    if (ex is WebException)
-                    {
-                        Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
-                        return ex;
-                    }
-                    else
-                        throw ex;
-                }
-            }
-        }
-
         public static object PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false)
         {
             // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp

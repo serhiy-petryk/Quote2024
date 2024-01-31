@@ -38,26 +38,6 @@ namespace Data.Helpers
             CsUtils.DisposeAllItems(entries);
         }
 
-        public static void ZipVirtualFileEntries(string zipFileName, IEnumerable<VirtualFileEntryOld> entries)
-        {
-            // -- Very slowly: another way for 7za -> use Process/ProcessStartInfo class
-            // see https://stackoverflow.com/questions/71343454/how-do-i-use-redirectstandardinput-when-running-a-process-with-administrator-pri
-
-            using (var zipArchive = System.IO.Compression.ZipFile.Open(zipFileName, ZipArchiveMode.Update))
-                foreach (var entry in entries)
-                {
-                    var oldEntries = zipArchive.Entries.Where(a =>
-                        string.Equals(a.FullName, entry.Name, StringComparison.InvariantCultureIgnoreCase)).ToArray();
-                    foreach (var o in oldEntries)
-                        o.Delete();
-
-                    var zipEntry = zipArchive.CreateEntry(entry.Name);
-                    using (var writer = new StreamWriter(zipEntry.Open()))
-                        writer.Write(entry.Content);
-                    zipEntry.LastWriteTime = new DateTimeOffset(entry.Timestamp);
-                }
-        }
-
         #region =========  Extensions for ZipArchiveEntry  ===========
         public static IEnumerable<string> GetLinesOfZipEntry(this ZipArchiveEntry entry)
         {

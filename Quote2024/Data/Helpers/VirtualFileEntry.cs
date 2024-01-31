@@ -29,27 +29,4 @@ namespace Data.Helpers
 
         public void Dispose() => _stream?.Dispose();
     }
-
-    public class VirtualFileEntryOld
-    {
-        public readonly string Name;
-        public readonly string Content;
-
-        public Stream Stream
-        {
-            get
-            {
-                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(Content)))
-                    return stream;
-            }
-        }
-
-        public readonly DateTime Timestamp = DateTime.Now;
-
-        public VirtualFileEntryOld(string name, string content)
-        {
-            Name = name;
-            Content = content;
-        }
-    }
 }
