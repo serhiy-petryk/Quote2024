@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -166,9 +167,23 @@ namespace Quote2024
         {
             btnTest.Enabled = false;
 
-            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
+            var sw = new Stopwatch();
+            sw.Start();
+
+            /*var task1 = Task.Run((() =>
+            {
+                var data = Data.Actions.Polygon.PolygonMinuteScan.GetQuotes().ToArray();
+            }));
+            await task1;*/
+
+            await Task.Factory.StartNew(Data.Scaners.TheFirstScanner.Start);
+
+            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
             // Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\GithubNasdaqStockScreener.zip");
 
+            sw.Stop();
+            var d1 = sw.ElapsedMilliseconds;
+            Debug.Print($"Test duration: {d1:N0} milliseconds");
             btnTest.Enabled = true;
         }
 

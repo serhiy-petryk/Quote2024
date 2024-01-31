@@ -97,6 +97,7 @@ namespace Data.Actions.Polygon
             public float vw;
             public int n;
 
+            public DateTime DateTime => CsUtils.GetEstDateTimeFromUnixMilliseconds(t);
             /*public short Date => _date; // day from 1/1/1970
             public short Time => _time; // time offset in minutes
             public DateTime DateTime => _dateTime;*/

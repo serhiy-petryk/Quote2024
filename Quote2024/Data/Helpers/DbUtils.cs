@@ -7,22 +7,25 @@ namespace Data.Helpers
 {
     public static class DbUtils
     {
-        public static void ClearAndSaveToDbTable<T>(IEnumerable<T> items, string destinationTable, params string[] properties)
-        {
-            using (var conn = new SqlConnection(Settings.DbConnectionString))
-                ClearAndSaveToDbTable(conn, items, destinationTable, properties);
-        }
+        public static void ClearAndSaveToDbTable<T>(IEnumerable<T> items, string destinationTable, params string[] properties) =>
+            SaveToDbTable(items, destinationTable, true, properties);
 
-        public static void ClearAndSaveToDbTable<T>(SqlConnection conn, IEnumerable<T> items, string destinationTable, params string[] properties)
+        public static void SaveToDbTable<T>(IEnumerable<T> items, string destinationTable, params string[] properties) =>
+            SaveToDbTable(items, destinationTable, false, properties);
+
+        public static void SaveToDbTable<T>(IEnumerable<T> items, string destinationTable, bool clearTable, params string[] properties)
         {
             using (var reader = ObjectReader.Create(items, properties))
-            using (var cmd = conn.CreateCommand())
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
             {
                 if (conn.State != ConnectionState.Open) conn.Open();
-
-                cmd.CommandTimeout = 150;
-                cmd.CommandText = $"truncate table {destinationTable}";
-                cmd.ExecuteNonQuery();
+                if (clearTable)
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandTimeout = 150;
+                        cmd.CommandText = $"truncate table {destinationTable}";
+                        cmd.ExecuteNonQuery();
+                    }
 
                 using (var bcp = new SqlBulkCopy(conn))
                 {
@@ -50,7 +53,5 @@ namespace Data.Helpers
                 cmd.ExecuteNonQuery();
             }
         }
-
-
     }
 }
