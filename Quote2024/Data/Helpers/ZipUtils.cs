@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using SevenZip;
 using SpanJson.Resolvers;
 
 namespace Data.Helpers
@@ -27,6 +28,17 @@ namespace Data.Helpers
         public static T DeserializeJson<T>(string entryContent) => SpanJson.JsonSerializer.Generic.Utf16.Deserialize<T>(entryContent);
 
         public static void ZipVirtualFileEntries(string zipFileName, IEnumerable<VirtualFileEntry> entries)
+        {
+            // -- Very slowly: another way for 7za -> use Process/ProcessStartInfo class
+            // see https://stackoverflow.com/questions/71343454/how-do-i-use-redirectstandardinput-when-running-a-process-with-administrator-pri
+
+            var tmp = new SevenZipCompressor {ArchiveFormat = OutArchiveFormat.Zip};
+            var dict = entries.ToDictionary(a=>a.Name, a=> a.Stream);
+            tmp.CompressStreamDictionary(dict, zipFileName);
+            CsUtils.DisposeAllItems(entries);
+        }
+
+        public static void ZipVirtualFileEntries(string zipFileName, IEnumerable<VirtualFileEntryOld> entries)
         {
             // -- Very slowly: another way for 7za -> use Process/ProcessStartInfo class
             // see https://stackoverflow.com/questions/71343454/how-do-i-use-redirectstandardinput-when-running-a-process-with-administrator-pri

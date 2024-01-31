@@ -7,6 +7,31 @@ namespace Data.Helpers
 {
     public static class Download
     {
+        public static object DownloadToBytes(string url, bool isXmlHttpRequest = false, CookieContainer cookies = null)
+        {
+            using (var wc = new WebClientEx())
+            {
+                wc.Encoding = System.Text.Encoding.UTF8;
+                wc.Cookies = cookies;
+                wc.IsXmlHttpRequest = isXmlHttpRequest;
+                wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                try
+                {
+                    return wc.DownloadData(url);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is WebException)
+                    {
+                        Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
+                        return ex;
+                    }
+                    else
+                        throw ex;
+                }
+            }
+        }
+
         public static object DownloadToString(string url, bool isXmlHttpRequest = false, CookieContainer cookies = null)
         {
             using (var wc = new WebClientEx())

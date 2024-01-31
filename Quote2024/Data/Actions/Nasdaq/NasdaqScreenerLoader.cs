@@ -26,32 +26,32 @@ namespace Data.Actions.Nasdaq
             Logger.AddMessage($"Started");
 
             var timeStamp = CsUtils.GetTimeStamp();
-            var virtualFileEntries = new Dictionary<string, VirtualFileEntry>();
 
             // Download data
+            var virtualFileEntries = new List<VirtualFileEntry>();
             foreach (var exchange in Exchanges)
             {
                 var stockUrl = string.Format(StockUrlTemplate, exchange);
                 Logger.AddMessage($"Download STOCK data for {exchange} from {stockUrl}");
-                var o = Download.DownloadToString(stockUrl, true);
+                var o = Download.DownloadToBytes(stockUrl, true);
                 if (o is Exception ex)
                     throw new Exception($"NasdaqScreenerLoader: Error while download from {StockUrlTemplate}. Error message: {ex.Message}");
 
-                var entry = new VirtualFileEntry($"StockScreener_{exchange}_{timeStamp.Item2}.json", (string)o);
-                virtualFileEntries.Add(entry.Name, entry);
+                var entry = new VirtualFileEntry($"StockScreener_{exchange}_{timeStamp.Item2}.json", (byte[])o);
+                virtualFileEntries.Add(entry);
             }
 
             Logger.AddMessage($"Download ETF data from {EtfUrl}");
-            var o2 = Download.DownloadToString(EtfUrl, true);
+            var o2 = Download.DownloadToBytes(EtfUrl, true);
             if (o2 is Exception ex2)
                 throw new Exception($"NasdaqScreenerLoader: Error while download from {EtfUrl}. Error message: {ex2.Message}");
 
-            var entry2 = new VirtualFileEntry($"EtfScreener_{timeStamp.Item2}.json", (string)o2);
-            virtualFileEntries.Add(entry2.Name, entry2);
+            var entry2 = new VirtualFileEntry($"EtfScreener_{timeStamp.Item2}.json", (byte[])o2);
+            virtualFileEntries.Add(entry2);
 
             // Zip data
             var zipFileName = $@"E:\Quote\WebData\Screener\Nasdaq\NasdaqScreener_{timeStamp.Item2}.zip";
-            ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries.Values);
+            ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries);
 
             // Parse and save data to database
             Logger.AddMessage($"Parse and save files to database");
@@ -211,7 +211,8 @@ namespace Data.Actions.Nasdaq
             private cEtfRow Row;
             public string Symbol => Row.symbol;
             public string Name=> NullCheck(Row.companyName);
-            public float LastSale => float.Parse(Row.lastSalePrice, NumberStyles.Any, culture);
+
+            public float? LastSale => string.Equals(Row.lastSalePrice, "$")? (float?) null : float.Parse(Row.lastSalePrice, NumberStyles.Any, culture);
             public float NetChange => float.Parse(Row.netChange, NumberStyles.Any, culture);
             public float? Change => string.IsNullOrEmpty(Row.percentageChange) ? (float?)null : float.Parse(Row.percentageChange.Replace("%", ""), culture);
             public DateTime TimeStamp;

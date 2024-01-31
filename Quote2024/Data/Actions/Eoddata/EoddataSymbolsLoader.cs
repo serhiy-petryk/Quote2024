@@ -17,7 +17,7 @@ namespace Data.Actions.Eoddata
             Logger.AddMessage($"Started");
 
             var timeStamp = CsUtils.GetTimeStamp();
-            var virtualFileEntries = new List<VirtualFileEntry>();
+            var virtualFileEntries = new List<VirtualFileEntryOld>();
             var zipFileName = $@"E:\Quote\WebData\Symbols\Eoddata\SymbolsEoddata_{timeStamp.Item2}.zip";
 
             // Prepare cookies
@@ -32,7 +32,7 @@ namespace Data.Actions.Eoddata
                 if (o is Exception ex)
                     throw new Exception($"EoddataSymbolsLoader: Error while download from {url}. Error message: {ex.Message}");
 
-                var entry = new VirtualFileEntry($@"{Path.GetFileNameWithoutExtension(zipFileName)}\{exchange}_{timeStamp.Item2}.txt", (string)o);
+                var entry = new VirtualFileEntryOld($@"{Path.GetFileNameWithoutExtension(zipFileName)}\{exchange}_{timeStamp.Item2}.txt", (string)o);
                 virtualFileEntries.Add(entry);
             }
 

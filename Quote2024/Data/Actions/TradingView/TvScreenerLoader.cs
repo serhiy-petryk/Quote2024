@@ -25,7 +25,7 @@ namespace Data.Actions.TradingView
             if (o is Exception ex)
                 throw new Exception($"TvScreenerLoader: Error while download from {URL}. Error message: {ex.Message}");
 
-            var entry = new VirtualFileEntry( $"{Path.GetFileNameWithoutExtension(zipFileName)}.json", (string)o);
+            var entry = new VirtualFileEntryOld( $"{Path.GetFileNameWithoutExtension(zipFileName)}.json", (string)o);
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
             
             // Parse and save data to database

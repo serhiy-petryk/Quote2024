@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,14 @@ namespace Data.Helpers
 {
     public static class CsUtils
     {
+        public static string CurrentArchitecture = IntPtr.Size == 4 ? "x86" : "x64";
+
         public static bool IsInDesignMode => LicenseManager.UsageMode == LicenseUsageMode.Designtime;
+
+        public static void DisposeAllItems(IEnumerable<IDisposable> items)
+        {
+            foreach (var item in items) item?.Dispose();
+        }
 
         public static string[] GetApiKeys(string dataProvider)
         {
