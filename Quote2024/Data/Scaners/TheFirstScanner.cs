@@ -14,7 +14,7 @@ namespace Data.Scaners
         public static void Start()
         {
             var startFrom = new TimeSpan(9, 50, 0);
-            var startTo = new TimeSpan(10, 0, 0);
+            var startTo = new TimeSpan(10, 30, 0);
 
             var tempTS = startFrom;
             var startTimeSpans = new List<TimeSpan>();
@@ -39,6 +39,8 @@ namespace Data.Scaners
                 var date = oo.Item2;
 
                 var endTimeSpans = Settings.ShortenedDays.ContainsKey(date) ? endTimeSpansShortened : endTimeSpansCommon;
+                var endMarketDateTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.GetMarketEndTime(date)));
+
                 var results = new List<TheFirstScanner>();
                 foreach (var o1 in startTimeSpans)
                 foreach (var o2 in endTimeSpans)
@@ -49,33 +51,38 @@ namespace Data.Scaners
 
                 resultsCount += results.Count;
                 foreach (var quote in quotes)
-                foreach (var result in results)
                 {
-                    if (quote.t < result._fromUnixMilliseconds || result.Final.HasValue)
-                        continue;
+                    if (quote.t >= endMarketDateTicks)
+                        break;
 
-                    if (quote.t < result._toUnixMilliseconds)
+                    foreach (var result in results)
                     {
-                        result.Count++;
-                        result.TradeCount += quote.n;
-                        if (result.Count == 1)
+                        if (quote.t < result._fromUnixMilliseconds || result.Final.HasValue)
+                            continue;
+
+                        if (quote.t < result._toUnixMilliseconds)
                         {
-                            result.Open = quote.o;
-                            result.High = quote.h;
-                            result.Low = quote.l;
-                            result.Close = quote.c;
+                            result.Count++;
+                            result.TradeCount += quote.n;
+                            if (result.Count == 1)
+                            {
+                                result.Open = quote.o;
+                                result.High = quote.h;
+                                result.Low = quote.l;
+                                result.Close = quote.c;
+                            }
+                            else
+                            {
+                                if (quote.h > result.High) result.High = quote.h;
+                                if (quote.l < result.Low) result.Low = quote.l;
+                                result.Close = quote.c;
+                            }
                         }
                         else
                         {
-                            if (quote.h > result.High) result.High = quote.h;
-                            if (quote.l < result.Low) result.Low = quote.l;
-                            result.Close = quote.c;
+                            result.Final = quote.o;
+                            result.FinalTime = CsUtils.GetEstDateTimeFromUnixMilliseconds(quote.t).TimeOfDay;
                         }
-                    }
-                    else
-                    {
-                        result.Final = quote.o;
-                        result.FinalTime = CsUtils.GetEstDateTimeFromUnixMilliseconds(quote.t).TimeOfDay;
                     }
                 }
 
@@ -122,7 +129,6 @@ namespace Data.Scaners
             Date = date;
             From = from;
             To = to;
-
             _fromUnixMilliseconds = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(from));
             _toUnixMilliseconds = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(to));
         }

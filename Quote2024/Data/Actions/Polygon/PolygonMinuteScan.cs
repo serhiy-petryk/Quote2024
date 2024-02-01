@@ -12,8 +12,8 @@ namespace Data.Actions.Polygon
 {
     public static class PolygonMinuteScan
     {
-        private static DateTime From = new DateTime(2023, 1, 1);
-        private static DateTime To = new DateTime(2023, 3, 1);
+        private static DateTime From = new DateTime(2023, 7, 1);
+        private static DateTime To = new DateTime(2023, 12, 29);
         private const int MinTurnover = 50;
         private const int MinTradeCount = 5000;
 
@@ -123,8 +123,12 @@ namespace Data.Actions.Polygon
 
                         if (!string.Equals(lastFolder, folder))
                         {
+                            if (lastBytes != null)
+                                yield return GetResults();
+
                             lastSymbol = null;
                             lastFolder = folder;
+                            lastBytes = null;
 
                             var zipFileName = DataFolder + folder + ".zip";
                             zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read);
