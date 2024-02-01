@@ -6,6 +6,8 @@ namespace Data.Actions.Polygon
 {
     public class PolygonCommon
     {
+        public static string GetApiKey() => CsUtils.GetApiKeys("polygon.io")[1];
+        public static string GetApiKey2003() => CsUtils.GetApiKeys("polygon.io.2003")[0];
 
         public static string GetMyTicker(string polygonTicker)
         {

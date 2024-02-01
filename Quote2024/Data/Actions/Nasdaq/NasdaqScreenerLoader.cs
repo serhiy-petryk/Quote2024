@@ -75,14 +75,13 @@ namespace Data.Actions.Nasdaq
                     if (Path.GetExtension(entry.FullName) == ".json" && entry.Name.IndexOf("Etf", StringComparison.InvariantCultureIgnoreCase) != -1)
                     {
                         var oEtf = ZipUtils.DeserializeJson<cEtfRoot>(entry);
-                        etfItems = oEtf.data.data.rows.Select(a=>new DbEtfRow(entry.LastWriteTime.DateTime, a)).ToList();
+                        etfItems = oEtf.data.data.rows.Select(a => new DbEtfRow(entry.LastWriteTime.DateTime, a)).ToList();
                     }
                     else if (Path.GetExtension(entry.FullName) == ".json" && entry.Name.IndexOf("Stock", StringComparison.InvariantCultureIgnoreCase) != -1)
                     {
-                        var content = entry.GetContentOfZipEntry();
-
                         var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
                         var exchange = ss[ss.Length - 2];
+                        var content = entry.GetContentOfZipEntry();
                         if (content.StartsWith("[")) // Github version
                         {
                             var oo = ZipUtils.DeserializeJson<cStockRow[]>(content);
