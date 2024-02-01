@@ -31,7 +31,7 @@ namespace Data.Scaners
             var resultsCount = 0;
 
             DbUtils.ClearAndSaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
-                "Count", "TradeCount", "Open", "High", "Low", "Close", "Final", "FinalTime");
+                "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
             
             foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes())
             {
@@ -46,8 +46,8 @@ namespace Data.Scaners
                 foreach (var o2 in endTimeSpans)
                     results.Add(new TheFirstScanner(symbol, date, o1, o2));
 
-                var minTimeTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(startFrom));
-                var quotes = oo.Item3.Where(a => a.t >= minTimeTicks).ToArray();
+                var ticksFrom = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.MarketStart)); // Unix ticks for 9:30
+                var quotes = oo.Item3.Where(a => a.t >= ticksFrom).ToArray();
 
                 resultsCount += results.Count;
                 foreach (var quote in quotes)
@@ -57,10 +57,25 @@ namespace Data.Scaners
 
                     foreach (var result in results)
                     {
-                        if (quote.t < result._fromUnixMilliseconds || result.Final.HasValue)
-                            continue;
+                        if (result.Final.HasValue)
+                            break;
 
-                        if (quote.t < result._toUnixMilliseconds)
+                        result.CountFull++;
+
+                        if (quote.t < result._fromUnixMilliseconds) // Before start
+                        {
+                            if (result.CountFull == 1)
+                            {
+                                result.HighBefore = quote.h;
+                                result.LowBefore = quote.l;
+                            }
+                            else
+                            {
+                                if (quote.h > result.HighBefore) result.HighBefore = quote.h;
+                                if (quote.l < result.LowBefore) result.LowBefore = quote.l;
+                            }
+                        }
+                        else if (quote.t < result._toUnixMilliseconds)
                         {
                             result.Count++;
                             result.TradeCount += quote.n;
@@ -90,7 +105,7 @@ namespace Data.Scaners
                 if (allResults.Count > 100000)
                 {
                     DbUtils.SaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
-                        "Count", "TradeCount", "Open", "High", "Low", "Close", "Final", "FinalTime");
+                        "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
                     allResults.Clear();
                 }
             }
@@ -98,7 +113,7 @@ namespace Data.Scaners
             if (allResults.Count > 0)
             {
                 DbUtils.SaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
-                    "Count", "TradeCount", "Open", "High", "Low", "Close", "Final", "FinalTime");
+                    "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
                 allResults.Clear();
             }
 
@@ -113,6 +128,9 @@ namespace Data.Scaners
         public TimeSpan To;
         public short Count;
         public int TradeCount;
+        public float HighBefore;
+        public float LowBefore;
+        public float Average;
         public float Open;
         public float High;
         public float Low;
@@ -122,6 +140,7 @@ namespace Data.Scaners
 
         private long _fromUnixMilliseconds;
         private long _toUnixMilliseconds;
+        private short CountFull;
 
         public TheFirstScanner(string symbol, DateTime date, TimeSpan from, TimeSpan to)
         {
