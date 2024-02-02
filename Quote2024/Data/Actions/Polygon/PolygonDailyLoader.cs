@@ -94,8 +94,7 @@ namespace Data.Actions.Polygon
                     var content = entry.GetContentOfZipEntry().Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
                     var oo = ZipUtils.DeserializeJson<cRoot>(content);
 
-                    if (oo.status != "OK" || oo.count != oo.queryCount || oo.count != oo.resultsCount ||
-                        oo.adjusted)
+                    if (oo.status != "OK" || oo.count != oo.queryCount || oo.count != oo.resultsCount || oo.adjusted)
                         throw new Exception($"Bad file: {zipFileName}");
                     
                     if (oo.resultsCount == 0) continue; // No data
