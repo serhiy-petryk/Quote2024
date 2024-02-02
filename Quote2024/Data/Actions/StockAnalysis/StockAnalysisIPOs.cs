@@ -46,8 +46,8 @@ namespace Data.Actions.StockAnalysis
                     // Save data to database
                     if (oo.data.data.Length > 0)
                     {
-                        DbUtils.ClearAndSaveToDbTable(oo.data.data, "dbQ2023Others..Bfr_IpoStockAnalysis", "Symbol", "Date", "Exchange",
-                            "Name", "IpoPrice", "CurrentPrice", "Sector", "Industry", "employees", "TimeStamp");
+                        DbUtils.ClearAndSaveToDbTable(oo.data.data, "dbQ2023Others..Bfr_IpoStockAnalysis", "pSymbol", "pDate", "pExchange",
+                            "pName", "pIpoPrice", "pCurrentPrice", "pSector", "pIndustry", "employees", "TimeStamp");
 
                         DbUtils.RunProcedure("dbQ2023Others..pUpdateIpoStockAnalysis");
                     }
@@ -65,7 +65,7 @@ namespace Data.Actions.StockAnalysis
 
         private class cData
         {
-            public int resultsCount;
+            public string resultsCount;
             public cItem[] data;
         }
         private class cItem
@@ -80,14 +80,14 @@ namespace Data.Actions.StockAnalysis
             public string industry;
             public int? employees;
 
-            public string Symbol => s;
-            public DateTime Date => ipoDate;
-            public string Exchange => exchange;
-            public string Name => n;
-            public float IpoPrice => ipoPrice;
-            public float CurrentPrice => ippc;
-            public string Sector => string.IsNullOrEmpty(sector) ? null : sector;
-            public string Industry => string.IsNullOrEmpty(industry) ? null : industry;
+            public string pSymbol => s;
+            public DateTime pDate => ipoDate;
+            public string pExchange => exchange;
+            public string pName => n;
+            public float pIpoPrice => ipoPrice;
+            public float pCurrentPrice => ippc;
+            public string pSector => string.IsNullOrEmpty(sector) ? null : sector;
+            public string pIndustry => string.IsNullOrEmpty(industry) ? null : industry;
             public DateTime TimeStamp;
         }
         #endregion
