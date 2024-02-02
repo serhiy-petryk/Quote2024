@@ -11,16 +11,12 @@ namespace Data.Helpers
     {
         public static T DeserializeJson<T>(ZipArchiveEntry entry)
         {
-            var x = new SpanJsonOptions();
             using (var entryStream = entry.Open())
-            using (var reader = new StreamReader(entryStream, System.Text.Encoding.UTF8, true))
+            using (var memstream = new MemoryStream())
             {
-                using (var memstream = new MemoryStream())
-                {
-                    reader.BaseStream.CopyTo(memstream);
-                    var bytes = memstream.ToArray();
-                    return SpanJson.JsonSerializer.Generic.Utf8.Deserialize<T>(bytes);
-                }
+                entryStream.CopyTo(memstream);
+                var bytes = memstream.ToArray();
+                return SpanJson.JsonSerializer.Generic.Utf8.Deserialize<T>(bytes);
             }
         }
 

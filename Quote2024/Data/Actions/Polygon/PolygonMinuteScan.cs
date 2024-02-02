@@ -143,12 +143,10 @@ namespace Data.Actions.Polygon
                             lastDates = new List<DateTime>();
                             var entry = zip.Entries.First(a => a.Name.Contains("_" + symbol + "_20", StringComparison.InvariantCultureIgnoreCase));
                             using (var entryStream = entry.Open())
+                            using (var memstream = new MemoryStream())
                             {
-                                using (var memstream = new MemoryStream())
-                                {
-                                    entryStream.CopyTo(memstream);
-                                    lastBytes = memstream.ToArray();
-                                }
+                                entryStream.CopyTo(memstream);
+                                lastBytes = memstream.ToArray();
                             }
                         }
 
