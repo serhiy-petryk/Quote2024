@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Windows.Forms;
-using Data.Actions.Polygon;
 using Data.Helpers;
 using Microsoft.Data.SqlClient;
 
