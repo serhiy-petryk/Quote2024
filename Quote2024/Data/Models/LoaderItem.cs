@@ -31,11 +31,11 @@ namespace Data.Models
             new LoaderItem {Name = "Investing Splits", Action = Actions.Investing.InvestingSplitsLoader.Start, Checked = false},
             new LoaderItem {Name = "StockAnalysis Corporate Actions", Action = Actions.StockAnalysis.StockAnalysisActions.Start, Checked = false},
             new LoaderItem {Name = "StockAnalysis IPOs", Action = Actions.StockAnalysis.StockAnalysisIPOs.Start, Checked=false},
-            /* new LoaderItem {Name = "Refresh Split data", Action = Models.SplitModel.RefreshSplitData, Checked = false},
+            new LoaderItem {Name = "Refresh Split data", Action = Models.SplitModel.RefreshSplitData, Checked = false},
             new LoaderItem {Name = "Index components from Wikipedia", Action = Actions.Wikipedia.WikipediaIndexLoader.Start, Checked = false},
-            new LoaderItem {Name = "Polygon Minute Quotes (2 last weeks)", Action = Actions.Polygon.PolygonMinuteLoader.Start, Checked = false},
-            // new LoaderItem {Name = "Polygon Minute Quotes (date range)", Action = Actions.Polygon.PolygonMinuteLoader.StartWithDateRange, Checked = false},
-            new LoaderItem {Name = "Yahoo Minute Quotes", Action = Actions.Yahoo.YahooMinuteQuotesLoader.Start, Checked = false},*/
+            /* new LoaderItem {Name = "Polygon Minute Quotes (2 last weeks)", Action = Actions.Polygon.PolygonMinuteLoader.Start, Checked = false},
+            // new LoaderItem {Name = "Polygon Minute Quotes (date range)", Action = Actions.Polygon.PolygonMinuteLoader.StartWithDateRange, Checked = false},*/
+            new LoaderItem {Name = "Yahoo Minute Quotes", Action = Actions.Yahoo.YahooMinuteLoader.Start, Checked = false},
         };
 
         public static System.Drawing.Image GetAnimatedImage() => GetImage(ItemStatus.Working);
