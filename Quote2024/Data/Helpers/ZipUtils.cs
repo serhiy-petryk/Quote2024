@@ -22,6 +22,13 @@ namespace Data.Helpers
 
         public static T DeserializeJson<T>(string entryContent) => SpanJson.JsonSerializer.Generic.Utf16.Deserialize<T>(entryContent);
 
+        public static void CompressFolder(string folder, string zipFileName)
+        {
+            var tmp = new SevenZipCompressor();
+            tmp.ArchiveFormat = OutArchiveFormat.Zip;
+            tmp.CompressDirectory(folder, zipFileName);
+        }
+
         public static void ZipVirtualFileEntries(string zipFileName, IEnumerable<VirtualFileEntry> entries)
         {
             // -- Very slowly: another way for 7za -> use Process/ProcessStartInfo class
