@@ -47,7 +47,7 @@ namespace Data.Helpers
         /// </summary>
         /// <param name="hourOffset"></param>
         /// <returns></returns>
-        public static Tuple<DateTime, string, string> GetTimeStamp(int hourOffset = -9) => Tuple.Create(
+        public static (DateTime, string, string) GetTimeStamp(int hourOffset = -9) => (
             DateTime.Now.AddHours(hourOffset), DateTime.Now.AddHours(hourOffset).ToString("yyyyMMdd"),
             DateTime.Now.AddHours(0).ToString("yyyyMMddHHmmss"));
 

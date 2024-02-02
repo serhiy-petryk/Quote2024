@@ -33,7 +33,7 @@ namespace Data.Actions.Eoddata
                         tradingDays.Add((DateTime) rdr["Date"]);
             }
 
-            var missingFiles = new List<Tuple<string, string>>();
+            var missingFiles = new List<(string, string)>();
             foreach (var date in tradingDays)
             {
                 var fileTimeStamp = date.ToString("yyyyMMdd", CultureInfo.InstalledUICulture);
@@ -41,7 +41,7 @@ namespace Data.Actions.Eoddata
                 {
                     var filename = $"{FILE_FOLDER}{exchange}_{fileTimeStamp}.zip";
                     if (!File.Exists(filename))
-                        missingFiles.Add(Tuple.Create(exchange, fileTimeStamp));
+                        missingFiles.Add((exchange, fileTimeStamp));
                 }
             }
 

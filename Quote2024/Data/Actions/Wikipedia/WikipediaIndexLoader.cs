@@ -12,12 +12,12 @@ namespace Data.Actions.Wikipedia
 {
     public static class WikipediaIndexLoader
     {
-        private static readonly Tuple<string,string>[] UrlsAndFilenames = new []
+        private static readonly (string,string)[] UrlsAndFilenames = new []
         {
-            Tuple.Create("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", "Components_SP500_{0}.html"),
-            Tuple.Create("https://en.wikipedia.org/wiki/List_of_S%26P_400_companies", "Components_SP400_{0}.html"),
-            Tuple.Create("https://en.wikipedia.org/wiki/List_of_S%26P_600_companies", "Components_SP600_{0}.html"),
-            Tuple.Create("https://en.wikipedia.org/wiki/Nasdaq-100", "Components_Nasdaq100_{0}.html")
+            ("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", "Components_SP500_{0}.html"),
+            ("https://en.wikipedia.org/wiki/List_of_S%26P_400_companies", "Components_SP400_{0}.html"),
+            ("https://en.wikipedia.org/wiki/List_of_S%26P_600_companies", "Components_SP600_{0}.html"),
+            ("https://en.wikipedia.org/wiki/Nasdaq-100", "Components_Nasdaq100_{0}.html")
             // old: https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies
         };
 
