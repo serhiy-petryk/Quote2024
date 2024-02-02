@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Data.Models
+namespace Tests.Json
 {
     public class ActionStockAnalysis
     {
@@ -28,7 +28,7 @@ namespace Data.Models
         public bool IsBad;
         public Action DescriptionAction;
 
-        public ActionStockAnalysis(Actions.StockAnalysis.StockAnalysisActions.cItem item, DateTime timestamp)
+        public ActionStockAnalysis(Utf8JsonTests.cItem item, DateTime timestamp)
         {
             TimeStamp = timestamp;
             Date = item.pDate;

@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Tests
@@ -19,6 +16,7 @@ namespace Tests
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Zip.ZipFolderCompressor.Start();
+            Json.Utf8JsonTests.Start();
 
             Application.Run(new TestMainForm());
         }

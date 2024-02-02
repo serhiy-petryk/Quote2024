@@ -176,7 +176,8 @@ namespace Quote2024
             }));
             await task1;*/
 
-            await Task.Factory.StartNew(Data.Scaners.TheFirstScanner.Start);
+            await Task.Factory.StartNew(Data.Actions.StockAnalysis.StockAnalysisActions.ParseAllFiles);
+            // await Task.Factory.StartNew(Data.Scaners.TheFirstScanner.Start);
 
             // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
             // Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\GithubNasdaqStockScreener.zip");

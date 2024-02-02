@@ -2,6 +2,10 @@
 ====  JSON  =====
 =================
 Use SpanJson -> https://github.com/Tornhoof/SpanJson -> Very fast, simple -> Benchmark: https://github.com/AmirHJabari/JsonBenchmark.Net
+Compability: 
+!Only newtonsoft json supports property names without quotes. System.Text.Json, NetJson, SpanJson, Utf8Json don't support it.
+SpanJson doesn't support scientific notation for integer numbers (int, long, ..).
+SpanJson has problem with case-sensetive names. Don't use field/properties with the same case insensitive names, read-only fields/properties, ...
 
 =================
 ====  ZIP  =====

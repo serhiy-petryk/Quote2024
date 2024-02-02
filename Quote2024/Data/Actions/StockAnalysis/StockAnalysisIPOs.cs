@@ -3,7 +3,7 @@ using System.IO.Compression;
 using System.Linq;
 using Data.Helpers;
 
-namespace Data.Actions.StockAnaysis
+namespace Data.Actions.StockAnalysis
 {
     public class StockAnalysisIPOs
     {

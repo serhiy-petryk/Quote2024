@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Data.Helpers;
 using Data.Models;
 
-namespace Data.Actions.StockAnaysis
+namespace Data.Actions.StockAnalysis
 {
     public class StockAnalysisActions
     {
@@ -30,12 +31,26 @@ namespace Data.Actions.StockAnaysis
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
 
             // Parse and save to database
-            var itemCount = ParseAndSaveToDb(zipFileName);
+            var itemCount = ParseAndSaveToDb(zipFileName, false);
 
             Logger.AddMessage($"!Finished. Items: {itemCount:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
         }
 
-        public static int ParseAndSaveToDb(string zipFileName)
+        public static void ParseAllFiles()
+        {
+            var files = Directory.GetFiles(Folder, "*.zip");
+            var itemCount = 0;
+            foreach (var zipFileName in files)
+            {
+                Logger.AddMessage($"File {Path.GetFileName(zipFileName)}. ItemCount: {itemCount}");
+                var count = ParseAndSaveToDb(zipFileName, true);
+                if (count < 100)
+                    throw new Exception("Trap!!!");
+                itemCount += count;
+            }
+        }
+
+        public static int ParseAndSaveToDb(string zipFileName, bool onlyCheck)
         {
             var itemCount = 0;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
@@ -44,6 +59,9 @@ namespace Data.Actions.StockAnaysis
                     var items = new List<Models.ActionStockAnalysis>();
                     Parse(entry.GetContentOfZipEntry(), items, entry.LastWriteTime.DateTime);
                     itemCount += items.Count;
+
+                    if (onlyCheck) continue;
+
                     // Save data to database
                     if (items.Count > 0)
                     {
@@ -69,6 +87,15 @@ namespace Data.Actions.StockAnaysis
                 ParseAsHtml(content, items, fileTimeStamp);
         }
 
+        private static Dictionary<string, string> _decoder = new Dictionary<string, string>
+        {
+            {"{action:\"", "{\"action\":\""}, {"{title:\"", "{\"title\":\""}, {"{date:\"", "{\"date\":\""},
+            {",type:\"", ",\"type\":\""},{",url:\"", ",\"url\":\""},{",id:\"", ",\"id\":\""},{",format:\"", ",\"format\":\""},
+            {",classes:\"", ",\"classes\":\""},{",symbol:\"", ",\"symbol\":\""},{",name:\"", ",\"name\":\""},{",other:\"", ",\"other\":\""},{",text:\"", ",\"text\":\""},
+            {",heading:\"",",\"heading\":\""},{",description:\"",",\"description\":\""},{",fileName:\"",",\"fileName\":\""},{",fullCount:",",\"fullCount\":"},
+            {",props:{", ",\"props\":{"},{",columns:[", ",\"columns\":["}, {",data:[", ",\"data\":["}
+
+        };
         private static bool TryToParseAsJson(string content, List<Models.ActionStockAnalysis> items, DateTime fileTimeStamp)
         {
             var i1 = content.IndexOf("const data =", StringComparison.InvariantCulture);
@@ -79,7 +106,14 @@ namespace Data.Actions.StockAnaysis
             i12 = s.IndexOf("{\"type\":", i12 + 8, StringComparison.InvariantCulture);
             var s2 = s.Substring(i12, s.Length - i12 - 1);
 
-            var oo = ZipUtils.DeserializeJson<cRoot>(s2);
+            var s3 = s2;
+            foreach (var kvp in _decoder)
+                s3 = s3.Replace(kvp.Key, kvp.Value);
+
+            var oo = ZipUtils.DeserializeJson<cRoot>(s3);
+            if (oo.data.fullCount != oo.data.data.Length)
+                throw new Exception("Check data Deserializator for StockAnalysisActions");
+
             foreach (var item in oo.data.data)
                 items.Add(new ActionStockAnalysis(item, fileTimeStamp));
 
@@ -134,10 +168,7 @@ namespace Data.Actions.StockAnaysis
             public string pOther => other == "N/A" || string.IsNullOrEmpty(other) ? null : other;
             public string pName => string.IsNullOrEmpty(name) ? null : name;
 
-            public override string ToString()
-            {
-                return $"{pDate:yyyy-MM-dd}, {pSymbol}, {type}, {pOther}, {text}";
-            }
+            public override string ToString() => $"{pDate:yyyy-MM-dd}, {pSymbol}, {type}, {pOther}, {text}";
         }
         #endregion
     }
