@@ -19,9 +19,9 @@ namespace Quote2024
         public MainForm()
         {
             InitializeComponent();
-
             if (CsUtils.IsInDesignMode) return;
 
+            dataGridView1.Height = 18 * Data.Models.LoaderItem.DataGridLoaderItems.Count + 2;
             dataGridView1.Paint += new PaintEventHandler(dataGridView1_Paint);
             dataGridView1.DataSource = Data.Models.LoaderItem.DataGridLoaderItems;
 

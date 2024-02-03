@@ -34,6 +34,7 @@ namespace Quote2024
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnRunMultiItemsLoader = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.checkedDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Image = new System.Windows.Forms.DataGridViewImageColumn();
@@ -44,7 +45,6 @@ namespace Quote2024
             this.btnTest = new System.Windows.Forms.Button();
             this.lblEoddataLogged = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnRunMultiItemsLoader = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
@@ -81,6 +81,7 @@ namespace Quote2024
             // 
             // tpLoader
             // 
+            this.tpLoader.AutoScroll = true;
             this.tpLoader.Controls.Add(this.btnRunMultiItemsLoader);
             this.tpLoader.Controls.Add(this.dataGridView1);
             this.tpLoader.Controls.Add(this.btnTest);
@@ -92,6 +93,16 @@ namespace Quote2024
             this.tpLoader.TabIndex = 0;
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
+            // 
+            // btnRunMultiItemsLoader
+            // 
+            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(397, 21);
+            this.btnRunMultiItemsLoader.Name = "btnRunMultiItemsLoader";
+            this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 23);
+            this.btnRunMultiItemsLoader.TabIndex = 68;
+            this.btnRunMultiItemsLoader.Text = "Run multiItems loader";
+            this.btnRunMultiItemsLoader.UseVisualStyleBackColor = true;
+            this.btnRunMultiItemsLoader.Click += new System.EventHandler(this.btnRunMultiItemsLoader_Click);
             // 
             // dataGridView1
             // 
@@ -116,7 +127,7 @@ namespace Quote2024
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 18;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(374, 324);
+            this.dataGridView1.Size = new System.Drawing.Size(374, 319);
             this.dataGridView1.TabIndex = 67;
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
@@ -201,16 +212,6 @@ namespace Quote2024
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // btnRunMultiItemsLoader
-            // 
-            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(397, 21);
-            this.btnRunMultiItemsLoader.Name = "btnRunMultiItemsLoader";
-            this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 23);
-            this.btnRunMultiItemsLoader.TabIndex = 68;
-            this.btnRunMultiItemsLoader.Text = "Run multiItems loader";
-            this.btnRunMultiItemsLoader.UseVisualStyleBackColor = true;
-            this.btnRunMultiItemsLoader.Click += new System.EventHandler(this.btnRunMultiItemsLoader_Click);
             // 
             // MainForm
             // 
