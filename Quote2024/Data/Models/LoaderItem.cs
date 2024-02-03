@@ -17,7 +17,7 @@ namespace Data.Models
 
         public static BindingList<LoaderItem> DataGridLoaderItems = new BindingList<LoaderItem>
         {
-            new LoaderItem {Name = "Polygon Minute Scan", Action = Actions.Polygon.PolygonMinuteScan.Start, Checked = false},
+            // new LoaderItem {Name = "Polygon Minute Scan", Action = Actions.Polygon.PolygonMinuteScan.Start, Checked = false},
             new LoaderItem {Name = "TradingView Screener", Action = Actions.TradingView.TvScreenerLoader.Start, Checked = false},
             new LoaderItem {Name = "Nasdaq Stock/Etf Screeners", Action = Actions.Nasdaq.NasdaqScreenerLoader.Start, Checked = false},
             new LoaderItem {Name = "Eoddata Symbols", Action = Actions.Eoddata.EoddataSymbolsLoader.Start, Checked = false},
@@ -34,6 +34,7 @@ namespace Data.Models
             new LoaderItem {Name = "Refresh Split data", Action = Models.SplitModel.RefreshSplitData, Checked = false},
             new LoaderItem {Name = "Index components from Wikipedia", Action = Actions.Wikipedia.WikipediaIndexLoader.Start, Checked = false},
             new LoaderItem {Name = "Polygon Minute Quotes (+ one week of last loading)", Action = Actions.Polygon.PolygonMinuteLoader.Start, Checked = false},
+            new LoaderItem {Name = "PolygonMinuteLog save to database", Action = Actions.Polygon.PolygonMinuteLogSaveToDb.Start, Checked = false},
             // new LoaderItem {Name = "Polygon Minute Quotes (date range)", Action = Actions.Polygon.PolygonMinuteLoader.StartWithDateRange, Checked = false},*/
             new LoaderItem {Name = "Yahoo Minute Quotes", Action = Actions.Yahoo.YahooMinuteLoader.Start, Checked = false},
         };

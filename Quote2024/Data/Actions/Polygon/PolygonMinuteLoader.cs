@@ -14,8 +14,8 @@ namespace Data.Actions.Polygon
     public static class PolygonMinuteLoader
     {
         private const string UrlTemplate = "https://api.polygon.io/v2/aggs/ticker/{0}/range/1/minute/{1}/{2}?adjusted=false&sort=asc&limit=50000&apiKey={3}";
-        private const string ZipFileNameTemplate = @"E:\Quote\WebData\Minute\Polygon2003\Buffer\MP2003_{0}.zip";
-        private const string FileNameTemplate = @"E:\Quote\WebData\Minute\Polygon2003\Buffer\MP2003_{0}\MP2003_{2}_{1}.json";
+        private static string ZipFileNameTemplate = Path.Combine(PolygonCommon.DataFolderMinute, "MP2003_{0}.zip");
+        private static string FileNameTemplate = Path.Combine(PolygonCommon.DataFolderMinute, @"MP2003_{0}\MP2003_{2}_{1}.json");
 
         public static void Start()
         {

@@ -110,7 +110,7 @@ namespace Data.Actions.StockAnalysis
             foreach (var kvp in _decoder)
                 s3 = s3.Replace(kvp.Key, kvp.Value);
 
-            var oo = ZipUtils.DeserializeJson<cRoot>(s3);
+            var oo = ZipUtils.DeserializeString<cRoot>(s3);
             if (oo.data.fullCount != oo.data.data.Length)
                 throw new Exception("Check data Deserializator for StockAnalysisActions");
 

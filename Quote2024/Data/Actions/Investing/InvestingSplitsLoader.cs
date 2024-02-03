@@ -80,7 +80,7 @@ namespace Data.Actions.Investing
 
         private static void ParseJson(ZipArchiveEntry entry, DateTime timeStamp, List<SplitModel> items)
         {
-            var o = ZipUtils.DeserializeJson<cRoot>(entry);
+            var o = ZipUtils.DeserializeZipEntry<cRoot>(entry);
             var rows = o.data.Trim().Split(new[] { "</tr>" }, StringSplitOptions.RemoveEmptyEntries);
 
             string lastDate = null;

@@ -13,7 +13,7 @@ namespace Data.Actions.Polygon
     {
         // private const string UrlTemplate = "https://api.polygon.io/v3/reference/tickers?market=stocks&date={0}&active=true&limit=1000";
         private const string UrlTemplate = "https://api.polygon.io/v3/reference/tickers?date={0}&active=true&limit=1000";
-        private const string ZipFileNameTemplate = @"E:\Quote\WebData\Symbols\Polygon2003\Data\SymbolsPolygon_{0}.zip";
+        private static readonly string ZipFileNameTemplate = Path.Combine(PolygonCommon.DataFolderSymbols, "SymbolsPolygon_{0}.zip");
 
         public static void Start()
         {
@@ -60,7 +60,7 @@ namespace Data.Actions.Polygon
                         var entry = new VirtualFileEntry(Path.Combine(Path.GetFileName(folder), $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), (byte[])o);
                         virtualFileEntries.Add(entry);
 
-                        var oo = ZipUtils.DeserializeJson<cRoot>(System.Text.Encoding.UTF8.GetString(entry.Content));
+                        var oo = ZipUtils.DeserializeString<cRoot>(System.Text.Encoding.UTF8.GetString(entry.Content));
                         /*File.WriteAllText(Path.Combine(folder, $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), (byte[])o);
 
                         var oo = JsonConvert.DeserializeObject<cRoot>((string)o);*/
@@ -84,8 +84,7 @@ namespace Data.Actions.Polygon
 
         public static void ParseAndSaveAllZip()
         {
-            var folder = Path.GetDirectoryName(ZipFileNameTemplate);
-            var files = Directory.GetFiles(folder, "*.zip").OrderBy(a => a).ToArray();
+            var files = Directory.GetFiles( PolygonCommon.DataFolderSymbols, "*.zip").OrderBy(a => a).ToArray();
             var itemCount = 0;
             foreach (var zipFileName in files)
                 itemCount += ParseAndSaveToDb(zipFileName);
@@ -104,7 +103,7 @@ namespace Data.Actions.Polygon
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
-                    var oo = ZipUtils.DeserializeJson<cRoot>(entry);
+                    var oo = ZipUtils.DeserializeZipEntry<cRoot>(entry);
                     var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
                     var date = DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMdd", CultureInfo.InstalledUICulture);
                     foreach (var item in oo.results)

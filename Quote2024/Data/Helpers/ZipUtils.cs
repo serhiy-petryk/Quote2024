@@ -9,7 +9,7 @@ namespace Data.Helpers
 {
     public static class ZipUtils
     {
-        public static T DeserializeJson<T>(ZipArchiveEntry entry)
+        public static T DeserializeZipEntry<T>(ZipArchiveEntry entry)
         {
             using (var entryStream = entry.Open())
             using (var memstream = new MemoryStream())
@@ -20,7 +20,7 @@ namespace Data.Helpers
             }
         }
 
-        public static T DeserializeJson<T>(string entryContent) => SpanJson.JsonSerializer.Generic.Utf16.Deserialize<T>(entryContent);
+        public static T DeserializeString<T>(string entryContent) => SpanJson.JsonSerializer.Generic.Utf16.Deserialize<T>(entryContent);
 
         public static void CompressFolder(string folder, string zipFileName)
         {

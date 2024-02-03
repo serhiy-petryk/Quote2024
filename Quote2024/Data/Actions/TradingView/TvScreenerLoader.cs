@@ -42,7 +42,7 @@ namespace Data.Actions.TradingView
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
-                    var o = ZipUtils.DeserializeJson<JsonTvScreenerModel>(entry);
+                    var o = ZipUtils.DeserializeZipEntry<JsonTvScreenerModel>(entry);
                     var items = o.data.Select(a => a.GetDbItem(entry.LastWriteTime.DateTime)).ToArray();
 
                     if (items.Length > 0)

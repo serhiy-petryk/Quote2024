@@ -38,7 +38,7 @@ namespace Data.Actions.StockAnalysis
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
-                    var oo = ZipUtils.DeserializeJson<cRoot>(entry);
+                    var oo = ZipUtils.DeserializeZipEntry<cRoot>(entry);
                     foreach (var item in oo.data.data)
                         item.TimeStamp = entry.LastWriteTime.DateTime;
                     itemCount += oo.data.data.Length;

@@ -74,7 +74,7 @@ namespace Data.Actions.Nasdaq
 
                     if (Path.GetExtension(entry.FullName) == ".json" && entry.Name.IndexOf("Etf", StringComparison.InvariantCultureIgnoreCase) != -1)
                     {
-                        var oEtf = ZipUtils.DeserializeJson<cEtfRoot>(entry);
+                        var oEtf = ZipUtils.DeserializeZipEntry<cEtfRoot>(entry);
                         etfItems = oEtf.data.data.rows.Select(a => new DbEtfRow(entry.LastWriteTime.DateTime, a)).ToList();
                     }
                     else if (Path.GetExtension(entry.FullName) == ".json" && entry.Name.IndexOf("Stock", StringComparison.InvariantCultureIgnoreCase) != -1)
@@ -84,12 +84,12 @@ namespace Data.Actions.Nasdaq
                         var content = entry.GetContentOfZipEntry();
                         if (content.StartsWith("[")) // Github version
                         {
-                            var oo = ZipUtils.DeserializeJson<cStockRow[]>(content);
+                            var oo = ZipUtils.DeserializeString<cStockRow[]>(content);
                             stockItems.AddRange(oo.Select(a => new DbStockRow(exchange, entry.LastWriteTime.DateTime, a)));
                         }
                         else
                         {
-                            var oo = ZipUtils.DeserializeJson<cStockRoot>(content);
+                            var oo = ZipUtils.DeserializeString<cStockRoot>(content);
                             stockItems.AddRange(oo.data.rows.Select(a=>new DbStockRow(exchange, entry.LastWriteTime.DateTime, a)));
                         }
 

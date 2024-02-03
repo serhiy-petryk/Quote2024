@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Core;
 using Data.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -12,12 +13,10 @@ namespace Data.Actions.Polygon
 {
     public static class PolygonMinuteScan
     {
-        private static DateTime From = new DateTime(2023, 7, 1);
-        private static DateTime To = new DateTime(2023, 12, 29);
+        private static readonly DateTime From = new DateTime(2023, 7, 1);
+        private static readonly DateTime To = new DateTime(2023, 12, 29);
         private const int MinTurnover = 50;
         private const int MinTradeCount = 5000;
-
-        private const string DataFolder = @"E:\Quote\WebData\Minute\Polygon2003\Data\";
 
         public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetQuotes()
         {
@@ -130,7 +129,7 @@ namespace Data.Actions.Polygon
                             lastFolder = folder;
                             lastBytes = null;
 
-                            var zipFileName = DataFolder + folder + ".zip";
+                            var zipFileName = Path.Combine(PolygonCommon.DataFolderMinute, folder + ".zip");
                             zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read);
                         }
 
