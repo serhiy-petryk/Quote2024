@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure.Core;
 using Data.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -13,8 +12,10 @@ namespace Data.Actions.Polygon
 {
     public static class PolygonMinuteScan
     {
-        private static readonly DateTime From = new DateTime(2023, 7, 1);
-        private static readonly DateTime To = new DateTime(2023, 12, 29);
+        // private static readonly DateTime From = new DateTime(2023, 7, 1);
+        // private static readonly DateTime To = new DateTime(2023, 12, 29);
+        private static readonly DateTime From = new DateTime(2023, 1, 1);
+        private static readonly DateTime To = new DateTime(2023, 3, 1);
         private const int MinTurnover = 50;
         private const int MinTradeCount = 5000;
 

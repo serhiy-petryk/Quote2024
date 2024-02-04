@@ -60,6 +60,9 @@ namespace Data.Actions.Polygon
                 }
             }
 
+            Logger.AddMessage($"Update MinutePoligonLog");
+            DbUtils.RunProcedure("dbQ2024Minute..pUpdateMinutePoligonLog");
+
             if (totalErrors > 0)
                 Logger.AddMessage($"!Finished. Files: {zipFiles.Count}. Found {totalErrors} errors");
             else
