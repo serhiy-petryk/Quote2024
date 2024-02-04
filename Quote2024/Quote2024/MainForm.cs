@@ -170,17 +170,8 @@ namespace Quote2024
             var sw = new Stopwatch();
             sw.Start();
 
-            /*var task1 = Task.Run((() =>
-            {
-                var data = Data.Actions.Polygon.PolygonMinuteScan.GetQuotes().ToArray();
-            }));
-            await task1;*/
 
-            await Task.Factory.StartNew(Data.Actions.StockAnalysis.StockAnalysisActions.ParseAllFiles);
-            // await Task.Factory.StartNew(Data.Scaners.TheFirstScanner.Start);
-
-            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMinuteScan.Start);
-            // Data.Actions.Nasdaq.NasdaqScreenerLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Screener\Nasdaq\GithubNasdaqStockScreener.zip");
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;
