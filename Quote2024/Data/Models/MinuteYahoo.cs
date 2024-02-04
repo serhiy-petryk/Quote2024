@@ -19,8 +19,6 @@ namespace Data.Models
             public bool SplitChecked = false;
         }
 
-        public cChart chart { get; set; }
-
         private static Dictionary<string, Dictionary<DateTime, QuoteCorrection>> _allCorrections = null;
 
         public static bool IsQuotePriceChecked(Quote q) => _allCorrections.ContainsKey(q.Symbol) &&
@@ -197,7 +195,9 @@ namespace Data.Models
             return q;
         }
 
-        #region ===============  SubClasses  ==================
+        #region ===============  Json property and SubClasses  ==================
+        public cChart chart { get; set; }
+
         public class cChart
         {
             public cResult[] result { get; set; }
