@@ -45,6 +45,7 @@ namespace Quote2024
             this.btnTest = new System.Windows.Forms.Button();
             this.lblEoddataLogged = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnMinuteYahooLog = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
@@ -82,6 +83,7 @@ namespace Quote2024
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnMinuteYahooLog);
             this.tpLoader.Controls.Add(this.btnRunMultiItemsLoader);
             this.tpLoader.Controls.Add(this.dataGridView1);
             this.tpLoader.Controls.Add(this.btnTest);
@@ -213,6 +215,17 @@ namespace Quote2024
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // btnMinuteYahooLog
+            // 
+            this.btnMinuteYahooLog.Location = new System.Drawing.Point(575, 19);
+            this.btnMinuteYahooLog.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnMinuteYahooLog.Name = "btnMinuteYahooLog";
+            this.btnMinuteYahooLog.Size = new System.Drawing.Size(170, 27);
+            this.btnMinuteYahooLog.TabIndex = 69;
+            this.btnMinuteYahooLog.Text = "Minute Yahoo Log (for zip)";
+            this.btnMinuteYahooLog.UseVisualStyleBackColor = true;
+            this.btnMinuteYahooLog.Click += new System.EventHandler(this.btnMinuteYahooLog_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -251,5 +264,6 @@ namespace Quote2024
         private System.Windows.Forms.DataGridViewTextBoxColumn Started;
         private System.Windows.Forms.DataGridViewTextBoxColumn Duration;
         private System.Windows.Forms.Button btnRunMultiItemsLoader;
+        private System.Windows.Forms.Button btnMinuteYahooLog;
     }
 }

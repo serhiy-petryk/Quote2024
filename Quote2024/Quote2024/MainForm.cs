@@ -21,7 +21,7 @@ namespace Quote2024
             InitializeComponent();
             if (CsUtils.IsInDesignMode) return;
 
-            dataGridView1.Height = 18 * Data.Models.LoaderItem.DataGridLoaderItems.Count + 2;
+            // dataGridView1.Height = 18 * Data.Models.LoaderItem.DataGridLoaderItems.Count + 2;
             dataGridView1.Paint += new PaintEventHandler(dataGridView1_Paint);
             dataGridView1.DataSource = Data.Models.LoaderItem.DataGridLoaderItems;
 
@@ -188,6 +188,24 @@ namespace Quote2024
             btnTest.Enabled = true;
         }
 
+        private void ShowStatus(string message)
+        {
+            if (statusStrip1.InvokeRequired)
+                Invoke(new MethodInvoker(delegate { ShowStatus(message); }));
+            else
+                StatusLabel.Text = message;
 
+            Application.DoEvents();
+        }
+
+        private void btnMinuteYahooLog_Click(object sender, EventArgs e)
+        {
+
+        btnMinuteYahooLog.Enabled = false;
+            if (CsUtils.OpenZipFileDialog(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder) is string fn && !string.IsNullOrEmpty(fn))
+                Data.Actions.Yahoo.YahooMinuteLogToTextFile.YahooMinuteLogSaveToTextFile(new[] { fn }, ShowStatus);
+
+            btnMinuteYahooLog.Enabled = true;
+        }
     }
 }
