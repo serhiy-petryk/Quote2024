@@ -210,6 +210,8 @@ namespace Quote2024
 
         private void btnMinuteYahooErrorCheck_Click(object sender, EventArgs e)
         {
+            btnMinuteYahooErrorCheck.Enabled = false;
+
             var sw = new Stopwatch();
             sw.Start();
 
@@ -220,6 +222,17 @@ namespace Quote2024
             sw.Stop();
             Debug.Print($"btnMinuteYahooErrorCheck_Click: {sw.ElapsedMilliseconds:N0} millisecs");
 
+            btnMinuteYahooErrorCheck.Enabled = true;
+        }
+
+        private void btnMinuteYahooSaveLogToDb_Click(object sender, EventArgs e)
+        {
+            btnMinuteYahooSaveLogToDb.Enabled = false;
+
+            //if (CsUtils.OpenFileDialogMultiselect(Settings.MinuteYahooDataFolder, @"zip files (*.zip)|*.zip") is string[] files && files.Length > 0)
+            //  Actions.MinuteYahoo_SaveLogToDb.Start(files, ShowStatus);
+
+            btnMinuteYahooSaveLogToDb.Enabled = true;
         }
     }
 }
