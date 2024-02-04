@@ -34,6 +34,7 @@ namespace Quote2024
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnMinuteYahooLog = new System.Windows.Forms.Button();
             this.btnRunMultiItemsLoader = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.checkedDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -45,7 +46,8 @@ namespace Quote2024
             this.btnTest = new System.Windows.Forms.Button();
             this.lblEoddataLogged = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnMinuteYahooLog = new System.Windows.Forms.Button();
+            this.btnMinuteYahooSaveLogToDb = new System.Windows.Forms.Button();
+            this.btnMinuteYahooErrorCheck = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
@@ -83,6 +85,8 @@ namespace Quote2024
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnMinuteYahooSaveLogToDb);
+            this.tpLoader.Controls.Add(this.btnMinuteYahooErrorCheck);
             this.tpLoader.Controls.Add(this.btnMinuteYahooLog);
             this.tpLoader.Controls.Add(this.btnRunMultiItemsLoader);
             this.tpLoader.Controls.Add(this.dataGridView1);
@@ -95,6 +99,17 @@ namespace Quote2024
             this.tpLoader.TabIndex = 0;
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
+            // 
+            // btnMinuteYahooLog
+            // 
+            this.btnMinuteYahooLog.Location = new System.Drawing.Point(575, 19);
+            this.btnMinuteYahooLog.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnMinuteYahooLog.Name = "btnMinuteYahooLog";
+            this.btnMinuteYahooLog.Size = new System.Drawing.Size(170, 27);
+            this.btnMinuteYahooLog.TabIndex = 69;
+            this.btnMinuteYahooLog.Text = "Minute Yahoo Log (for zip)";
+            this.btnMinuteYahooLog.UseVisualStyleBackColor = true;
+            this.btnMinuteYahooLog.Click += new System.EventHandler(this.btnMinuteYahooLog_Click);
             // 
             // btnRunMultiItemsLoader
             // 
@@ -215,16 +230,26 @@ namespace Quote2024
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // btnMinuteYahooLog
+            // btnMinuteYahooSaveLogToDb
             // 
-            this.btnMinuteYahooLog.Location = new System.Drawing.Point(575, 19);
-            this.btnMinuteYahooLog.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.btnMinuteYahooLog.Name = "btnMinuteYahooLog";
-            this.btnMinuteYahooLog.Size = new System.Drawing.Size(170, 27);
-            this.btnMinuteYahooLog.TabIndex = 69;
-            this.btnMinuteYahooLog.Text = "Minute Yahoo Log (for zip)";
-            this.btnMinuteYahooLog.UseVisualStyleBackColor = true;
-            this.btnMinuteYahooLog.Click += new System.EventHandler(this.btnMinuteYahooLog_Click);
+            this.btnMinuteYahooSaveLogToDb.Location = new System.Drawing.Point(575, 111);
+            this.btnMinuteYahooSaveLogToDb.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnMinuteYahooSaveLogToDb.Name = "btnMinuteYahooSaveLogToDb";
+            this.btnMinuteYahooSaveLogToDb.Size = new System.Drawing.Size(196, 27);
+            this.btnMinuteYahooSaveLogToDb.TabIndex = 71;
+            this.btnMinuteYahooSaveLogToDb.Text = "Minute Yahoo Save Log to DB";
+            this.btnMinuteYahooSaveLogToDb.UseVisualStyleBackColor = true;
+            // 
+            // btnMinuteYahooErrorCheck
+            // 
+            this.btnMinuteYahooErrorCheck.Location = new System.Drawing.Point(575, 64);
+            this.btnMinuteYahooErrorCheck.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnMinuteYahooErrorCheck.Name = "btnMinuteYahooErrorCheck";
+            this.btnMinuteYahooErrorCheck.Size = new System.Drawing.Size(170, 27);
+            this.btnMinuteYahooErrorCheck.TabIndex = 70;
+            this.btnMinuteYahooErrorCheck.Text = "Minute Yahoo Error Check";
+            this.btnMinuteYahooErrorCheck.UseVisualStyleBackColor = true;
+            this.btnMinuteYahooErrorCheck.Click += new System.EventHandler(this.btnMinuteYahooErrorCheck_Click);
             // 
             // MainForm
             // 
@@ -265,5 +290,7 @@ namespace Quote2024
         private System.Windows.Forms.DataGridViewTextBoxColumn Duration;
         private System.Windows.Forms.Button btnRunMultiItemsLoader;
         private System.Windows.Forms.Button btnMinuteYahooLog;
+        private System.Windows.Forms.Button btnMinuteYahooSaveLogToDb;
+        private System.Windows.Forms.Button btnMinuteYahooErrorCheck;
     }
 }

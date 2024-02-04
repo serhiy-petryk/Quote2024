@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Data.Helpers
 {
@@ -10,14 +11,30 @@ namespace Data.Helpers
         public static string OpenZipFileDialog(string folder) => OpenFileDialogGeneric(folder, @"zip files (*.zip)|*.zip");
         public static string OpenFileDialogGeneric(string folder, string filter)
         {
-            using (var ofd = new System.Windows.Forms.OpenFileDialog())
+            using (var ofd = new OpenFileDialog())
             {
                 ofd.InitialDirectory = folder;
                 ofd.RestoreDirectory = true;
                 ofd.Multiselect = false;
                 ofd.Filter = filter;
-                if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (ofd.ShowDialog() == DialogResult.OK)
                     return ofd.FileName;
+                return null;
+            }
+        }
+
+        public static string[] OpenFileDialogMultiselect(string folder, string filter, string title = null)
+        {
+            using (var ofd = new OpenFileDialog())
+            {
+                if (!string.IsNullOrEmpty(title))
+                    ofd.Title = title;
+                ofd.InitialDirectory = folder;
+                ofd.RestoreDirectory = true;
+                ofd.Multiselect = true;
+                ofd.Filter = filter;
+                if (ofd.ShowDialog() == DialogResult.OK)
+                    return ofd.FileNames;
                 return null;
             }
         }

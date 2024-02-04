@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Data.Helpers;
 
 namespace Data.Models

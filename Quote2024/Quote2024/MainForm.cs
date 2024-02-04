@@ -207,5 +207,19 @@ namespace Quote2024
 
             btnMinuteYahooLog.Enabled = true;
         }
+
+        private void btnMinuteYahooErrorCheck_Click(object sender, EventArgs e)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            if (CsUtils.OpenFileDialogMultiselect(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder,
+                    @"zip files (*.zip)|*.zip") is string[] files && files.Length > 0)
+                Data.Actions.Yahoo.YahooMinuteChecks.CheckOnBadQuoteAndsplit(files, ShowStatus);
+            
+            sw.Stop();
+            Debug.Print($"btnMinuteYahooErrorCheck_Click: {sw.ElapsedMilliseconds:N0} millisecs");
+
+        }
     }
 }
