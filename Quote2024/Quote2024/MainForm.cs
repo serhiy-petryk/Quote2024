@@ -229,8 +229,8 @@ namespace Quote2024
         {
             btnMinuteYahooSaveLogToDb.Enabled = false;
 
-            //if (CsUtils.OpenFileDialogMultiselect(Settings.MinuteYahooDataFolder, @"zip files (*.zip)|*.zip") is string[] files && files.Length > 0)
-            //  Actions.MinuteYahoo_SaveLogToDb.Start(files, ShowStatus);
+            if (CsUtils.OpenFileDialogMultiselect(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder, @"zip files (*.zip)|*.zip") is string[] files && files.Length > 0)
+              Data.Actions.Yahoo.YahooMinuteSaveLogToDb.Start(files, ShowStatus);
 
             btnMinuteYahooSaveLogToDb.Enabled = true;
         }

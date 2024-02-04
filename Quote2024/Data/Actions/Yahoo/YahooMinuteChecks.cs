@@ -38,7 +38,6 @@ namespace Data.Actions.Yahoo
                 var cnt = 0;
                 var quotes = new List<Quote>();
                 var errorLog = new Dictionary<string, string>();
-
                 foreach (var data in YahooCommon.GetMinuteDataFromZipFile(zipFileName, errorLog))
                 {
                     cnt++;
