@@ -60,7 +60,7 @@ namespace Data.Actions.Polygon
                         var entry = new VirtualFileEntry(Path.Combine(Path.GetFileName(folder), $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), (byte[])o);
                         virtualFileEntries.Add(entry);
 
-                        var oo = ZipUtils.DeserializeString<cRoot>(System.Text.Encoding.UTF8.GetString(entry.Content));
+                        var oo = ZipUtils.DeserializeBytes<cRoot>(entry.Content);
                         /*File.WriteAllText(Path.Combine(folder, $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), (byte[])o);
 
                         var oo = JsonConvert.DeserializeObject<cRoot>((string)o);*/

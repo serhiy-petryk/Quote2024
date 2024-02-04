@@ -19,6 +19,7 @@ namespace Data.Helpers
             }
         }
 
+        public static T DeserializeBytes<T>(byte[] bytes ) => SpanJson.JsonSerializer.Generic.Utf8.Deserialize<T>(bytes);
         public static T DeserializeString<T>(string entryContent) => SpanJson.JsonSerializer.Generic.Utf16.Deserialize<T>(entryContent);
 
         public static void CompressFolder(string folder, string zipFileName)
