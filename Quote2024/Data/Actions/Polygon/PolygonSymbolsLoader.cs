@@ -76,8 +76,8 @@ namespace Data.Actions.Polygon
                 }
             }
 
-            Logger.AddMessage($"Adjust data of SymbolsPolygon table");
-            DbUtils.RunProcedure("dbQ2024..pTempSymbolsPolygon1");
+            Logger.AddMessage($"Update Symbols Xref");
+            DbUtils.RunProcedure("dbQ2024..pUpdateSymbolsXref");
 
             Logger.AddMessage($"!Finished. Processed {fileCount} files with {itemCount:N0} items");
         }
@@ -89,8 +89,8 @@ namespace Data.Actions.Polygon
             foreach (var zipFileName in files)
                 itemCount += ParseAndSaveToDb(zipFileName);
 
-            Logger.AddMessage($"Adjust data of SymbolsPolygon table");
-            DbUtils.RunProcedure("dbQ2024..pTempSymbolsPolygon1");
+            Logger.AddMessage($"Update Symbols Xref");
+            DbUtils.RunProcedure("dbQ2024..pUpdateSymbolsXref");
 
             Logger.AddMessage($"!Finished. Processed {files.Length} files with {itemCount:N0} items");
         }

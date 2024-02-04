@@ -25,7 +25,7 @@ namespace Data.Models
             new LoaderItem {Name = "Yahoo Indices & Update Trading days", Action = Actions.Yahoo.YahooIndicesLoader.Start, Checked = false},
             new LoaderItem {Name = "Polygon Symbols (~4 minutes)", Action = Actions.Polygon.PolygonSymbolsLoader.Start, Checked = false},
             new LoaderItem {Name = "Polygon Daily Quotes", Action = Actions.Polygon.PolygonDailyLoader.Start, Checked = false},
-            new LoaderItem {Name = "Add missing symbols into SymbolsPolygon (~4 minutes)", Action = Actions.Polygon.PolygonMissingSymbolsUpdate.Start, Checked = false},
+            new LoaderItem {Name = "Synchronize Polygon Day and Symbols (~4 minutes)", Action = Actions.Polygon.PolygonSynchronizeDayAndSymbols.Start, Checked = false},
             new LoaderItem {Name = "Eoddata Daily Quotes", Action = Actions.Eoddata.EoddataDailyLoader.Start, Checked = false},
             new LoaderItem {Name = "Eoddata Splits", Action = Actions.Eoddata.EoddataSplitsLoader.Start, Checked = false},
             new LoaderItem {Name = "Investing Splits", Action = Actions.Investing.InvestingSplitsLoader.Start, Checked = false},

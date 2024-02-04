@@ -57,9 +57,6 @@ namespace Data.Actions.Polygon
                 filesSize += CsUtils.GetFileSizeInKB(zipFileName);
             }
 
-            Logger.AddMessage($"Update data in database");
-            DbUtils.RunProcedure("dbQ2024..pUpdateDayPolygon");
-
             Logger.AddMessage($"!Finished. Loaded quotes into DayPolygon table. Quotes: {itemCount:N0}. Number of files: {filesCount}. Size of files: {filesSize:N0}KB");
         }
 
@@ -73,9 +70,6 @@ namespace Data.Actions.Polygon
                 Logger.AddMessage($"Parsed {fileCnt++} files from {files.Length}");
                 itemCnt += ParseAndSaveToDb(file);
             }
-
-            Logger.AddMessage($"Refresh summary data");
-            DbUtils.RunProcedure("dbQ2024..pUpdateDayPolygon");
 
             Logger.AddMessage($"Finished! Parsed {fileCnt++} files from {files.Length}");
         }
