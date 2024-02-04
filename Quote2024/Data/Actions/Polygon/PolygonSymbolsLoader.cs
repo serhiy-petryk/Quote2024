@@ -76,9 +76,6 @@ namespace Data.Actions.Polygon
                 }
             }
 
-            Logger.AddMessage($"Update Symbols Xref");
-            DbUtils.RunProcedure("dbQ2024..pUpdateSymbolsXref");
-
             Logger.AddMessage($"!Finished. Processed {fileCount} files with {itemCount:N0} items");
         }
 
@@ -88,9 +85,6 @@ namespace Data.Actions.Polygon
             var itemCount = 0;
             foreach (var zipFileName in files)
                 itemCount += ParseAndSaveToDb(zipFileName);
-
-            Logger.AddMessage($"Update Symbols Xref");
-            DbUtils.RunProcedure("dbQ2024..pUpdateSymbolsXref");
 
             Logger.AddMessage($"!Finished. Processed {files.Length} files with {itemCount:N0} items");
         }
