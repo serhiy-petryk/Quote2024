@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Data.Actions.Polygon;
 using Data.Helpers;
+using Data.Models;
 
 namespace Data.Scaners
 {
     public class TheFirstScanner
     {
+        private const float AveragePeriod = 21f;
+        private const float AveragePeriodDelta = 2.6f;
+
         public static void Start()
         {
             var startFrom = new TimeSpan(9, 50, 0);
@@ -40,8 +45,8 @@ namespace Data.Scaners
 
                 var results = new List<TheFirstScanner>();
                 foreach (var o1 in startTimeSpans)
-                foreach (var o2 in endTimeSpans)
-                    results.Add(new TheFirstScanner(symbol, date, o1, o2));
+                    foreach (var o2 in endTimeSpans)
+                        results.Add(new TheFirstScanner(symbol, date, o1, o2));
 
                 var ticksFrom = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.MarketStart)); // Unix ticks for 9:30
                 var quotes = oo.Item3.Where(a => a.t >= ticksFrom).ToArray();
@@ -51,23 +56,26 @@ namespace Data.Scaners
                 {
                     if (quote.t >= endMarketDateTicks)
                         break;
-
                     foreach (var result in results)
                     {
-                        if (result.Final.HasValue)
-                            break;
+                        if (result.Final.HasValue) continue;
 
                         result.CountFull++;
+
 
                         if (quote.t < result._fromUnixMilliseconds) // Before start
                         {
                             if (result.CountFull == 1)
                             {
+                                result.Average = GetAveragePrice(quote);
                                 result.HighBefore = quote.h;
                                 result.LowBefore = quote.l;
                             }
                             else
                             {
+                                result.Average =
+                                    (result.Average * (AveragePeriod - AveragePeriodDelta) +
+                                     AveragePeriodDelta * GetAveragePrice(quote)) / AveragePeriod;
                                 if (quote.h > result.HighBefore) result.HighBefore = quote.h;
                                 if (quote.l < result.LowBefore) result.LowBefore = quote.l;
                             }
@@ -76,6 +84,7 @@ namespace Data.Scaners
                         {
                             result.Count++;
                             result.TradeCount += quote.n;
+
                             if (result.Count == 1)
                             {
                                 result.Open = quote.o;
@@ -115,6 +124,8 @@ namespace Data.Scaners
             }
 
             Debug.Print($"Results count: {resultsCount}");
+
+            float GetAveragePrice(PolygonCommon.cMinuteItem q) => (q.o + q.h + q.l + q.c) / 4.0f;
         }
 
         #region =========  Instance  ==========
