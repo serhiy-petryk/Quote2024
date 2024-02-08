@@ -170,8 +170,9 @@ namespace Quote2024
             var sw = new Stopwatch();
             sw.Start();
 
+            var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);
+            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;

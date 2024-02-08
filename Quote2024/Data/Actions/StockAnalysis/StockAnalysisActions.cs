@@ -96,6 +96,21 @@ namespace Data.Actions.StockAnalysis
             {",props:{", ",\"props\":{"},{",columns:[", ",\"columns\":["}, {",data:[", ",\"data\":["}
 
         };
+
+        public static string GetJsonContent()
+        {
+            var fileContent = File.ReadAllText(@"E:\Quote\WebData\Splits\StockAnalysis\StockAnalysisActions_20240127.html");
+            var i1 = fileContent.IndexOf("const data =", StringComparison.InvariantCulture);
+            if (i1 == -1) return null;
+
+            var i2 = fileContent.IndexOf("}}]", i1 + 12, StringComparison.InvariantCulture);
+            var s = fileContent.Substring(i1 + 12, i2 - i1 - 12 + 3).Trim();
+            var i12 = s.IndexOf("{\"type\":", StringComparison.InvariantCulture);
+            i12 = s.IndexOf("{\"type\":", i12 + 8, StringComparison.InvariantCulture);
+            var s2 = s.Substring(i12, s.Length - i12 - 1);
+            return s2;
+        }
+
         private static bool TryToParseAsJson(string content, List<Models.ActionStockAnalysis> items, DateTime fileTimeStamp)
         {
             var i1 = content.IndexOf("const data =", StringComparison.InvariantCulture);
