@@ -12,15 +12,18 @@ namespace Data.Actions.Polygon
 {
     public static class PolygonMinuteScan
     {
-        // private static readonly DateTime From = new DateTime(2023, 7, 1);
-        // private static readonly DateTime To = new DateTime(2023, 12, 29);
-        private static readonly DateTime From = new DateTime(2023, 1, 1);
-        private static readonly DateTime To = new DateTime(2023, 3, 1);
+        private static readonly DateTime From = new DateTime(2018, 1, 1);
+        private static readonly DateTime To = new DateTime(2024, 12, 29);
+        // private static readonly DateTime From = new DateTime(2023, 1, 1);
+        // private static readonly DateTime To = new DateTime(2023, 3, 1);
         private const int MinTurnover = 50;
         private const int MinTradeCount = 5000;
 
-        public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetQuotes()
+        public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetQuotes(DateTime? from = null, DateTime? to= null)
         {
+            if (!from.HasValue) from = From;
+            if (!to.HasValue) from = To;
+
             var sw = new Stopwatch();
             sw.Start();
 
@@ -29,7 +32,7 @@ namespace Data.Actions.Polygon
 
             Logger.AddMessage($"Started");
 
-            foreach (var oo in GetData())
+            foreach (var oo in GetData(from.Value, to.Value))
             {
                 if (itemCount % 100 == 0)
                     Logger.AddMessage($"Items: {itemCount}");
@@ -45,8 +48,11 @@ namespace Data.Actions.Polygon
             Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}. Bytes: {byteCount:N0}");
         }
 
-        public static void Start()
+        public static void Start(DateTime? from = null, DateTime? to = null)
         {
+            if (!from.HasValue) from = From;
+            if (!to.HasValue) from = To;
+
             var sw = new Stopwatch();
             sw.Start();
 
@@ -55,7 +61,7 @@ namespace Data.Actions.Polygon
 
             Logger.AddMessage($"Started");
 
-            foreach (var oo in GetData())
+            foreach (var oo in GetData(from.Value, to.Value))
             {
                 if (itemCount % 100 == 0)
                     Logger.AddMessage($"Items: {itemCount}");
@@ -68,10 +74,10 @@ namespace Data.Actions.Polygon
             Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}. Bytes: {byteCount:N0}");
         }
 
-        public static IEnumerable<(string, List<(DateTime, PolygonCommon.cMinuteItem[])>)> GetData()
+        public static IEnumerable<(string, List<(DateTime, PolygonCommon.cMinuteItem[])>)> GetData(DateTime from, DateTime to)
         {
             Task<(string, List<(DateTime, PolygonCommon.cMinuteItem[])>)> task = null;
-            foreach (var oo in GetBytes_ZipFile())
+            foreach (var oo in GetBytes_ZipFile(from, to))
             {
                 if (task != null)
                     yield return task.Result;
@@ -96,7 +102,7 @@ namespace Data.Actions.Polygon
                 yield return task.Result;
         }
 
-        public static IEnumerable<(string, byte[], List<DateTime>)> GetBytes_ZipFile()
+        public static IEnumerable<(string, byte[], List<DateTime>)> GetBytes_ZipFile(DateTime from, DateTime to)
         {
             // var foldersAndSymbolsAndDates = new Dictionary<string, Dictionary<string, List<DateTime>>>();
             string lastFolder = null;
@@ -111,7 +117,7 @@ namespace Data.Actions.Polygon
                 conn.Open();
                 cmd.CommandTimeout = 300;
                 cmd.CommandText = $"SELECT * FROM dbQ2024Minute..MinutePolygonLog WHERE RowStatus IN (2, 5) " +
-                                  $"AND Date BETWEEN '{From:yyyy-MM-dd}' AND '{To:yyyy-MM-dd}' AND " +
+                                  $"AND Date BETWEEN '{from:yyyy-MM-dd}' AND '{to:yyyy-MM-dd}' AND " +
                                   $"[Close]*[Volume]>={MinTurnover * 1000000} AND TradeCount>={MinTradeCount} " +
                                   "ORDER BY Folder, Symbol, Date";
                 using (var rdr = cmd.ExecuteReader())
