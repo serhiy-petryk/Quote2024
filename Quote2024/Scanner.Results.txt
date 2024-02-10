@@ -1,0 +1,24 @@
+Data filter: [Close]*[Volume]>=50'000'000 AND TradeCount>=5000
+
+1. Scanner to define точку входа в транзакцію.
+DataGeneration: Data.Scanners.TheFirstScanner. Start method (from 2023-07-03 to 2023-12-29, where finaltime is not null and [Open]>5.0 and Final is not null)
+Count percent calculation:	sum (iif([Open]>(High-0.01),1.0,0.0))/count(*)*100 HighCountPerc,
+Amount percent calculation: avg (iif([Open]>(High-0.01),([Open]-[Final])/[Open],-0.01/[Open]))*100.0 HighAmtPerc,
+Results:
+Count percent is from 6.7 (11:00 final time) to 3.6 (final time 15:45)
+Amount percent is ~+0.02%.
+Slightly fluctuations of amount percent is for 10:00, 10:06 (From) = ~0.03%.
+Amount percent is not depended to end time.
+
+Conclusion: start entry point: 10:00 (or 10:06); end entry point: 12:00.
+
+===================================
+2. Hour Scanner for 2022, 2023 years.
+Average amount percent ~+0.015% (from 0% to 0.03%). The best value is for 10:00-11:00: ~+0,03%. Worst result is for 15:00-15:45: 0.007 (2023 year), 0.013 (2022 year).
+Average count is ~6.5-7.0%. It doesn't depend of time.
+
+3. Hour Scanner for 2022, 2023 years (for two hours)
+Average amount percent ~+0.002% (from 0.007% to 0.044%). The best value is for 10:00-11:00: ~+0,033%. Worst result is for 15:00-15:45: 0.007 (2023 year), 0.012 (2022 year).
+Average count is ~4-6.0%. It doesn't depend of time.
+
+
