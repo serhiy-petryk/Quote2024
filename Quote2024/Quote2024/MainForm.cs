@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.OffScreen;
 using Data.Helpers;
+using Data.Scanners;
 using Quote2024.Helpers;
 
 namespace Quote2024
@@ -173,7 +174,7 @@ namespace Quote2024
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
             // await Task.Factory.StartNew(Data.Scaners.TheFirstScanner.Start);
-            await Task.Factory.StartNew(Data.Scaners.HourPolygon.Start);
+            await Task.Factory.StartNew(HourPolygon.Start);
             // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);
 
             sw.Stop();

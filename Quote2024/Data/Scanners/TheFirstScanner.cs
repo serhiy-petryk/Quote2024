@@ -4,9 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using Data.Actions.Polygon;
 using Data.Helpers;
-using Data.Models;
 
-namespace Data.Scaners
+namespace Data.Scanners
 {
     public class TheFirstScanner
     {

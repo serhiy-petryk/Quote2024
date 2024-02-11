@@ -11,6 +11,8 @@ namespace Data.Scanners
     {
         private const float AveragePeriod = 21f;
         private const float AveragePeriodDelta = 2.6f;
+        private static readonly DateTime FromDate = new DateTime(2022, 1, 1);
+        private static readonly DateTime ToDate = new DateTime(2099, 12, 29);
 
         public static void Start()
         {
@@ -28,11 +30,10 @@ namespace Data.Scanners
             var allResults = new List<HourPolygon>();
             var resultsCount = 0;
 
-            DbUtils.ClearAndSaveToDbTable(allResults, "dbQ2024..HourPolygon", "Symbol", "Date", "Time", "To", "Open", "High", "Low", "Close", "Volume", "Average", "TradeCount", "Count");
+            DbUtils.ClearAndSaveToDbTable(allResults, "dbQ2024..HourPolygon", "Symbol", "Date", "Time", "To", "Open",
+                "High", "Low", "Close", "Volume", "PrevAverage", "Average", "CloseAtAverage", "TradeCount", "Count");
 
-            var from = new DateTime(2022, 1, 1);
-            var to = new DateTime(2099, 12, 31);
-            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(from, to))
+            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(FromDate, ToDate))
             {
                 var symbol = oo.Item1;
                 var date = oo.Item2;
@@ -52,15 +53,14 @@ namespace Data.Scanners
                     var fromUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1));
                     var toUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item2));
                     var countFull = 0;
+                    bool? averageUp = null;
+                    var average = 0f;
                     foreach (var quote in quotes)
                     {
                         countFull++;
                         if (quote.t<fromUnixTicks)
                         {
-                            if (countFull == 1)
-                                result.Average = GetAveragePrice(quote);
-                            else
-                                result.Average = (result.Average * (AveragePeriod - AveragePeriodDelta) + AveragePeriodDelta * GetAveragePrice(quote)) / AveragePeriod;
+                            result.PrevAverage = average;
                         }
                         else if (quote.t<toUnixTicks)
                         {
@@ -74,6 +74,11 @@ namespace Data.Scanners
                                 result.High = quote.h;
                                 result.Low = quote.l;
                                 result.Close = quote.c;
+                                result.Average = average;
+                                if (average > 0 && (result.Open - 0.01f) > average)
+                                    averageUp = true;
+                                else if (average > 0 && (result.Open + 0.01f) < average)
+                                    averageUp = false;
                             }
                             else
                             {
@@ -81,21 +86,39 @@ namespace Data.Scanners
                                 if (quote.l < result.Low) result.Low = quote.l;
                                 result.Close = quote.c;
                             }
+
+                            if (averageUp.HasValue && !result.CloseAtAverage.HasValue)
+                            {
+                                if (averageUp == true && quote.l <= average)
+                                    result.CloseAtAverage = quote.l;
+                                else if (averageUp == false && quote.h >= average)
+                                    result.CloseAtAverage = quote.h;
+                            }
                         }
+
+                        if (countFull == 1)
+                            average = GetAveragePrice(quote);
+                        else
+                            average = (average * (AveragePeriod - AveragePeriodDelta) + AveragePeriodDelta * GetAveragePrice(quote)) / AveragePeriod;
                     }
+
+                    if (averageUp.HasValue && !result.CloseAtAverage.HasValue)
+                        result.CloseAtAverage = result.Close;
                 }
 
                 allResults.AddRange(results);
                 if (allResults.Count > 100000)
                 {
-                    DbUtils.SaveToDbTable(allResults, "dbQ2024..HourPolygon", "Symbol", "Date", "Time", "To", "Open", "High", "Low", "Close", "Volume", "Average", "TradeCount", "Count");
+                    DbUtils.SaveToDbTable(allResults, "dbQ2024..HourPolygon", "Symbol", "Date", "Time", "To", "Open",
+                        "High", "Low", "Close", "Volume", "PrevAverage", "Average", "CloseAtAverage", "TradeCount", "Count");
                     allResults.Clear();
                 }
             }
 
             if (allResults.Count > 0)
             {
-                DbUtils.SaveToDbTable(allResults, "dbQ2024..HourPolygon", "Symbol", "Date", "Time", "To", "Open", "High", "Low", "Close", "Volume", "Average", "TradeCount", "Count");
+                DbUtils.SaveToDbTable(allResults, "dbQ2024..HourPolygon", "Symbol", "Date", "Time", "To", "Open",
+                    "High", "Low", "Close", "Volume", "PrevAverage", "Average", "CloseAtAverage", "TradeCount", "Count");
                 allResults.Clear();
             }
 
@@ -115,7 +138,9 @@ namespace Data.Scanners
         public float Low;
         public float Close;
         public float Volume;
+        public float PrevAverage;
         public float Average;
+        public float? CloseAtAverage;
         public int TradeCount;
         public byte Count;
 
