@@ -22,7 +22,7 @@ namespace Data.Actions.Polygon
         public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetQuotes(DateTime? from = null, DateTime? to= null)
         {
             if (!from.HasValue) from = From;
-            if (!to.HasValue) from = To;
+            if (!to.HasValue) to = To;
 
             var sw = new Stopwatch();
             sw.Start();

@@ -174,7 +174,7 @@ namespace Quote2024
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
             // await Task.Factory.StartNew(Data.Scaners.TheFirstScanner.Start);
-            await Task.Factory.StartNew(HourPolygon.Start);
+            await Task.Factory.StartNew(TradesPerMinute.Start);
             // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);
 
             sw.Stop();
