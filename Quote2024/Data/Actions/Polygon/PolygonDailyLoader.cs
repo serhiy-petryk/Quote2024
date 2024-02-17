@@ -94,7 +94,7 @@ namespace Data.Actions.Polygon
 
                     // Save data to buffer table of data server
                     DbUtils.SaveToDbTable(oo.results, "dbQ2024..DayPolygon", "Symbol", "Date", "Open", "High",
-                        "Low", "Close", "Volume", "WeightedVolume", "TradeCount");
+                        "Low", "Close", "Volume", "WeightedVolumePrice", "TradeCount");
                 }
 
             return itemCount;
@@ -131,7 +131,7 @@ namespace Data.Actions.Polygon
             public float Low => l;
             public float Close => c;
             public float Volume => v;
-            public float WeightedVolume => vw;
+            public float WeightedVolumePrice => vw;
             public int TradeCount => n;
         }
         #endregion
