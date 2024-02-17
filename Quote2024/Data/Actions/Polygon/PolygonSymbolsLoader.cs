@@ -41,9 +41,6 @@ namespace Data.Actions.Polygon
                 {
                     fileCount++;
                     var folder = zipFileName.Substring(0, zipFileName.Length - 4);
-                    if (!Directory.Exists(folder))
-                        Directory.CreateDirectory(folder);
-
                     var url = string.Format(UrlTemplate, date.ToString("yyyy-MM-dd"));
                     var cnt = 0;
                     var virtualFileEntries = new List<VirtualFileEntry>();
