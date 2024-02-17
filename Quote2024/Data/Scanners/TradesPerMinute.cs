@@ -402,7 +402,7 @@ Time	Count	Trades	% change
     {
         public static void Start()
         {
-            var result = new Dictionary<TimeSpan, int[]>();
+            var result = new Dictionary<TimeSpan, float[]>();
             var quoteCount = 0;
             foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(new DateTime(2023, 1, 1),
                          new DateTime(2024, 1, 1)))
@@ -413,16 +413,17 @@ Time	Count	Trades	% change
                     var time = quote.DateTime.TimeOfDay;
                     if (!result.ContainsKey(time))
                     {
-                        result.Add(time, new int[2]);
+                        result.Add(time, new float[3]);
                     }
 
                     result[time][0]++;
                     result[time][1] += quote.n;
+                    result[time][2] += (quote.h-quote.l)/ (quote.h + quote.l)*2*100;
                 }
             }
 
             foreach (var kvp in result.OrderBy(a => a.Key))
-                Debug.Print($"{kvp.Key}\t{kvp.Value[0]}\t{kvp.Value[1]/kvp.Value[0]}");
+                Debug.Print($"{kvp.Key}\t{kvp.Value[0]}\t{kvp.Value[1] / kvp.Value[0]}\t{kvp.Value[2] / kvp.Value[0]}");
 
             Debug.Print($"Quote count: {quoteCount:N0}");
         }
