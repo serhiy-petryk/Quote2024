@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Data.Helpers;
 
@@ -103,7 +104,16 @@ namespace Data.Actions.Polygon
             public float vw;
             public int n;
 
+            // All not valid quotes have volume=0 except one quote of 2004 year where open<low
+            public bool IsValid => !(o > h || o < l || c > h || c < l || v < 0.5f || n == 0);
+
             public DateTime DateTime => CsUtils.GetEstDateTimeFromUnixMilliseconds(t);
+
+            public override string ToString()
+            {
+                return $"{GetString(o)}, {GetString(h)}, {GetString(l)}, {GetString(c)}, {GetString(v)}, {n}";
+                string GetString(float f) => f.ToString(CultureInfo.InvariantCulture);
+            }
             /*public short Date => _date; // day from 1/1/1970
             public short Time => _time; // time offset in minutes
             public DateTime DateTime => _dateTime;*/

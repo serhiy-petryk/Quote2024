@@ -168,18 +168,21 @@ namespace Quote2024
         {
             btnTest.Enabled = false;
 
+            // Data.Helpers.StatMethods.Tests();
             var sw = new Stopwatch();
             sw.Start();
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            // await Task.Factory.StartNew(Data.Scaners.TheFirstScanner.Start);
-            await Task.Factory.StartNew(TradesPerMinute.Start);
+            await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
+            // await Task.Factory.StartNew(Data.Scanners.HourPolygon.Start);
+            // await Task.Factory.StartNew(TradesPerMinute.Start);
             // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;
             Debug.Print($"Test duration: {d1:N0} milliseconds");
+
             btnTest.Enabled = true;
         }
 
