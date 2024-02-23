@@ -27,8 +27,8 @@ namespace Data
             .Select(a => DateTime.ParseExact(a, "yyyy-MM-dd", CultureInfo.InvariantCulture))
             .ToDictionary(a => a, a => (object)null);
 
-        private static readonly TimeSpan MarketEndCommon = new TimeSpan(16, 0, 0);
-        private static readonly TimeSpan MarketEndOfShortenedDay = new TimeSpan(13, 0, 0);
+        public static readonly TimeSpan MarketEndCommon = new TimeSpan(16, 0, 0);
+        public static readonly TimeSpan MarketEndOfShortenedDay = new TimeSpan(13, 0, 0);
 
         public static TimeSpan MarketStart = new TimeSpan(9, 30, 0); // time=marketStart: inside market
         public static TimeSpan MarketStartIn = new TimeSpan(9, 54, 0);
