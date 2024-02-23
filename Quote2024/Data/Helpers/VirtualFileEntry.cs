@@ -18,8 +18,6 @@ namespace Data.Helpers
             }
         }
 
-        public readonly DateTime Timestamp = DateTime.Now;
-
         public VirtualFileEntry(string name, byte[] content)
         {
             Name = name;

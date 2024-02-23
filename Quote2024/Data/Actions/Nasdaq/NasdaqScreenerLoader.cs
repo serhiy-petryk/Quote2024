@@ -126,17 +126,17 @@ namespace Data.Actions.Nasdaq
         #region =========  Json classes  ============
         //========================
         private static CultureInfo culture = new CultureInfo("en-US");
-        private class cStockRoot
+        internal class cStockRoot
         {
             public cStockData data;
             public object message;
             public cStatus status;
         }
-        private class cStockData
+        internal class cStockData
         {
             public cStockRow[] rows;
         }
-        private class cStockRow
+        internal class cStockRow
         {
             public string symbol;
             public string name;
@@ -151,7 +151,7 @@ namespace Data.Actions.Nasdaq
             public string industry;
         }
 
-        private class DbStockRow
+        internal class DbStockRow
         {
             // "Symbol", "Exchange", "Name", "LastSale", "Volume", "NetChange", "Change", "MarketCap", "Country", "IpoYear", "Sector", "Industry", "TimeStamp"
             private cStockRow Row;
@@ -168,12 +168,20 @@ namespace Data.Actions.Nasdaq
             public string Sector => NullCheck(Row.sector);
             public string Industry => NullCheck(Row.industry);
             public DateTime TimeStamp;
+            public DateTime Date; // for NasdaqGithub
 
             public DbStockRow(string exchange, DateTime timeStamp, cStockRow row)
             {
                 Exchange = exchange;
                 TimeStamp = timeStamp;
                 Row = row;
+            }
+            public DbStockRow(string exchange, DateTime timeStamp, cStockRow row, DateTime dateKey)
+            {
+                Exchange = exchange;
+                TimeStamp = timeStamp;
+                Row = row;
+                Date = dateKey;
             }
         }
 
@@ -224,7 +232,7 @@ namespace Data.Actions.Nasdaq
         }
 
         //=====================
-        private class cStatus
+        internal class cStatus
         {
             public int rCode;
             public object bCodeMessage;
