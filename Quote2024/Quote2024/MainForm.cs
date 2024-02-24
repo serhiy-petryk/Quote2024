@@ -179,7 +179,7 @@ namespace Quote2024
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
 
-            await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);
+            await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarScreenerLoader.Start);
 
             // await Task.Factory.StartNew(TradesPerMinute.Start);
             // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);

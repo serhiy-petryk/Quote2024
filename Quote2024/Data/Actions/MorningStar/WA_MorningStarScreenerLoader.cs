@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Data.Helpers;
 
@@ -129,7 +128,7 @@ namespace Data.Actions.MorningStar
 
         public static void DownloadList()
         {
-            foreach (var sector in MorningStarScreenerLoader.Sectors)
+            foreach (var sector in MorningStarCommon.Sectors)
             {
                 Logger.AddMessage($"Process {sector} sector");
                 var url = string.Format(ListUrlTemplate, sector);
