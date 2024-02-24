@@ -7,7 +7,7 @@ namespace Data.Actions.MorningStar
 {
     public static class MorningStarScreenerLoader
     {
-        private static string[] _sectors = new[]
+        public static string[] Sectors = new[]
         {
             "basic-materials-stocks", "communication-services-stocks", "consumer-cyclical-stocks",
             "consumer-defensive-stocks", "energy-stocks", "financial-services-stocks", "healthcare-stocks",
@@ -35,7 +35,7 @@ namespace Data.Actions.MorningStar
             var zipFileName = Path.Combine(DataFolder, $"MSS_{dateKey}.zip");
             var entryNameTemplate = Path.Combine(Path.GetFileNameWithoutExtension(zipFileName), $"MSS_{dateKey}_" + "{0}_{1}.json");
 
-            foreach (var sector in _sectors)
+            foreach (var sector in Sectors)
             {
                 Logger.AddMessage($"Process {sector} sector");
 
