@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Data.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using Data.Helpers;
 
 namespace Data.Actions.MorningStar
 {
@@ -41,16 +41,20 @@ namespace Data.Actions.MorningStar
                     foreach (var item in oo.results)
                     {
                         var exchange = item.meta.exchange;
-                        var symbol = item.meta.ticker;
+                        var originalSymbol = item.meta.ticker;
                         var name = item.fields.name.value;
 
+                        var symbol = originalSymbol;
                         if (string.IsNullOrEmpty(symbol) && name == "Nano Labs Ltd Ordinary Shares - Class A")
                             symbol = "NA";
 
                         if (!MorningStarCommon.Exchanges.Any(exchange.Contains)) continue;
+                        if (symbol == "SANP1") continue;
+
                         if (string.IsNullOrEmpty(symbol))
                             throw new Exception($"No ticker code. Please, check. Security name is {name}. File: {entry.Name}");
-
+                        if (string.IsNullOrEmpty(name))
+                            throw new Exception($"Name of '{originalSymbol}' ticker is blank. Please, adjust structure (Bfr_)ScreenerMorningStar tables in database. File: {entry.Name}");
                         symbol = MorningStarCommon.GetMyTicker(symbol);
 
                         if (!data.ContainsKey(exchange))
@@ -70,15 +74,19 @@ namespace Data.Actions.MorningStar
                             dbItems.Add(symbol, dbItem);
                         }
                         else
-                        {
-
-                        }
+                            throw new Exception($"'{originalSymbol}' Ticker is repeating. Please, check source data in {entry.Name}");
                     }
                 }
+
+            var badTickers = MorningStarCommon.BadTickers;
+            if (badTickers.Count > 0)
+                throw new Exception($"There are {badTickers.Count} bad morning star tickers. Please, check MorningStarMethod.GetMyTicker");
 
             var itemsToSave = data.Values.SelectMany(a => a.Values).ToArray();
             DbUtils.ClearAndSaveToDbTable(itemsToSave, "dbQ2023Others..Bfr_ScreenerMorningStar", "Symbol", "Date",
                 "Exchange", "Sector", "Name", "TimeStamp");
+
+            DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerMorningStar");
         }
 
         private static void DownloadAndSaveToZip()
