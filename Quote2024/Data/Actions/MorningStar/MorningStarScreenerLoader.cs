@@ -1,10 +1,10 @@
-﻿using Data.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using Data.Helpers;
 
 namespace Data.Actions.MorningStar
 {
@@ -31,7 +31,6 @@ namespace Data.Actions.MorningStar
             var dateKey = DateTime.ParseExact(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1], "yyyyMMdd",
                 CultureInfo.InvariantCulture);
             var data = new Dictionary<string, Dictionary<string, DbItem>>();
-            var itemCount = 0;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {

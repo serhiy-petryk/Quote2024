@@ -36,9 +36,7 @@ namespace Data.Actions.MorningStar
             {
                 var ss = Path.GetFileNameWithoutExtension(htmlFile).Split('_');
                 var timeKey = ss[1];
-                var sector = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(ss[0]
-                    .Replace("-stocks", "", StringComparison.InvariantCultureIgnoreCase)
-                    .Replace("-", " ", StringComparison.InvariantCultureIgnoreCase));
+                var sector = MorningStarCommon.GetSectorName(ss[0]);
 
                 var countBefore = data.Count;
                 var countBefore2 = data2.Count;
@@ -54,7 +52,7 @@ namespace Data.Actions.MorningStar
                     var k3 = s.IndexOf('/', k2+1);
                     var symbol = s.Substring(k2+1, k3-k2-1).ToUpper();
                     var k4 = s.IndexOf('>');
-                    var k5 = s.IndexOf("</a>", StringComparison.InvariantCulture);
+                    var k5 = s.IndexOf("</a>", StringComparison.Ordinal);
                     var name = s.Substring(k4 + 1, k5 - k4 - 1).Trim();
                     if (name.EndsWith("</span>"))
                     {
@@ -107,7 +105,7 @@ namespace Data.Actions.MorningStar
                 var cnt = 0;
                 Parallel.ForEach(items, new ParallelOptions { MaxDegreeOfParallelism = 8 }, item =>
                 {
-                    Logger.AddMessage($"Downloaded {cnt++} from {items.Length} pages for {item.Sector}");
+                    Logger.AddMessage($"Downloaded {cnt++} from {items.Length} pages for {MorningStarCommon.GetSectorName(sectorKey)}");
                     var url = $"https://web.archive.org/web/{item.TimeStamp}/{item.Url}";
                     var filename = Path.Combine(HtmlDataFolder, $"{sectorKey}_{item.TimeStamp}.html");
                     if (!File.Exists(filename))
@@ -166,19 +164,19 @@ namespace Data.Actions.MorningStar
                 Exchange = exchange;
                 TimeStamp = timeStamp;
 
-                var i1 = content.IndexOf(">LAST:<", StringComparison.InvariantCulture);
+                var i1 = content.IndexOf(">LAST:<", StringComparison.Ordinal);
                 if (i1 == -1)
                 {
                     IsBad = true;
                     return;
                 }
 
-                var i22 = content.LastIndexOf("<table ", i1, StringComparison.InvariantCulture);
-                var i32 = content.IndexOf("</table>", i22, StringComparison.InvariantCulture);
+                var i22 = content.LastIndexOf("<table ", i1, StringComparison.Ordinal);
+                var i32 = content.IndexOf("</table>", i22, StringComparison.Ordinal);
                 var rows2 = content.Substring(i22 + 7, i32 - i22 - 7).Trim().Split(new[] { "</tr>" }, StringSplitOptions.RemoveEmptyEntries);
 
-                var i21 = content.LastIndexOf("<table ", i22 - 7, StringComparison.InvariantCulture);
-                var i31 = content.IndexOf("</table>", i21, StringComparison.InvariantCulture);
+                var i21 = content.LastIndexOf("<table ", i22 - 7, StringComparison.Ordinal);
+                var i31 = content.IndexOf("</table>", i21, StringComparison.Ordinal);
                 var rows1 = content.Substring(i21 + 7, i31 - i21 - 7).Trim().Split(new[] { "</tr>" }, StringSplitOptions.RemoveEmptyEntries);
 
                 var cells = rows1[0].Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
@@ -204,11 +202,6 @@ namespace Data.Actions.MorningStar
             public string TimeStamp;
             public string Type;
             public int Status;
-
-            public string Sector => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Path
-                .GetFileNameWithoutExtension(Url.Split('?')[0])
-                .Replace("-stocks", "", StringComparison.InvariantCultureIgnoreCase)
-                .Replace("-", " ", StringComparison.InvariantCultureIgnoreCase));
 
             public JsonItem(string line)
             {
