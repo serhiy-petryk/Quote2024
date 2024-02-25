@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Data.Actions.Polygon;
 using Data.Helpers;
 
 namespace Data.Scanners
