@@ -19,19 +19,28 @@ namespace Data.Actions.MorningStar
         {
             Logger.AddMessage($"Started");
 
+            var data = new Dictionary<string, List<DbItem>>();
+
             // DownloadList();
             // DownloadData();
-            ParseHtmlFiles();
+            ParseHtmlFiles(data);
+            SaveToDb(data);
 
             Logger.AddMessage($"Finished!");
         }
 
-        public static void ParseHtmlFiles()
+        public static void SaveToDb(Dictionary<string, List<DbItem>> data)
+        {
+            var items = data.SelectMany(a => a.Value).OrderBy(a=>a.Symbol).ToArray();
+            DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..HScreenerMorningStar", "Symbol", "Date", "LastDate",
+                "Exchange", "Sector", "Name");
+        }
+
+        public static void ParseHtmlFiles(Dictionary<string, List<DbItem>> dictData)
         {
             var htmlFiles = Directory.GetFiles(HtmlDataFolder, "*.html").OrderBy(a=>a).ToArray();
             var data = new List<(string, string, string, string, string)>();
             var data2 = new List<(string, string, string, string, string)>();
-            var dictData = new Dictionary<string, List<(string, string, string, string, string, string)>>();
             foreach (var htmlFile in htmlFiles)
             {
                 var ss = Path.GetFileNameWithoutExtension(htmlFile).Split('_');
@@ -49,6 +58,8 @@ namespace Data.Actions.MorningStar
                     if (k2 > 10) continue;
 
                     var exchange = s.Substring(0,k2).ToUpper();
+                    if (!MorningStarCommon.Exchanges.Any(exchange.Contains)) continue;
+
                     var k3 = s.IndexOf('/', k2+1);
                     var symbol = s.Substring(k2+1, k3-k2-1).ToUpper();
                     var k4 = s.IndexOf('>');
@@ -59,6 +70,12 @@ namespace Data.Actions.MorningStar
                         var k6 = name.Substring(0, name.Length - 1).LastIndexOf('>');
                         name = name.Substring(k6 + 1, name.Length - k6 - 8).Trim();
                     }
+
+                    //if (!name.Contains(' '))
+                      //  Debug.Print($"Check. Symbol: {symbol}. Name: {name}");
+                    if (symbol == "ALL-PH" && name == "ALLpH") continue;
+                    if (name == "BF.B" || name== "CWEN.A" || name== "WFCpC") continue;
+
                     if (!string.Equals(symbol, name))
                     {
                         name = System.Net.WebUtility.HtmlDecode(name);
@@ -70,25 +87,41 @@ namespace Data.Actions.MorningStar
                             data.Add(item);
                             if (!dictData.ContainsKey(symbol))
                             {
-                                dictData.Add(symbol, new List<(string, string, string, string, string, string)>());
-                                dictData[symbol].Add((sector, timeKey, timeKey, symbol, exchange, name));
+                                dictData.Add(symbol, new List<DbItem>());
+                                var newDbItem = new DbItem()
+                                {
+                                    Symbol = symbol,
+                                    sDate = timeKey,
+                                    sLastDate = timeKey,
+                                    Exchange = exchange,
+                                    Name = name,
+                                    Sector = sector
+                                };
+                                dictData[symbol].Add(newDbItem);
                             }
                             else
                             {
                                 var lastItem = dictData[symbol][dictData[symbol].Count - 1];
-                                if (lastItem.Item1 != sector || lastItem.Item5 != exchange || lastItem.Item6 != name)
+                                if (lastItem.Sector != sector || lastItem.Exchange != exchange || lastItem.Name!= name)
                                 {
-                                    var newItem = (sector, timeKey, timeKey, symbol, exchange, name);
-                                    dictData[symbol].Add(newItem);
+                                    var newDbItem = new DbItem()
+                                    {
+                                        Symbol = symbol, sDate = timeKey, sLastDate = timeKey, Exchange = exchange,
+                                        Name = name, Sector = sector
+                                    };
+                                    dictData[symbol].Add(newDbItem);
                                 }
                                 else
                                 {
-                                    // only change [To] timeKey
-                                    var newItem = (lastItem.Item1, lastItem.Item2, timeKey, lastItem.Item4, lastItem.Item5, lastItem.Item6);
-                                    dictData[symbol][dictData[symbol].Count - 1] = newItem;
+                                    // only change [LastDate] timeKey
+                                    dictData[symbol][dictData[symbol].Count - 1].sLastDate = timeKey;
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+
                     }
                 }
                 Debug.Print((data.Count - countBefore) + "\t" + (data2.Count - countBefore2) + "\t" + ss1.Length + "\t" + Path.GetFileNameWithoutExtension(htmlFile));
@@ -195,6 +228,18 @@ namespace Data.Actions.MorningStar
                 Low = float.Parse(GetCellContent(cells[2]), NumberStyles.Any, CultureInfo.InvariantCulture);
             }
         }*/
+
+        public class DbItem
+        {
+            public string Symbol;
+            public string sDate;
+            public string sLastDate;
+            public string Exchange;
+            public string Sector;
+            public string Name;
+            public DateTime Date => DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
+            public DateTime LastDate => DateTime.ParseExact(sLastDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
+        }
 
         private class JsonItem
         {
