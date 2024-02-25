@@ -71,11 +71,6 @@ namespace Data.Actions.MorningStar
                         name = name.Substring(k6 + 1, name.Length - k6 - 8).Trim();
                     }
 
-                    //if (!name.Contains(' '))
-                      //  Debug.Print($"Check. Symbol: {symbol}. Name: {name}");
-                    if (symbol == "ALL-PH" && name == "ALLpH") continue;
-                    if (name == "BF.B" || name== "CWEN.A" || name== "WFCpC") continue;
-
                     if (!string.Equals(symbol, name))
                     {
                         name = System.Net.WebUtility.HtmlDecode(name);
@@ -109,7 +104,9 @@ namespace Data.Actions.MorningStar
                                         Symbol = symbol, sDate = timeKey, sLastDate = timeKey, Exchange = exchange,
                                         Name = name, Sector = sector
                                     };
-                                    dictData[symbol].Add(newDbItem);
+
+                                    if (lastItem.LastDate != newDbItem.Date || lastItem.Name.Length < newDbItem.Name.Length)
+                                        dictData[symbol].Add(newDbItem);
                                 }
                                 else
                                 {

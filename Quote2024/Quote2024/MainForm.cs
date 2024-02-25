@@ -177,10 +177,10 @@ namespace Quote2024
             // await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
 
-            await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
+            // await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);
+            await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);
 
             // await Task.Factory.StartNew(()=>Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\WebArchive.Wikipedia.Indices.zip"));
 
