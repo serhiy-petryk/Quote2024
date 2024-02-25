@@ -50,11 +50,26 @@ namespace Data.Actions.Wikipedia
             Logger.AddMessage($"!Finished. Items: {itemCount:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
         }
 
+        public static void ParseAndSaveToDbAllFiles()
+        {
+            var allZipFiles = new List<string>
+                { @"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\WebArchive.Wikipedia.Indices.zip" };
+
+            const string folder = @"E:\Quote\WebData\Indices\Wikipedia\IndexComponents";
+            var files = Directory.GetFiles(folder, "*_202*.zip").OrderBy(a=>a);
+            allZipFiles.AddRange(files);
+            foreach (var zipFileName in allZipFiles)
+            {
+                ParseAndSaveToDb(zipFileName);
+            }
+        }
+
         public static int ParseAndSaveToDb(string zipFileName)
         {
             var itemCount = 0;
+            var prevTimeStamp = DateTime.MinValue;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
-                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0).OrderBy(a=>a.Name))
                 {
                     var content = entry.GetContentOfZipEntry();
 
@@ -63,7 +78,10 @@ namespace Data.Actions.Wikipedia
 
                     var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
                     var indexName = ss[ss.Length - 2];
+
                     var timeStamp = entry.LastWriteTime.DateTime;
+                    if (prevTimeStamp.Date == timeStamp.Date) continue;
+                    prevTimeStamp = timeStamp;
 
                     var i1 = content.IndexOf("id=\"constituents\"", StringComparison.InvariantCultureIgnoreCase);
                     if (i1 > 0)

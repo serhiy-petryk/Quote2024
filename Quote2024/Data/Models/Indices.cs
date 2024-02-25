@@ -13,7 +13,9 @@ namespace Data.Models
             {
                 DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..Bfr_Indices", "Index", "Symbol", "Name", "Sector",
                     "Industry", "TimeStamp");
+
                 DbUtils.RunProcedure("dbQ2023Others..pUpdateIndices");
+                DbUtils.RunProcedure("dbQ2023Others..pUpdateIndices2");
             }
         }
 
