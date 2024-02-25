@@ -216,8 +216,6 @@ namespace Data.Scanners
             }
 
             Debug.Print($"Results count: {resultsCount}");
-
-            float GetAveragePrice(PolygonCommon.cMinuteItem q) => (q.o + q.h + q.l + q.c) / 4.0f;
         }
 
         #region =========  Instance  ==========
