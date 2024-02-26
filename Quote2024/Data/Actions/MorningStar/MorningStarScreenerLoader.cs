@@ -20,13 +20,14 @@ namespace Data.Actions.MorningStar
         {
             Logger.AddMessage($"Started");
 
-            // DownloadAndSaveToZip();
-            ParseJson(@"E:\Quote\WebData\Screener\MorningStar\Data\MSS_20240224.zip");
+            var zipFileName = DownloadAndSaveToZip();
+            ParseJsonAndSaveToDb(zipFileName);
+            ParseJsonAndSaveToDb(@"E:\Quote\WebData\Screener\MorningStar\Data\MSS_20240224.zip");
 
             Logger.AddMessage($"Finished!");
         }
 
-        private static void ParseJson(string zipFileName)
+        private static void ParseJsonAndSaveToDb(string zipFileName)
         {
             var dateKey = DateTime.ParseExact(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1], "yyyyMMdd",
                 CultureInfo.InvariantCulture);
@@ -88,7 +89,7 @@ namespace Data.Actions.MorningStar
             DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerMorningStar");
         }
 
-        private static void DownloadAndSaveToZip()
+        private static string DownloadAndSaveToZip()
         {
             var dateKey = DateTime.Now.AddHours(-8).Date.ToString("yyyyMMdd");
             var virtualFileEntries = new List<VirtualFileEntry>();
@@ -143,6 +144,7 @@ namespace Data.Actions.MorningStar
             }
 
             ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries);
+            return zipFileName;
         }
 
         #region ============  Json classes  ==============
