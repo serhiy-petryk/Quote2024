@@ -32,7 +32,7 @@ namespace Data.Actions.MorningStar
         public static void SaveToDb(Dictionary<string, List<DbItem>> data)
         {
             var items = data.SelectMany(a => a.Value).OrderBy(a=>a.Symbol).ToArray();
-            DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..HScreenerMorningStar", "Symbol", "Date", "LastDate",
+            DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..HScreenerMorningStar", "Symbol", "Date", "LastUpdated",
                 "Exchange", "Sector", "Name");
             
             DbUtils.ExecuteSql("UPDATE a SET Sector=b.CorrectSectorName FROM dbQ2023Others..HScreenerMorningStar a INNER JOIN dbQ2023Others..SectorXref b on a.Sector = b.BadSectorName");
@@ -89,7 +89,7 @@ namespace Data.Actions.MorningStar
                                 {
                                     Symbol = symbol,
                                     sDate = timeKey,
-                                    sLastDate = timeKey,
+                                    sLastUpdated = timeKey,
                                     Exchange = exchange,
                                     Name = name,
                                     Sector = sector
@@ -103,17 +103,17 @@ namespace Data.Actions.MorningStar
                                 {
                                     var newDbItem = new DbItem()
                                     {
-                                        Symbol = symbol, sDate = timeKey, sLastDate = timeKey, Exchange = exchange,
+                                        Symbol = symbol, sDate = timeKey, sLastUpdated = timeKey, Exchange = exchange,
                                         Name = name, Sector = sector
                                     };
 
-                                    if (lastItem.LastDate != newDbItem.Date || lastItem.Name.Length < newDbItem.Name.Length)
+                                    if (lastItem.LastUpdated != newDbItem.Date || lastItem.Name.Length < newDbItem.Name.Length)
                                         dictData[symbol].Add(newDbItem);
                                 }
                                 else
                                 {
                                     // only change [LastDate] timeKey
-                                    dictData[symbol][dictData[symbol].Count - 1].sLastDate = timeKey;
+                                    dictData[symbol][dictData[symbol].Count - 1].sLastUpdated = timeKey;
                                 }
                             }
                         }
@@ -232,12 +232,12 @@ namespace Data.Actions.MorningStar
         {
             public string Symbol;
             public string sDate;
-            public string sLastDate;
+            public string sLastUpdated;
             public string Exchange;
             public string Sector;
             public string Name;
             public DateTime Date => DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
-            public DateTime LastDate => DateTime.ParseExact(sLastDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
+            public DateTime LastUpdated => DateTime.ParseExact(sLastUpdated, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
         }
 
         private class JsonItem
