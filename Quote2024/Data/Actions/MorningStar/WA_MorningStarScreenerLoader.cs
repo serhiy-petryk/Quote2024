@@ -34,6 +34,8 @@ namespace Data.Actions.MorningStar
             var items = data.SelectMany(a => a.Value).OrderBy(a=>a.Symbol).ToArray();
             DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..HScreenerMorningStar", "Symbol", "Date", "LastDate",
                 "Exchange", "Sector", "Name");
+            
+            DbUtils.ExecuteSql("UPDATE a SET Sector=b.CorrectSectorName FROM dbQ2023Others..HScreenerMorningStar a INNER JOIN dbQ2023Others..SectorXref b on a.Sector = b.BadSectorName");
         }
 
         public static void ParseHtmlFiles(Dictionary<string, List<DbItem>> dictData)
