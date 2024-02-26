@@ -22,7 +22,7 @@ namespace Data.Actions.MorningStar
 
             var zipFileName = DownloadAndSaveToZip();
             ParseJsonAndSaveToDb(zipFileName);
-            ParseJsonAndSaveToDb(@"E:\Quote\WebData\Screener\MorningStar\Data\MSS_20240224.zip");
+            // ParseJsonAndSaveToDb(@"E:\Quote\WebData\Screener\MorningStar\Data\MSS_20240224.zip");
 
             Logger.AddMessage($"Finished!");
         }
