@@ -40,14 +40,15 @@ namespace Data.Actions.MorningStar
 
         public static void ParseHtmlFiles(Dictionary<string, List<DbItem>> dictData)
         {
-            var htmlFiles = Directory.GetFiles(HtmlDataFolder, "*.html").OrderBy(a=>a).ToArray();
+            string[] GetSectorAndTimeKey(string filename) => Path.GetFileNameWithoutExtension(filename).Split('_');
+
+            var htmlFiles = Directory.GetFiles(HtmlDataFolder, "*.html").OrderBy(a=>GetSectorAndTimeKey(a)[1]).ToArray();
             var data = new List<(string, string, string, string, string)>();
             var data2 = new List<(string, string, string, string, string)>();
             foreach (var htmlFile in htmlFiles)
             {
-                var ss = Path.GetFileNameWithoutExtension(htmlFile).Split('_');
-                var timeKey = ss[1];
-                var sector = MorningStarCommon.GetSectorName(ss[0]);
+                var timeKey = GetSectorAndTimeKey(htmlFile)[1];
+                var sector = MorningStarCommon.GetSectorName(GetSectorAndTimeKey(htmlFile)[0]);
 
                 var countBefore = data.Count;
                 var countBefore2 = data2.Count;
@@ -64,6 +65,7 @@ namespace Data.Actions.MorningStar
 
                     var k3 = s.IndexOf('/', k2+1);
                     var symbol = s.Substring(k2+1, k3-k2-1).ToUpper();
+
                     var k4 = s.IndexOf('>');
                     var k5 = s.IndexOf("</a>", StringComparison.Ordinal);
                     var name = s.Substring(k4 + 1, k5 - k4 - 1).Trim();
@@ -75,6 +77,8 @@ namespace Data.Actions.MorningStar
 
                     if (!string.Equals(symbol, name))
                     {
+                        symbol = symbol.Replace("-P", "^").Replace("-", ".");
+
                         name = System.Net.WebUtility.HtmlDecode(name);
                         if (ss1[0].Contains("Gainers, Losers, Actives"))
                             data2.Add((sector,timeKey, symbol, exchange, name));
@@ -174,60 +178,6 @@ namespace Data.Actions.MorningStar
         }
 
         #region =========  SubClasses  ===========
-
-        /*private class DbItem
-        {
-            public string Symbol;
-            public DateTime Date;
-            public string Source => "quote";
-            public string Exchange;
-            public string Name;
-            public float Open;
-            public float High;
-            public float Low;
-            public float Last;
-            public long Volume;
-            public DateTime TimeStamp;
-
-            public bool IsBad;
-
-            public DbItem(string exchange, DateTime timeStamp, string content)
-            {
-                Exchange = exchange;
-                TimeStamp = timeStamp;
-
-                var i1 = content.IndexOf(">LAST:<", StringComparison.Ordinal);
-                if (i1 == -1)
-                {
-                    IsBad = true;
-                    return;
-                }
-
-                var i22 = content.LastIndexOf("<table ", i1, StringComparison.Ordinal);
-                var i32 = content.IndexOf("</table>", i22, StringComparison.Ordinal);
-                var rows2 = content.Substring(i22 + 7, i32 - i22 - 7).Trim().Split(new[] { "</tr>" }, StringSplitOptions.RemoveEmptyEntries);
-
-                var i21 = content.LastIndexOf("<table ", i22 - 7, StringComparison.Ordinal);
-                var i31 = content.IndexOf("</table>", i21, StringComparison.Ordinal);
-                var rows1 = content.Substring(i21 + 7, i31 - i21 - 7).Trim().Split(new[] { "</tr>" }, StringSplitOptions.RemoveEmptyEntries);
-
-                var cells = rows1[0].Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
-                Symbol = GetCellContent(cells[0]);
-                Name = GetCellContent(cells[1]);
-                var sDate = GetCellContent(cells[2]);
-                Date = DateTime.Parse(sDate, CultureInfo.InvariantCulture);
-
-                cells = rows2[0].Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
-                Last = float.Parse(GetCellContent(cells[0]), NumberStyles.Any, CultureInfo.InvariantCulture);
-                Open = float.Parse(GetCellContent(cells[2]), NumberStyles.Any, CultureInfo.InvariantCulture);
-                High = float.Parse(GetCellContent(cells[3]), NumberStyles.Any, CultureInfo.InvariantCulture);
-                Volume = long.Parse(GetCellContent(cells[5]), NumberStyles.Any, CultureInfo.InvariantCulture);
-
-                cells = rows2[1].Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
-                Low = float.Parse(GetCellContent(cells[2]), NumberStyles.Any, CultureInfo.InvariantCulture);
-            }
-        }*/
-
         public class DbItem
         {
             public string Symbol;
