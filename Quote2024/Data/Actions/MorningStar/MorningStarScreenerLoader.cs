@@ -14,7 +14,6 @@ namespace Data.Actions.MorningStar
         // private const string UrlTemplate = @"https://www.morningstar.com/api/v2/navigation-list/{0}?sort=marketCap:desc&page={1}&limit=50";
         private const string UrlTemplate = @"https://www.morningstar.com/api/v2/navigation-list/{0}?sort=ticker&page={1}&limit=50";
         private const string DataFolder = @"E:\Quote\WebData\Screener\MorningStar\Data";
-        private const string JsonDataFolder = @"E:\Quote\WebData\Screener\MorningStar\Json";
 
         public static void Start()
         {
@@ -100,20 +99,12 @@ namespace Data.Actions.MorningStar
             {
                 Logger.AddMessage($"Process {sector} sector");
 
-                byte[] bytes;
-                var filename = JsonDataFolder + $@"\{sector}_0.json";
-                if (!File.Exists(filename))
-                {
-                    var url = string.Format(UrlTemplate, sector, 1);
-                    var o = Helpers.Download.DownloadToBytes(url, true);
-                    if (o is Exception ex)
-                        throw new Exception(
-                            $"MorningStarScreenerLoader: Error while download from {url}. Error message: {ex.Message}");
-                    bytes = (byte[])o;
-                    File.WriteAllBytes(filename, bytes);
-                }
-                else
-                    bytes = File.ReadAllBytes(filename);
+                var url = string.Format(UrlTemplate, sector, 1);
+                var o = Helpers.Download.DownloadToBytes(url, true);
+                if (o is Exception ex)
+                    throw new Exception(
+                        $"MorningStarScreenerLoader: Error while download from {url}. Error message: {ex.Message}");
+                var bytes = (byte[])o;
 
                 var entryName = string.Format(entryNameTemplate, sector, "0");
                 var entry = new VirtualFileEntry(entryName, bytes);
@@ -123,19 +114,12 @@ namespace Data.Actions.MorningStar
 
                 for (var k = 1; k < oo.pagination.totalPages; k++)
                 {
-                    filename = JsonDataFolder + $@"\{sector}_{k}.json";
-                    if (!File.Exists(filename))
-                    {
-                        var url = string.Format(UrlTemplate, sector, k + 1);
-                        var o = Helpers.Download.DownloadToBytes(url, true);
-                        if (o is Exception ex)
-                            throw new Exception(
-                                $"MorningStarScreenerLoader: Error while download from {url}. Error message: {ex.Message}");
-                        bytes = (byte[])o;
-                        File.WriteAllBytes(filename, bytes);
-                    }
-                    else
-                        bytes = File.ReadAllBytes(filename);
+                    url = string.Format(UrlTemplate, sector, k + 1);
+                    o = Helpers.Download.DownloadToBytes(url, true);
+                    if (o is Exception ex2)
+                        throw new Exception(
+                            $"MorningStarScreenerLoader: Error while download from {url}. Error message: {ex2.Message}");
+                    bytes = (byte[])o;
 
                     entryName = string.Format(entryNameTemplate, sector, k.ToString());
                     entry = new VirtualFileEntry(entryName, bytes);

@@ -21,7 +21,6 @@ namespace Data.Actions.Chartmill
         // 2020-01-03,2020-04-03,2020-07-10,2020-10-02,2021-01-08,2021-04-09,2021-07-02,2021-10-01,2022-01-07,2022-01-07,2022-04-01,2022-07-01,2022-10-07,2023-01-06,2023-03-31,2023-07-07,2023-10-02,2024-01-02,
 
         private const string DataFolder = @"E:\Quote\WebData\Screener\Chartmill\Data";
-        private const string JsonDataFolder = @"E:\Quote\WebData\Screener\Chartmill\Json";
 
         public static void Start()
         {
@@ -109,32 +108,20 @@ namespace Data.Actions.Chartmill
             var zipFileName = Path.Combine(DataFolder, $"Chartmill_{dateKey}.zip");
             var entryNameTemplate = Path.Combine(Path.GetFileNameWithoutExtension(zipFileName), $"Chartmill_{dateKey}_" + "{0}.json");
 
-            var jsonFolder = Path.Combine(JsonDataFolder, $@"Chartmill_{dateKey}");
-            if (!Directory.Exists(jsonFolder))
-                Directory.CreateDirectory(jsonFolder);
-
             var from = 0;
             var rows = 0;
             while (from == 0 || from < rows)
             {
-                var filename = Path.Combine(jsonFolder, $@"Chartmill_{dateKey}_{from}.json");
-                byte[] bytes;
-                if (!File.Exists(filename))
-                {
-                    var parameters = date.HasValue
-                        ? ParameterTemplateWithDate.Replace("{0}", from.ToString())
-                            .Replace("{1}", date.Value.ToString("yyyy-MM-dd"))
-                        : ParameterTemplate.Replace("{0}", from.ToString());
+                var parameters = date.HasValue
+                    ? ParameterTemplateWithDate.Replace("{0}", from.ToString())
+                        .Replace("{1}", date.Value.ToString("yyyy-MM-dd"))
+                    : ParameterTemplate.Replace("{0}", from.ToString());
 
-                    var o = Download.PostToBytes(Url, parameters, false);
-                    if (o is Exception ex)
-                        throw new Exception(
-                            $"ChartmillScreenerLoader: Error while download from {Url}. Error message: {ex.Message}");
-                    bytes = (byte[])o;
-                    File.WriteAllBytes(filename, bytes);
-                }
-                else
-                    bytes = File.ReadAllBytes(filename);
+                var o = Download.PostToBytes(Url, parameters, false);
+                if (o is Exception ex)
+                    throw new Exception(
+                        $"ChartmillScreenerLoader: Error while download from {Url}. Error message: {ex.Message}");
+                var bytes = (byte[])o;
 
                 var entryName = string.Format(entryNameTemplate, from.ToString());
                 var entry = new VirtualFileEntry(entryName, bytes);
