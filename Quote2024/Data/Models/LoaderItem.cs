@@ -18,9 +18,12 @@ namespace Data.Models
         public static BindingList<LoaderItem> DataGridLoaderItems = new BindingList<LoaderItem>
         {
             // new LoaderItem {Name = "Polygon Minute Scan", Action = Actions.Polygon.PolygonMinuteScan.Start, Checked = false},
-            new LoaderItem {Name = "TradingView Screener", Action = Actions.TradingView.TvScreenerLoader.Start, Checked = false},
-            new LoaderItem {Name = "Nasdaq Stock/Etf Screeners", Action = Actions.Nasdaq.NasdaqScreenerLoader.Start, Checked = false},
-            new LoaderItem {Name = "Nasdaq Stock Screeners from Github", Action = Actions.Nasdaq.NasdaqScreenerGithubLoader.Start, Checked = false},
+            // new LoaderItem {Name = "TradingView Screener", Action = Actions.TradingView.TvScreenerLoader.Start, Checked = false},
+            // new LoaderItem {Name = "Nasdaq Stock/Etf Screeners", Action = Actions.Nasdaq.NasdaqScreenerLoader.Start, Checked = false},
+            // new LoaderItem {Name = "Nasdaq Stock Screeners from Github", Action = Actions.Nasdaq.NasdaqScreenerGithubLoader.Start, Checked = false},
+            new LoaderItem {Name = "MorningStar Screener", Action = Actions.MorningStar.MorningStarScreenerLoader.Start, Checked = false},
+            new LoaderItem {Name = "Chartmill Screener", Action = Actions.Chartmill.ChartmillScreenerLoader.Start, Checked = false},
+            new LoaderItem {Name = "Index components from Wikipedia", Action = Actions.Wikipedia.WikipediaIndexLoader.Start, Checked = false},
             new LoaderItem {Name = "Eoddata Symbols", Action = Actions.Eoddata.EoddataSymbolsLoader.Start, Checked = false},
             // new LoaderItem {Name = "Yahoo Profiles", Action=Actions.Yahoo.YahooProfileLoader.Start},
             new LoaderItem {Name = "Yahoo Indices & Update Trading days", Action = Actions.Yahoo.YahooIndicesLoader.Start, Checked = false},
@@ -33,7 +36,6 @@ namespace Data.Models
             new LoaderItem {Name = "StockAnalysis Corporate Actions", Action = Actions.StockAnalysis.StockAnalysisActions.Start, Checked = false},
             new LoaderItem {Name = "StockAnalysis IPOs", Action = Actions.StockAnalysis.StockAnalysisIPOs.Start, Checked=false},
             new LoaderItem {Name = "Refresh Split data", Action = Models.SplitModel.RefreshSplitData, Checked = false},
-            new LoaderItem {Name = "Index components from Wikipedia", Action = Actions.Wikipedia.WikipediaIndexLoader.Start, Checked = false},
             new LoaderItem {Name = "Polygon Minute Quotes (+ one week of last loading)", Action = Actions.Polygon.PolygonMinuteLoader.Start, Checked = false},
             new LoaderItem {Name = "PolygonMinuteLog save to database", Action = Actions.Polygon.PolygonMinuteLogSaveToDb.Start, Checked = false},
             // new LoaderItem {Name = "Polygon Minute Quotes (date range)", Action = Actions.Polygon.PolygonMinuteLoader.StartWithDateRange, Checked = false},*/

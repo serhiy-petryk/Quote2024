@@ -31,8 +31,6 @@ namespace Data.Actions.Chartmill
 
             // Parse and save data to database
             Logger.AddMessage($"Parse and save to database");
-            // var zipFileName = @"E:\Quote\WebData\Screener\Chartmill\Data\Chartmill_20240226.zip";
-
             ParseJsonAndSaveToDb(zipFileName);
 
             Logger.AddMessage($"!Finished. Items: itemCount:N0. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
