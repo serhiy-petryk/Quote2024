@@ -67,6 +67,7 @@ namespace Data.Actions.Wikipedia
         public static int ParseAndSaveToDb(string zipFileName)
         {
             var itemCount = 0;
+            var prevIndexName = string.Empty;
             var prevTimeStamp = DateTime.MinValue;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0).OrderBy(a=>a.Name))
@@ -80,7 +81,8 @@ namespace Data.Actions.Wikipedia
                     var indexName = ss[ss.Length - 2];
 
                     var timeStamp = entry.LastWriteTime.DateTime;
-                    if (prevTimeStamp.Date == timeStamp.Date) continue;
+                    if (prevTimeStamp.Date == timeStamp.Date && prevIndexName == indexName) continue;
+                    prevIndexName = indexName;
                     prevTimeStamp = timeStamp;
 
                     var i1 = content.IndexOf("id=\"constituents\"", StringComparison.InvariantCultureIgnoreCase);
@@ -146,7 +148,7 @@ namespace Data.Actions.Wikipedia
                     i1 = content.IndexOf(" changes to the list of ", StringComparison.InvariantCultureIgnoreCase);
                     if (i1 > 0)
                     {
-                        Debug.Print($"Changes: {entry.Name}");
+                        // Debug.Print($"Changes: {entry.Name}");
                         i1 = content.IndexOf(">Reason", StringComparison.InvariantCultureIgnoreCase);
                         var i2 = content.IndexOf("</table>", i1 + 7, StringComparison.InvariantCultureIgnoreCase);
                         var table = content.Substring(i1, i2 - i1);
