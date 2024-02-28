@@ -35,7 +35,8 @@ namespace Data.Actions.MorningStar
             DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..HScreenerMorningStar", "Symbol", "Date", "LastUpdated",
                 "Exchange", "Sector", "Name");
             
-            DbUtils.ExecuteSql("UPDATE a SET Sector=b.CorrectSectorName FROM dbQ2023Others..HScreenerMorningStar a INNER JOIN dbQ2023Others..SectorXref b on a.Sector = b.BadSectorName");
+            DbUtils.ExecuteSql("UPDATE a SET Sector=b.CorrectSectorName FROM dbQ2023Others..HScreenerMorningStar a "+
+                               "INNER JOIN dbQ2024..SectorXref b on a.Sector = b.BadSectorName");
         }
 
         public static void ParseHtmlFiles(Dictionary<string, List<DbItem>> dictData)

@@ -39,7 +39,7 @@ namespace Data.Actions.Chartmill
             Logger.AddMessage($"!Finished. Items: itemCount:N0. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
         }
 
-        public static void StartHistory()
+        public static void DownloadAndSaveToZipHistory()
         {
             Logger.AddMessage($"Started");
 
@@ -166,9 +166,6 @@ namespace Data.Actions.Chartmill
             public byte? Country;
             public byte? Type;
             public bool? Etf;
-
-            //   public DateTime Date => DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
-            // public DateTime LastUpdated => DateTime.ParseExact(sLastUpdated, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
         }
 
         private class cRoot
