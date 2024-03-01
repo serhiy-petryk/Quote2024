@@ -6,14 +6,14 @@ using Data.Helpers;
 
 namespace Data.Scanners
 {
-    public class HourPolygon
+    public class ScannerQuote
     {
         private const float AveragePeriod = 21f;
         private const float AveragePeriodDelta = 2.6f;
-        private static readonly DateTime FromDate = new DateTime(2022, 1, 1);
-        private static readonly DateTime ToDate = new DateTime(2099, 12, 29);
+        // private static readonly DateTime FromDate = new DateTime(2022, 1, 1);
+        // private static readonly DateTime ToDate = new DateTime(2099, 12, 29);
 
-        public static void StartMin5()
+        /*public static void StartMin5()
         {
             var aa = new List<TimeSpan>();
             var ts = new TimeSpan(9, 30, 0);
@@ -42,16 +42,27 @@ namespace Data.Scanners
             var timeCommon = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
             Start("dbQ2024..HourHalfPolygon", timeCommon, timeShortened);
-        }
+        }*/
 
         public static void StartHour()
         {
             var timeCommon = "09:30,10:00,11:00,12:00,13:00,14:00,15:00,15:45,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,11:00,12:00,12:45,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            Start("dbQ2024..HourPolygon2", timeCommon, timeShortened);
+            var tableName = "dbQ2024..HourPolygon";
+            var sourceSql = "select Symbol, Date from dbQ2024..DayPolygon where IsTest IS NULL AND year(date) in (2022,2023) and Volume*[Close]>=1000000 and TradeCount>=500";
+            Start(tableName, timeCommon, timeShortened, sourceSql);
         }
 
-        public static void Start(string tableName, TimeSpan[] timeCommon, TimeSpan[] timeShortened)
+        public static void StartTestHour()
+        {
+            var timeCommon = "09:30,10:00,11:00,12:00,13:00,14:00,15:00,15:45,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
+            var timeShortened = "09:30,10:00,11:00,12:00,12:45,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
+            var tableName = "dbQ2024Tests..temp_OpenClose_Hour_2024_02";
+            var sourceSql = "select symbol, Date3 Date from dbQ2024Tests..temp_OpenClose_2024_02";
+            Start(tableName, timeCommon, timeShortened, sourceSql);
+        }
+
+        public static void Start(string tableName, TimeSpan[] timeCommon, TimeSpan[] timeShortened, string sourceSql)
         {
             var timeRangeCommon = new List<(TimeSpan, TimeSpan)>();
             for (var k = 0; k < timeCommon.Length - 1; k++)
@@ -72,7 +83,7 @@ namespace Data.Scanners
                 "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30",
                 "CloseAtEma2_30");
 
-            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(FromDate, ToDate))
+            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(sourceSql))
             {
                 var symbol = oo.Item1;
                 var date = oo.Item2;
@@ -227,5 +238,69 @@ namespace Data.Scanners
 
             Debug.Print($"Results count: {resultsCount}");
         }
+
+        #region =========  Instance  ==========
+
+        public string Symbol;
+        public DateTime Date;
+        public TimeSpan Time;
+        public TimeSpan To;
+        public float Open;
+        public float High;
+        public float Low;
+        public float Close;
+        public float Volume;
+        public float? Final;
+        public short? FinalDelayInMinutes;
+
+        public int TradeCount;
+        public byte Count;
+
+        public float OpenNext;
+        public byte? OpenNextDelayInMinutes;
+
+        public float Prev2Wma_20;
+        public float PrevWma_20;
+        public float Wma_20;
+        public float? CloseAtWma_20;
+
+        public float Prev2Wma_30;
+        public float PrevWma_30;
+        public float Wma_30;
+        public float? CloseAtWma_30;
+
+        public float Prev2Ema_20;
+        public float PrevEma_20;
+        public float Ema_20;
+        public float? CloseAtEma_20;
+
+        public float Prev2Ema_30;
+        public float PrevEma_30;
+        public float Ema_30;
+        public float? CloseAtEma_30;
+
+        public float Prev2Ema2_20;
+        public float PrevEma2_20;
+        public float Ema2_20;
+        public float? CloseAtEma2_20;
+
+        public float Prev2Ema2_30;
+        public float PrevEma2_30;
+        public float Ema2_30;
+        public float? CloseAtEma2_30;
+
+        private long _fromUnixMilliseconds;
+        private long _toUnixMilliseconds;
+
+        public ScannerQuote(string symbol, DateTime date, (TimeSpan, TimeSpan) FromTo)
+        {
+            Symbol = symbol;
+            Date = date;
+            Time = FromTo.Item1;
+            To = FromTo.Item2;
+            _fromUnixMilliseconds = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Time));
+            _toUnixMilliseconds = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(To));
+        }
+        #endregion
     }
 }
