@@ -6,7 +6,7 @@ using Data.Helpers;
 
 namespace Data.Scanners
 {
-    public class ScannerQuote
+    public class QuoteScanner
     {
         private const float AveragePeriod = 21f;
         private const float AveragePeriodDelta = 2.6f;
@@ -35,14 +35,19 @@ namespace Data.Scanners
                 ts = ts.Add(new TimeSpan(0, 15, 0));
             }
             Start("dbQ2024..Min15Polygon", aa.ToArray(), aa.Where(a => a <= Settings.MarketEndOfShortenedDay).ToArray());
-        }
+        }*/
 
         public static void StartHourHalf()
         {
             var timeCommon = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            Start("dbQ2024..HourHalfPolygon", timeCommon, timeShortened);
-        }*/
+            var tableName = "dbQ2024..HourHalfPolygon";
+            var sourceSql = "select a.Symbol, a.Date from dbQ2024Minute..MinutePolygonLog a " +
+                            "inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date " +
+                            "where year(a.date) in (2023) and a.RowStatus IN (2, 5) and " +
+                            "a.[High]*a.Volume > 5000000 and a.TradeCount > 500 and b.IsTest is null";
+            Start(tableName, timeCommon, timeShortened, sourceSql);
+        }
 
         public static void StartHour()
         {
@@ -75,7 +80,7 @@ namespace Data.Scanners
             for (var k = 0; k < timeShortened.Length - 1; k++)
                 timeRangeShortened.Add((timeShortened[k], timeShortened[k + 1]));
 
-            var allResults = new List<ScannerQuote>();
+            var allResults = new List<QuoteScanner>();
             var resultsCount = 0;
 
             DbUtils.ClearAndSaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
@@ -102,12 +107,12 @@ namespace Data.Scanners
                 var ema2_30 = StatMethods.Ema2(closes, 30);
 
                 var timeRange = Settings.ShortenedDays.ContainsKey(date) ? timeRangeShortened : timeRangeCommon;
-                var results = new List<ScannerQuote>();
+                var results = new List<QuoteScanner>();
 
                 foreach (var o1 in timeRange)
                 {
                     resultsCount += results.Count;
-                    var result = new ScannerQuote(symbol, date, o1);
+                    var result = new QuoteScanner(symbol, date, o1);
                     results.Add(result);
 
                     var fromUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1));
@@ -309,7 +314,7 @@ namespace Data.Scanners
         private long _fromUnixMilliseconds;
         private long _toUnixMilliseconds;
 
-        public ScannerQuote(string symbol, DateTime date, (TimeSpan, TimeSpan) FromTo)
+        public QuoteScanner(string symbol, DateTime date, (TimeSpan, TimeSpan) FromTo)
         {
             Symbol = symbol;
             Date = date;

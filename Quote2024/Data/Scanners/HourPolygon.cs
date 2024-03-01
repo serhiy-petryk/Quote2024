@@ -61,7 +61,7 @@ namespace Data.Scanners
             for (var k = 0; k < timeShortened.Length - 1; k++)
                 timeRangeShortened.Add((timeShortened[k], timeShortened[k + 1]));
 
-            var allResults = new List<ScannerQuote>();
+            var allResults = new List<QuoteScanner>();
             var resultsCount = 0;
 
             DbUtils.ClearAndSaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
@@ -88,12 +88,12 @@ namespace Data.Scanners
                 var ema2_30 = StatMethods.Ema2(closes, 30);
 
                 var timeRange = Settings.ShortenedDays.ContainsKey(date) ? timeRangeShortened : timeRangeCommon;
-                var results = new List<ScannerQuote>();
+                var results = new List<QuoteScanner>();
 
                 foreach (var o1 in timeRange)
                 {
                     resultsCount += results.Count;
-                    var result = new ScannerQuote(symbol, date, o1);
+                    var result = new QuoteScanner(symbol, date, o1);
                     results.Add(result);
 
                     var fromUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1));

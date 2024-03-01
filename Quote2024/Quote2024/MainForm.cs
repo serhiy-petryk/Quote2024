@@ -180,7 +180,7 @@ namespace Quote2024
             // await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
 
             // await Task.Factory.StartNew(Data.Actions.Chartmill.ChartmillScreenerLoader.ParseAllZipFiles);
-            await Task.Factory.StartNew(Data.Scanners.ScannerQuote.StartHour);
+            await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
