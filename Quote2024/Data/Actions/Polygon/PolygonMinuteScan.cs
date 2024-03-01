@@ -239,7 +239,7 @@ namespace Data.Actions.Polygon
                 cmd.CommandTimeout = 300;
                 cmd.CommandText = $"SELECT a.* FROM dbQ2024Minute..MinutePolygonLog a inner join "+
                                   $"({sql}) b on a.Symbol = b.Symbol and a.Date = b.Date "+
-                                  "WHERE RowStatus IN(2, 5) ORDER BY a.Folder, a.Symbol, a.Date";
+                                  "WHERE RowStatus IN (2, 5) ORDER BY a.Folder, a.Symbol, a.Date";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {

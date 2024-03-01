@@ -49,7 +49,10 @@ namespace Data.Scanners
             var timeCommon = "09:30,10:00,11:00,12:00,13:00,14:00,15:00,15:45,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,11:00,12:00,12:45,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var tableName = "dbQ2024..HourPolygon";
-            var sourceSql = "select Symbol, Date from dbQ2024..DayPolygon where IsTest IS NULL AND year(date) in (2022,2023) and Volume*[Close]>=1000000 and TradeCount>=500";
+            var sourceSql = "select a.Symbol, a.Date from dbQ2024Minute..MinutePolygonLog a "+
+                            "inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date "+
+                            "where year(a.date) in (2021, 2022, 2023) and a.RowStatus IN (2, 5) and "+
+                            "a.[High]*a.Volume > 10000000 and a.TradeCount > 1000 and b.IsTest is null";
             Start(tableName, timeCommon, timeShortened, sourceSql);
         }
 
@@ -77,11 +80,11 @@ namespace Data.Scanners
 
             DbUtils.ClearAndSaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                 "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
-                "OpenNextDelayInMinutes", "OpenNext", "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
-                "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20", "PrevEma_20", "Ema_20",
-                "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30", "Prev2Ema2_20",
-                "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30",
-                "CloseAtEma2_30");
+                "OpenNextDelayInMinutes", "OpenNext", "HighBefore", "LowBefore", "Prev2Wma_20", "PrevWma_20",
+                "Wma_20", "CloseAtWma_20", "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20",
+                "PrevEma_20", "Ema_20", "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30",
+                "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30",
+                "Ema2_30", "CloseAtEma2_30");
 
             foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(sourceSql))
             {
@@ -133,6 +136,17 @@ namespace Data.Scanners
                             result.PrevEma_30 = ema_30[countFull];
                             result.PrevEma2_20 = ema2_20[countFull];
                             result.PrevEma2_30 = ema2_30[countFull];
+
+                            if (countFull == 0)
+                            {
+                                result.HighBefore = quote.h;
+                                result.LowBefore = quote.l;
+                            }
+                            else
+                            {
+                                if (result.HighBefore < quote.h) result.HighBefore = quote.h;
+                                if (result.LowBefore > quote.l) result.LowBefore = quote.l;
+                            }
                         }
                         else if (quote.t < toUnixTicks)
                         {
@@ -215,11 +229,11 @@ namespace Data.Scanners
                 {
                     DbUtils.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                         "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
-                        "OpenNextDelayInMinutes", "OpenNext", "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
-                        "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20", "PrevEma_20", "Ema_20",
-                        "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30", "Prev2Ema2_20",
-                        "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30",
-                        "CloseAtEma2_30");
+                        "OpenNextDelayInMinutes", "OpenNext", "HighBefore", "LowBefore", "Prev2Wma_20", "PrevWma_20",
+                        "Wma_20", "CloseAtWma_20", "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20",
+                        "PrevEma_20", "Ema_20", "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30",
+                        "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30",
+                        "Ema2_30", "CloseAtEma2_30");
                     allResults.Clear();
                 }
             }
@@ -228,11 +242,11 @@ namespace Data.Scanners
             {
                 DbUtils.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                     "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
-                    "OpenNextDelayInMinutes", "OpenNext", "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
-                    "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20", "PrevEma_20", "Ema_20",
-                    "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30", "Prev2Ema2_20",
-                    "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30",
-                    "CloseAtEma2_30");
+                    "OpenNextDelayInMinutes", "OpenNext", "HighBefore", "LowBefore", "Prev2Wma_20", "PrevWma_20",
+                    "Wma_20", "CloseAtWma_20", "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20",
+                    "PrevEma_20", "Ema_20", "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30",
+                    "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30",
+                    "Ema2_30", "CloseAtEma2_30");
                 allResults.Clear();
             }
 
@@ -256,8 +270,11 @@ namespace Data.Scanners
         public int TradeCount;
         public byte Count;
 
-        public float OpenNext;
         public byte? OpenNextDelayInMinutes;
+        public float OpenNext;
+
+        public float HighBefore;
+        public float LowBefore;
 
         public float Prev2Wma_20;
         public float PrevWma_20;
