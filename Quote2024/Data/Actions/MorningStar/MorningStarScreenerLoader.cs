@@ -25,6 +25,13 @@ namespace Data.Actions.MorningStar
             Logger.AddMessage($"Finished!");
         }
 
+        public static void ParseJsonAndSaveToDbAllFiles()
+        {
+            var files = Directory.GetFiles(DataFolder, "*.zip").OrderBy(a => a).ToArray();
+            foreach(var file in files)
+                ParseJsonAndSaveToDb(file);
+        }
+
         private static void ParseJsonAndSaveToDb(string zipFileName)
         {
             var dateKey = DateTime.ParseExact(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1], "yyyyMMdd",
@@ -113,6 +120,9 @@ namespace Data.Actions.MorningStar
 
                 for (var k = 1; k < oo.pagination.totalPages; k++)
                 {
+                    if (k % 10 == 0)
+                        Logger.AddMessage($"Process {sector} sector. Downloaded {k} pages from {oo.pagination.totalPages}");
+
                     url = string.Format(UrlTemplate, sector, k + 1);
                     o = Helpers.Download.DownloadToBytes(url, true);
                     if (o is Exception ex2)

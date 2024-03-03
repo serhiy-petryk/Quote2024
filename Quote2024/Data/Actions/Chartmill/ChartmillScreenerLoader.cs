@@ -108,8 +108,12 @@ namespace Data.Actions.Chartmill
 
             var from = 0;
             var rows = 0;
+            var count = 0;
             while (from == 0 || from < rows)
             {
+                if (count % 10 == 0 && count != 0)
+                    Logger.AddMessage($"Downloaded {from} rows from {rows}");
+
                 var parameters = date.HasValue
                     ? ParameterTemplateWithDate.Replace("{0}", from.ToString())
                         .Replace("{1}", date.Value.ToString("yyyy-MM-dd"))
@@ -131,6 +135,7 @@ namespace Data.Actions.Chartmill
 
                 if (rows == 0)
                     throw new Exception("ChartmillScreenerLoader. No data downloaded");
+                count++;
             }
 
             ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries);
