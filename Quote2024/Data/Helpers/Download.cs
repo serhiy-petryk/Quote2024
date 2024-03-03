@@ -42,8 +42,7 @@ namespace Data.Helpers
                 wc.Encoding = System.Text.Encoding.UTF8;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                // wc.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded"); // for post
-                wc.Headers.Add(HttpRequestHeader.ContentType, "application/json");
+                wc.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded"); // very important for Investing.Splits
 
                 try
                 {
