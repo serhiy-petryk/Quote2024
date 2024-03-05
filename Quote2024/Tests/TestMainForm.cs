@@ -9,7 +9,7 @@ namespace Tests
     public partial class TestMainForm : Form
     {
         private Websocket.Client.WebsocketClient _client;
-        private string _logFile = @"E:\Temp\WebSocket.txt";
+        private string _logFile = $@"E:\Temp\WebSocket_{DateTime.Now:yyyyMMddHHmmss}.txt";
 
         public TestMainForm()
         {
