@@ -29,7 +29,7 @@ namespace Tests
             _client.DisconnectionHappened.Subscribe(info => SaveLog("Disconnection happened, type: " + info.Type));
             _client.MessageReceived.Subscribe(msg =>
             {
-                var messText = $"{DateTime.Now:hh:mm:ss.fff}: {msg}";
+                var messText = $"{DateTime.Now:HH:mm:ss.fff}: {msg}";
                 File.AppendAllText(_logFile, messText + Environment.NewLine);
                 if (cbLogMessages.Checked)
                     SaveLog(messText);

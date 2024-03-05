@@ -44,7 +44,7 @@ namespace Tests
             // 
             // SendMessageText
             // 
-            this.SendMessageText.Location = new System.Drawing.Point(25, 48);
+            this.SendMessageText.Location = new System.Drawing.Point(12, 9);
             this.SendMessageText.Multiline = true;
             this.SendMessageText.Name = "SendMessageText";
             this.SendMessageText.Size = new System.Drawing.Size(529, 62);
@@ -52,7 +52,7 @@ namespace Tests
             // 
             // SendButton
             // 
-            this.SendButton.Location = new System.Drawing.Point(560, 67);
+            this.SendButton.Location = new System.Drawing.Point(560, 20);
             this.SendButton.Name = "SendButton";
             this.SendButton.Size = new System.Drawing.Size(75, 43);
             this.SendButton.TabIndex = 1;
@@ -68,16 +68,16 @@ namespace Tests
             this.listBox1.FormattingEnabled = true;
             this.listBox1.HorizontalScrollbar = true;
             this.listBox1.ItemHeight = 15;
-            this.listBox1.Location = new System.Drawing.Point(25, 116);
+            this.listBox1.Location = new System.Drawing.Point(12, 86);
             this.listBox1.Name = "listBox1";
             this.listBox1.ScrollAlwaysVisible = true;
-            this.listBox1.Size = new System.Drawing.Size(623, 319);
+            this.listBox1.Size = new System.Drawing.Size(623, 349);
             this.listBox1.TabIndex = 2;
             // 
             // ConnectButton
             // 
             this.ConnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ConnectButton.Location = new System.Drawing.Point(697, 48);
+            this.ConnectButton.Location = new System.Drawing.Point(695, 128);
             this.ConnectButton.Name = "ConnectButton";
             this.ConnectButton.Size = new System.Drawing.Size(75, 50);
             this.ConnectButton.TabIndex = 3;
@@ -88,7 +88,7 @@ namespace Tests
             // DisconnectButton
             // 
             this.DisconnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DisconnectButton.Location = new System.Drawing.Point(697, 116);
+            this.DisconnectButton.Location = new System.Drawing.Point(695, 199);
             this.DisconnectButton.Name = "DisconnectButton";
             this.DisconnectButton.Size = new System.Drawing.Size(75, 46);
             this.DisconnectButton.TabIndex = 4;
@@ -98,25 +98,25 @@ namespace Tests
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(177, 12);
+            this.textBox1.Location = new System.Drawing.Point(652, 41);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(185, 23);
+            this.textBox1.Size = new System.Drawing.Size(175, 23);
             this.textBox1.TabIndex = 5;
             this.textBox1.Text = "wss://delayed.polygon.io/stocks";
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(25, 12);
+            this.textBox2.Location = new System.Drawing.Point(651, 12);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(146, 23);
+            this.textBox2.Size = new System.Drawing.Size(175, 23);
             this.textBox2.TabIndex = 6;
             this.textBox2.Text = "wss://echo.websocket.org";
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(368, 12);
+            this.textBox3.Location = new System.Drawing.Point(652, 70);
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
             this.textBox3.Size = new System.Drawing.Size(176, 23);
@@ -126,16 +126,16 @@ namespace Tests
             // WebServerUri
             // 
             this.WebServerUri.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.WebServerUri.Location = new System.Drawing.Point(578, 14);
+            this.WebServerUri.Location = new System.Drawing.Point(654, 99);
             this.WebServerUri.Name = "WebServerUri";
-            this.WebServerUri.Size = new System.Drawing.Size(194, 23);
+            this.WebServerUri.Size = new System.Drawing.Size(172, 23);
             this.WebServerUri.TabIndex = 8;
             this.WebServerUri.Text = "wss://echo.websocket.org";
             // 
             // ClearLogButton
             // 
             this.ClearLogButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ClearLogButton.Location = new System.Drawing.Point(697, 208);
+            this.ClearLogButton.Location = new System.Drawing.Point(695, 342);
             this.ClearLogButton.Name = "ClearLogButton";
             this.ClearLogButton.Size = new System.Drawing.Size(75, 46);
             this.ClearLogButton.TabIndex = 9;
@@ -149,7 +149,7 @@ namespace Tests
             this.cbLogMessages.AutoSize = true;
             this.cbLogMessages.Checked = true;
             this.cbLogMessages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbLogMessages.Location = new System.Drawing.Point(690, 285);
+            this.cbLogMessages.Location = new System.Drawing.Point(695, 416);
             this.cbLogMessages.Name = "cbLogMessages";
             this.cbLogMessages.Size = new System.Drawing.Size(105, 19);
             this.cbLogMessages.TabIndex = 10;
@@ -160,7 +160,7 @@ namespace Tests
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(838, 450);
             this.Controls.Add(this.cbLogMessages);
             this.Controls.Add(this.ClearLogButton);
             this.Controls.Add(this.WebServerUri);
