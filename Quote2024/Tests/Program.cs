@@ -16,7 +16,8 @@ namespace Tests
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Zip.ZipFolderCompressor.Start();
-            Json.Utf8JsonTests.Start();
+            // Json.Utf8JsonTests.Start();
+            // Task.Factory.StartNew(WebSocket.WebSocketTests.DoClientWebSocket);
 
             Application.Run(new TestMainForm());
         }
