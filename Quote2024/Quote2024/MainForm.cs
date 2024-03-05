@@ -175,13 +175,14 @@ namespace Quote2024
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
             // await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
-            // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
 
             // await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
 
             // await Task.Factory.StartNew(Data.Actions.Chartmill.ChartmillScreenerLoader.ParseAllZipFiles);
-            await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
+
+            // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
+            await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
             // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);

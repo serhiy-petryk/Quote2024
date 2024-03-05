@@ -66,11 +66,16 @@ namespace Data.Scanners
 
             DbUtils.ClearAndSaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                 "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
-                "OpenNextDelayInMinutes", "OpenNext", "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
-                "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20", "PrevEma_20", "Ema_20",
-                "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30", "Prev2Ema2_20",
-                "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30",
-                "CloseAtEma2_30");
+                "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext",
+                "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
+                "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
+                "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30",
+                "PrevEma_10", "PrevEma_10", "Ema_10", "CloseAtEma_10",
+                "PrevEma_20", "PrevEma_20", "Ema_20", "CloseAtEma_20",
+                "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30",
+                "Prev2Ema2_10", "PrevEma2_10", "Ema2_10", "CloseAtEma2_10",
+                "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20",
+                "Prev2Ema2_30", "PrevEma2_30", "Ema2_30", "CloseAtEma2_30");
 
             foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(FromDate, ToDate))
             {
@@ -80,10 +85,13 @@ namespace Data.Scanners
                 var tickTo = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.GetMarketEndTime(date)));
                 var quotes = oo.Item3.Where(a => a.t >= ticksFrom && a.t < tickTo && a.IsValid).ToArray();
                 var closes = quotes.Select(q => q.c).ToArray();
+                var wma_10 = StatMethods.Wma(closes, 10);
                 var wma_20 = StatMethods.Wma(closes, 20);
                 var wma_30 = StatMethods.Wma(closes, 30);
+                var ema_10 = StatMethods.Ema(closes, 10);
                 var ema_20 = StatMethods.Ema(closes, 20);
                 var ema_30 = StatMethods.Ema(closes, 30);
+                var ema2_10 = StatMethods.Ema(closes, 10);
                 var ema2_20 = StatMethods.Ema2(closes, 20);
                 var ema2_30 = StatMethods.Ema2(closes, 30);
 
@@ -99,27 +107,36 @@ namespace Data.Scanners
                     var fromUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1));
                     var toUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item2));
                     var countFull = 0;
+                    bool? wma_10_Up = null;
                     bool? wma_20_Up = null;
                     bool? wma_30_Up = null;
+                    bool? ema_10_Up = null;
                     bool? ema_20_Up = null;
                     bool? ema_30_Up = null;
+                    bool? ema2_10_Up = null;
                     bool? ema2_20_Up = null;
                     bool? ema2_30_Up = null;
                     foreach (var quote in quotes)
                     {
                         if (quote.t < fromUnixTicks)
                         {
+                            result.Prev2Wma_10 = result.PrevWma_10;
                             result.Prev2Wma_20 = result.PrevWma_20;
                             result.Prev2Wma_30 = result.PrevWma_30;
+                            result.Prev2Ema_10 = result.PrevEma_10;
                             result.Prev2Ema_20 = result.PrevEma_20;
                             result.Prev2Ema_30 = result.PrevEma_30;
+                            result.Prev2Ema2_10 = result.PrevEma2_10;
                             result.Prev2Ema2_20 = result.PrevEma2_20;
                             result.Prev2Ema2_30 = result.PrevEma2_30;
 
+                            result.PrevWma_10 = wma_10[countFull];
                             result.PrevWma_20 = wma_20[countFull];
                             result.PrevWma_30 = wma_30[countFull];
+                            result.PrevEma_10 = ema_10[countFull];
                             result.PrevEma_20 = ema_20[countFull];
                             result.PrevEma_30 = ema_30[countFull];
+                            result.PrevEma2_10 = ema2_10[countFull];
                             result.PrevEma2_20 = ema2_20[countFull];
                             result.PrevEma2_30 = ema2_30[countFull];
                         }
@@ -136,17 +153,23 @@ namespace Data.Scanners
                                 result.Low = quote.l;
                                 result.Close = quote.c;
 
+                                result.Wma_10 = wma_10[countFull];
                                 result.Wma_20 = wma_20[countFull];
                                 result.Wma_30 = wma_30[countFull];
+                                result.Ema_10 = ema_10[countFull];
                                 result.Ema_20 = ema_20[countFull];
                                 result.Ema_30 = ema_30[countFull];
+                                result.Ema2_10 = ema2_10[countFull];
                                 result.Ema2_20 = ema2_20[countFull];
                                 result.Ema2_30 = ema2_30[countFull];
 
+                                wma_10_Up = GetAverageUpDown(wma_10[countFull]);
                                 wma_20_Up = GetAverageUpDown(wma_20[countFull]);
                                 wma_30_Up = GetAverageUpDown(wma_30[countFull]);
+                                ema_10_Up = GetAverageUpDown(ema_10[countFull]);
                                 ema_20_Up = GetAverageUpDown(ema_20[countFull]);
                                 ema_30_Up = GetAverageUpDown(ema_30[countFull]);
+                                ema2_10_Up = GetAverageUpDown(ema2_10[countFull]);
                                 ema2_20_Up = GetAverageUpDown(ema2_20[countFull]);
                                 ema2_30_Up = GetAverageUpDown(ema2_30[countFull]);
 
@@ -162,18 +185,26 @@ namespace Data.Scanners
                                 if (result.Count == 2)
                                 {
                                     result.OpenNext = quote.o;
+                                    result.HighNext = quote.h;
+                                    result.LowNext = quote.l;
                                     result.OpenNextDelayInMinutes = Convert.ToByte((quote.t - fromUnixTicks) / 60000);
                                 }
+
+                                if (quote.h > result.HighNext) result.HighNext = quote.h;
+                                if (quote.l < result.LowNext) result.LowNext = quote.l;
 
                                 if (quote.h > result.High) result.High = quote.h;
                                 if (quote.l < result.Low) result.Low = quote.l;
                                 result.Close = quote.c;
                             }
 
+                            result.CloseAtWma_10 ??= GetCloseAtAver(wma_10[countFull], wma_10_Up);
                             result.CloseAtWma_20 ??= GetCloseAtAver(wma_20[countFull], wma_20_Up);
                             result.CloseAtWma_30 ??= GetCloseAtAver(wma_30[countFull], wma_30_Up);
+                            result.CloseAtEma_10 ??= GetCloseAtAver(ema_10[countFull], ema_10_Up);
                             result.CloseAtEma_20 ??= GetCloseAtAver(ema_20[countFull], ema_20_Up);
                             result.CloseAtEma_30 ??= GetCloseAtAver(ema_30[countFull], ema_30_Up);
+                            result.CloseAtEma2_10 ??= GetCloseAtAver(ema2_10[countFull], ema2_10_Up);
                             result.CloseAtEma2_20 ??= GetCloseAtAver(ema2_20[countFull], ema2_20_Up);
                             result.CloseAtEma2_30 ??= GetCloseAtAver(ema2_30[countFull], ema2_30_Up);
 
@@ -204,11 +235,16 @@ namespace Data.Scanners
                 {
                     DbUtils.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                         "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
-                        "OpenNextDelayInMinutes", "OpenNext", "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
-                        "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20", "PrevEma_20", "Ema_20",
-                        "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30", "Prev2Ema2_20",
-                        "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30",
-                        "CloseAtEma2_30");
+                        "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext",
+                        "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
+                        "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
+                        "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30",
+                        "PrevEma_10", "PrevEma_10", "Ema_10", "CloseAtEma_10",
+                        "PrevEma_20", "PrevEma_20", "Ema_20", "CloseAtEma_20",
+                        "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30",
+                        "Prev2Ema2_10", "PrevEma2_10", "Ema2_10", "CloseAtEma2_10",
+                        "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20",
+                        "Prev2Ema2_30", "PrevEma2_30", "Ema2_30", "CloseAtEma2_30");
                     allResults.Clear();
                 }
             }
@@ -217,11 +253,16 @@ namespace Data.Scanners
             {
                 DbUtils.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                     "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
-                    "OpenNextDelayInMinutes", "OpenNext", "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
-                    "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30", "PrevEma_20", "PrevEma_20", "Ema_20",
-                    "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30", "Prev2Ema2_20",
-                    "PrevEma2_20", "Ema2_20", "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30",
-                    "CloseAtEma2_30");
+                    "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext",
+                    "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
+                    "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
+                    "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30",
+                    "PrevEma_10", "PrevEma_10", "Ema_10", "CloseAtEma_10",
+                    "PrevEma_20", "PrevEma_20", "Ema_20", "CloseAtEma_20",
+                    "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30",
+                    "Prev2Ema2_10", "PrevEma2_10", "Ema2_10", "CloseAtEma2_10",
+                    "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20",
+                    "Prev2Ema2_30", "PrevEma2_30", "Ema2_30", "CloseAtEma2_30");
                 allResults.Clear();
             }
 
