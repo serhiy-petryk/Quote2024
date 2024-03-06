@@ -52,13 +52,14 @@ namespace WebSocketClientApp
             this.SendMessageText.Location = new System.Drawing.Point(12, 41);
             this.SendMessageText.Multiline = true;
             this.SendMessageText.Name = "SendMessageText";
-            this.SendMessageText.Size = new System.Drawing.Size(529, 23);
+            this.SendMessageText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.SendMessageText.Size = new System.Drawing.Size(542, 69);
             this.SendMessageText.TabIndex = 0;
             // 
             // SendButton
             // 
             this.SendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SendButton.Location = new System.Drawing.Point(560, 37);
+            this.SendButton.Location = new System.Drawing.Point(560, 66);
             this.SendButton.Name = "SendButton";
             this.SendButton.Size = new System.Drawing.Size(75, 27);
             this.SendButton.TabIndex = 1;
@@ -74,10 +75,10 @@ namespace WebSocketClientApp
             this.listBox1.FormattingEnabled = true;
             this.listBox1.HorizontalScrollbar = true;
             this.listBox1.ItemHeight = 15;
-            this.listBox1.Location = new System.Drawing.Point(12, 71);
+            this.listBox1.Location = new System.Drawing.Point(12, 116);
             this.listBox1.Name = "listBox1";
             this.listBox1.ScrollAlwaysVisible = true;
-            this.listBox1.Size = new System.Drawing.Size(623, 364);
+            this.listBox1.Size = new System.Drawing.Size(623, 319);
             this.listBox1.TabIndex = 2;
             // 
             // ConnectButton
