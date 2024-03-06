@@ -19,6 +19,8 @@ namespace Tests
             // Json.Utf8JsonTests.Start();
             // Task.Factory.StartNew(WebSocket.WebSocketTests.DoClientWebSocket);
 
+            WebSocket.WebSocketTests.ParseFile();
+
             Application.Run(new TestMainForm());
         }
     }

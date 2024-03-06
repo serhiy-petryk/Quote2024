@@ -40,21 +40,27 @@ namespace Tests
             this.WebServerUri = new System.Windows.Forms.TextBox();
             this.ClearLogButton = new System.Windows.Forms.Button();
             this.cbLogMessages = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtLogFileName = new System.Windows.Forms.TextBox();
+            this.cbSaveLogToFile = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // SendMessageText
             // 
-            this.SendMessageText.Location = new System.Drawing.Point(12, 9);
+            this.SendMessageText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SendMessageText.Location = new System.Drawing.Point(12, 41);
             this.SendMessageText.Multiline = true;
             this.SendMessageText.Name = "SendMessageText";
-            this.SendMessageText.Size = new System.Drawing.Size(529, 62);
+            this.SendMessageText.Size = new System.Drawing.Size(529, 23);
             this.SendMessageText.TabIndex = 0;
             // 
             // SendButton
             // 
-            this.SendButton.Location = new System.Drawing.Point(560, 20);
+            this.SendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SendButton.Location = new System.Drawing.Point(560, 37);
             this.SendButton.Name = "SendButton";
-            this.SendButton.Size = new System.Drawing.Size(75, 43);
+            this.SendButton.Size = new System.Drawing.Size(75, 27);
             this.SendButton.TabIndex = 1;
             this.SendButton.Text = "Send";
             this.SendButton.UseVisualStyleBackColor = true;
@@ -68,10 +74,10 @@ namespace Tests
             this.listBox1.FormattingEnabled = true;
             this.listBox1.HorizontalScrollbar = true;
             this.listBox1.ItemHeight = 15;
-            this.listBox1.Location = new System.Drawing.Point(12, 86);
+            this.listBox1.Location = new System.Drawing.Point(12, 71);
             this.listBox1.Name = "listBox1";
             this.listBox1.ScrollAlwaysVisible = true;
-            this.listBox1.Size = new System.Drawing.Size(623, 349);
+            this.listBox1.Size = new System.Drawing.Size(623, 364);
             this.listBox1.TabIndex = 2;
             // 
             // ConnectButton
@@ -98,6 +104,7 @@ namespace Tests
             // 
             // textBox1
             // 
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Location = new System.Drawing.Point(652, 41);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
@@ -107,6 +114,7 @@ namespace Tests
             // 
             // textBox2
             // 
+            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox2.Location = new System.Drawing.Point(651, 12);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
@@ -116,6 +124,7 @@ namespace Tests
             // 
             // textBox3
             // 
+            this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox3.Location = new System.Drawing.Point(652, 70);
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
@@ -156,11 +165,45 @@ namespace Tests
             this.cbLogMessages.Text = "Log messages?";
             this.cbLogMessages.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(79, 15);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "Log file name";
+            // 
+            // txtLogFileName
+            // 
+            this.txtLogFileName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtLogFileName.Location = new System.Drawing.Point(97, 9);
+            this.txtLogFileName.Name = "txtLogFileName";
+            this.txtLogFileName.Size = new System.Drawing.Size(401, 23);
+            this.txtLogFileName.TabIndex = 12;
+            // 
+            // cbSaveLogToFile
+            // 
+            this.cbSaveLogToFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbSaveLogToFile.AutoSize = true;
+            this.cbSaveLogToFile.Checked = true;
+            this.cbSaveLogToFile.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbSaveLogToFile.Location = new System.Drawing.Point(504, 11);
+            this.cbSaveLogToFile.Name = "cbSaveLogToFile";
+            this.cbSaveLogToFile.Size = new System.Drawing.Size(141, 19);
+            this.cbSaveLogToFile.TabIndex = 13;
+            this.cbSaveLogToFile.Text = "Save messages in file?";
+            this.cbSaveLogToFile.UseVisualStyleBackColor = true;
+            // 
             // TestMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(838, 450);
+            this.Controls.Add(this.cbSaveLogToFile);
+            this.Controls.Add(this.txtLogFileName);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.cbLogMessages);
             this.Controls.Add(this.ClearLogButton);
             this.Controls.Add(this.WebServerUri);
@@ -192,5 +235,8 @@ namespace Tests
         private System.Windows.Forms.TextBox WebServerUri;
         private System.Windows.Forms.Button ClearLogButton;
         private System.Windows.Forms.CheckBox cbLogMessages;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtLogFileName;
+        private System.Windows.Forms.CheckBox cbSaveLogToFile;
     }
 }

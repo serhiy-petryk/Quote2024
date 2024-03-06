@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.OffScreen;
 using Data.Helpers;
-using Data.Scanners;
 using Quote2024.Helpers;
 
 namespace Quote2024
