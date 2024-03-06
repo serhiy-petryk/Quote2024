@@ -111,6 +111,7 @@ namespace Quote2024
             this.btnOpenWebSocket.TabIndex = 72;
             this.btnOpenWebSocket.Text = "Open WebSocketClient form";
             this.btnOpenWebSocket.UseVisualStyleBackColor = true;
+            this.btnOpenWebSocket.Click += new System.EventHandler(this.btnOpenWebSocket_Click);
             // 
             // btnMinuteYahooSaveLogToDb
             // 

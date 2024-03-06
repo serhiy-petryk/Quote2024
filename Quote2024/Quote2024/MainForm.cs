@@ -244,5 +244,11 @@ namespace Quote2024
 
             btnMinuteYahooSaveLogToDb.Enabled = true;
         }
+
+        private void btnOpenWebSocket_Click(object sender, EventArgs e)
+        {
+            var form = new WebSocketClientApp.MainForm();
+            form.Show();
+        }
     }
 }
