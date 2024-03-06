@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace Tests
+namespace WebSocketClientApp
 {
     static class Program
     {
@@ -15,13 +15,7 @@ namespace Tests
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Zip.ZipFolderCompressor.Start();
-            // Json.Utf8JsonTests.Start();
-            // Task.Factory.StartNew(WebSocket.WebSocketTests.DoClientWebSocket);
-
-            // WebSocket.WebSocketTests.ParseFile();
-
-            Application.Run(new TestMainForm());
+            Application.Run(new MainForm());
         }
     }
 }

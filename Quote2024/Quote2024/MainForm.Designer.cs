@@ -34,6 +34,7 @@ namespace Quote2024
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnOpenWebSocket = new System.Windows.Forms.Button();
             this.btnMinuteYahooSaveLogToDb = new System.Windows.Forms.Button();
             this.btnMinuteYahooErrorCheck = new System.Windows.Forms.Button();
             this.btnMinuteYahooLog = new System.Windows.Forms.Button();
@@ -61,7 +62,7 @@ namespace Quote2024
             this.StatusLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 388);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(976, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(804, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -79,12 +80,13 @@ namespace Quote2024
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(976, 388);
+            this.tabControl1.Size = new System.Drawing.Size(804, 388);
             this.tabControl1.TabIndex = 1;
             // 
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnOpenWebSocket);
             this.tpLoader.Controls.Add(this.btnMinuteYahooSaveLogToDb);
             this.tpLoader.Controls.Add(this.btnMinuteYahooErrorCheck);
             this.tpLoader.Controls.Add(this.btnMinuteYahooLog);
@@ -95,17 +97,28 @@ namespace Quote2024
             this.tpLoader.Location = new System.Drawing.Point(4, 24);
             this.tpLoader.Name = "tpLoader";
             this.tpLoader.Padding = new System.Windows.Forms.Padding(3);
-            this.tpLoader.Size = new System.Drawing.Size(968, 360);
+            this.tpLoader.Size = new System.Drawing.Size(796, 360);
             this.tpLoader.TabIndex = 0;
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
             // 
+            // btnOpenWebSocket
+            // 
+            this.btnOpenWebSocket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenWebSocket.Location = new System.Drawing.Point(617, 218);
+            this.btnOpenWebSocket.Name = "btnOpenWebSocket";
+            this.btnOpenWebSocket.Size = new System.Drawing.Size(170, 33);
+            this.btnOpenWebSocket.TabIndex = 72;
+            this.btnOpenWebSocket.Text = "Open WebSocketClient form";
+            this.btnOpenWebSocket.UseVisualStyleBackColor = true;
+            // 
             // btnMinuteYahooSaveLogToDb
             // 
-            this.btnMinuteYahooSaveLogToDb.Location = new System.Drawing.Point(575, 111);
+            this.btnMinuteYahooSaveLogToDb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinuteYahooSaveLogToDb.Location = new System.Drawing.Point(591, 98);
             this.btnMinuteYahooSaveLogToDb.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnMinuteYahooSaveLogToDb.Name = "btnMinuteYahooSaveLogToDb";
-            this.btnMinuteYahooSaveLogToDb.Size = new System.Drawing.Size(196, 27);
+            this.btnMinuteYahooSaveLogToDb.Size = new System.Drawing.Size(196, 36);
             this.btnMinuteYahooSaveLogToDb.TabIndex = 71;
             this.btnMinuteYahooSaveLogToDb.Text = "Minute Yahoo Save Log to DB";
             this.btnMinuteYahooSaveLogToDb.UseVisualStyleBackColor = true;
@@ -113,10 +126,11 @@ namespace Quote2024
             // 
             // btnMinuteYahooErrorCheck
             // 
-            this.btnMinuteYahooErrorCheck.Location = new System.Drawing.Point(575, 64);
+            this.btnMinuteYahooErrorCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinuteYahooErrorCheck.Location = new System.Drawing.Point(617, 51);
             this.btnMinuteYahooErrorCheck.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnMinuteYahooErrorCheck.Name = "btnMinuteYahooErrorCheck";
-            this.btnMinuteYahooErrorCheck.Size = new System.Drawing.Size(170, 27);
+            this.btnMinuteYahooErrorCheck.Size = new System.Drawing.Size(170, 41);
             this.btnMinuteYahooErrorCheck.TabIndex = 70;
             this.btnMinuteYahooErrorCheck.Text = "Minute Yahoo Error Check";
             this.btnMinuteYahooErrorCheck.UseVisualStyleBackColor = true;
@@ -124,10 +138,11 @@ namespace Quote2024
             // 
             // btnMinuteYahooLog
             // 
-            this.btnMinuteYahooLog.Location = new System.Drawing.Point(575, 19);
+            this.btnMinuteYahooLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinuteYahooLog.Location = new System.Drawing.Point(617, 6);
             this.btnMinuteYahooLog.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnMinuteYahooLog.Name = "btnMinuteYahooLog";
-            this.btnMinuteYahooLog.Size = new System.Drawing.Size(170, 27);
+            this.btnMinuteYahooLog.Size = new System.Drawing.Size(170, 39);
             this.btnMinuteYahooLog.TabIndex = 69;
             this.btnMinuteYahooLog.Text = "Minute Yahoo Log (for zip)";
             this.btnMinuteYahooLog.UseVisualStyleBackColor = true;
@@ -135,9 +150,10 @@ namespace Quote2024
             // 
             // btnRunMultiItemsLoader
             // 
-            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(397, 21);
+            this.btnRunMultiItemsLoader.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(398, 47);
             this.btnRunMultiItemsLoader.Name = "btnRunMultiItemsLoader";
-            this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 23);
+            this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 37);
             this.btnRunMultiItemsLoader.TabIndex = 68;
             this.btnRunMultiItemsLoader.Text = "Run multiItems loader";
             this.btnRunMultiItemsLoader.UseVisualStyleBackColor = true;
@@ -149,6 +165,9 @@ namespace Quote2024
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AllowUserToResizeColumns = false;
             this.dataGridView1.AllowUserToResizeRows = false;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.AutoGenerateColumns = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
@@ -161,12 +180,12 @@ namespace Quote2024
             this.Started,
             this.Duration});
             this.dataGridView1.DataSource = this.loaderItemBindingSource;
-            this.dataGridView1.Location = new System.Drawing.Point(17, 18);
+            this.dataGridView1.Location = new System.Drawing.Point(6, 6);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 18;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(374, 319);
+            this.dataGridView1.Size = new System.Drawing.Size(385, 348);
             this.dataGridView1.TabIndex = 67;
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
@@ -223,9 +242,10 @@ namespace Quote2024
             // 
             // btnTest
             // 
-            this.btnTest.Location = new System.Drawing.Point(762, 265);
+            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest.Location = new System.Drawing.Point(712, 318);
             this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(75, 23);
+            this.btnTest.Size = new System.Drawing.Size(75, 36);
             this.btnTest.TabIndex = 66;
             this.btnTest.Text = "Test";
             this.btnTest.UseVisualStyleBackColor = true;
@@ -233,21 +253,22 @@ namespace Quote2024
             // 
             // lblEoddataLogged
             // 
-            this.lblEoddataLogged.AutoSize = true;
+            this.lblEoddataLogged.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblEoddataLogged.BackColor = System.Drawing.Color.Red;
             this.lblEoddataLogged.ForeColor = System.Drawing.Color.White;
-            this.lblEoddataLogged.Location = new System.Drawing.Point(337, 3);
+            this.lblEoddataLogged.Location = new System.Drawing.Point(398, 6);
             this.lblEoddataLogged.Name = "lblEoddataLogged";
-            this.lblEoddataLogged.Size = new System.Drawing.Size(153, 15);
+            this.lblEoddataLogged.Size = new System.Drawing.Size(159, 22);
             this.lblEoddataLogged.TabIndex = 65;
             this.lblEoddataLogged.Text = "Not logged in eoddata.com";
+            this.lblEoddataLogged.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(968, 360);
+            this.tabPage2.Size = new System.Drawing.Size(796, 360);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -256,7 +277,7 @@ namespace Quote2024
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(976, 410);
+            this.ClientSize = new System.Drawing.Size(804, 410);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.statusStrip1);
             this.Name = "MainForm";
@@ -265,7 +286,6 @@ namespace Quote2024
             this.statusStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tpLoader.ResumeLayout(false);
-            this.tpLoader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.loaderItemBindingSource)).EndInit();
             this.ResumeLayout(false);
@@ -293,5 +313,6 @@ namespace Quote2024
         private System.Windows.Forms.Button btnMinuteYahooLog;
         private System.Windows.Forms.Button btnMinuteYahooSaveLogToDb;
         private System.Windows.Forms.Button btnMinuteYahooErrorCheck;
+        private System.Windows.Forms.Button btnOpenWebSocket;
     }
 }
