@@ -20,7 +20,12 @@ namespace Tests
             // Task.Factory.StartNew(WebSocket.WebSocketTests.DoClientWebSocket);
 
             // WebSocket.WebSocketTests.ParseFile();
-            WebSocket.Yahoo.TestHar();//.PricingData.RunFileTest();
+            // WebSocket.Yahoo.TestHar();//.PricingData.RunFileTest();
+
+            // Protobuf.Tests.SaveToCsv();
+            // Protobuf.Tests.ReadFromProto();
+            // Protobuf.Tests.ReadFromZip();
+            // Protobuf.Tests.ReadFromCsv();
 
             Application.Run(new TestMainForm());
         }
