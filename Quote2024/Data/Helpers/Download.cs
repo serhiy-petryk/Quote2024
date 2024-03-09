@@ -1,11 +1,24 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Data.Helpers
 {
     public static class Download
     {
+        public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false)
+        {
+            using (var wc = new WebClientEx())
+            {
+                wc.Encoding = System.Text.Encoding.UTF8;
+                // wc.Cookies = cookies;
+                wc.IsXmlHttpRequest = isXmlHttpRequest;
+                wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                    return wc.DownloadDataTaskAsync(url);
+            }
+        }
+
         public static object DownloadToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieContainer cookies = null)
         {
             using (var wc = new WebClientEx())
@@ -34,7 +47,7 @@ namespace Data.Helpers
             }
         }
 
-        public static object PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false)
+        public static object PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null)
         {
             // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
             using (var wc = new WebClientEx())
@@ -42,7 +55,7 @@ namespace Data.Helpers
                 wc.Encoding = System.Text.Encoding.UTF8;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                wc.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded"); // very important for Investing.Splits
+                wc.Headers.Add(HttpRequestHeader.ContentType, contentType ?? "application/x-www-form-urlencoded"); // very important for Investing.Splits
 
                 try
                 {

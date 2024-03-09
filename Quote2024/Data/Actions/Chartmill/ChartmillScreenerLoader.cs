@@ -119,7 +119,7 @@ namespace Data.Actions.Chartmill
                         .Replace("{1}", date.Value.ToString("yyyy-MM-dd"))
                     : ParameterTemplate.Replace("{0}", from.ToString());
 
-                var o = Download.PostToBytes(Url, parameters, false);
+                var o = Download.PostToBytes(Url, parameters, false, false, "application/json");
                 if (o is Exception ex)
                     throw new Exception(
                         $"ChartmillScreenerLoader: Error while download from {Url}. Error message: {ex.Message}");
