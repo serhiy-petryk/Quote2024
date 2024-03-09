@@ -43,6 +43,7 @@ namespace WebSocketClientApp
             this.label1 = new System.Windows.Forms.Label();
             this.txtLogFileName = new System.Windows.Forms.TextBox();
             this.cbSaveLogToFile = new System.Windows.Forms.CheckBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SendMessageText
@@ -95,7 +96,7 @@ namespace WebSocketClientApp
             // DisconnectButton
             // 
             this.DisconnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DisconnectButton.Location = new System.Drawing.Point(695, 199);
+            this.DisconnectButton.Location = new System.Drawing.Point(695, 184);
             this.DisconnectButton.Name = "DisconnectButton";
             this.DisconnectButton.Size = new System.Drawing.Size(75, 46);
             this.DisconnectButton.TabIndex = 4;
@@ -145,7 +146,7 @@ namespace WebSocketClientApp
             // ClearLogButton
             // 
             this.ClearLogButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ClearLogButton.Location = new System.Drawing.Point(695, 342);
+            this.ClearLogButton.Location = new System.Drawing.Point(695, 295);
             this.ClearLogButton.Name = "ClearLogButton";
             this.ClearLogButton.Size = new System.Drawing.Size(75, 46);
             this.ClearLogButton.TabIndex = 9;
@@ -159,7 +160,7 @@ namespace WebSocketClientApp
             this.cbLogMessages.AutoSize = true;
             this.cbLogMessages.Checked = true;
             this.cbLogMessages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbLogMessages.Location = new System.Drawing.Point(695, 416);
+            this.cbLogMessages.Location = new System.Drawing.Point(679, 270);
             this.cbLogMessages.Name = "cbLogMessages";
             this.cbLogMessages.Size = new System.Drawing.Size(105, 19);
             this.cbLogMessages.TabIndex = 10;
@@ -195,11 +196,23 @@ namespace WebSocketClientApp
             this.cbSaveLogToFile.Text = "Save messages in file?";
             this.cbSaveLogToFile.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(679, 389);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(114, 46);
+            this.button1.TabIndex = 14;
+            this.button1.Text = "Open new form";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(838, 450);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.cbSaveLogToFile);
             this.Controls.Add(this.txtLogFileName);
             this.Controls.Add(this.label1);
@@ -237,5 +250,6 @@ namespace WebSocketClientApp
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtLogFileName;
         private System.Windows.Forms.CheckBox cbSaveLogToFile;
+        private System.Windows.Forms.Button button1;
     }
 }

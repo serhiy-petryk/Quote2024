@@ -81,5 +81,11 @@ namespace WebSocketClientApp
             DisconnectButton.Enabled = _client != null;
             SendButton.Enabled = _client != null;
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var frm = new MainForm();
+            frm.Show();
+        }
     }
 }
