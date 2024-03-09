@@ -181,7 +181,10 @@ namespace Quote2024
 
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
-            await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
+            // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
+
+            Data.RealTime.YahooMinutes.Start();
+            // await Task.Factory.StartNew(Data.Tests.Twelvedata.TestComplexCall);
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
             // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);
@@ -222,16 +225,10 @@ namespace Quote2024
         {
             btnMinuteYahooErrorCheck.Enabled = false;
 
-            var sw = new Stopwatch();
-            sw.Start();
-
             if (CsUtils.OpenFileDialogMultiselect(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder,
                     @"zip files (*.zip)|*.zip") is string[] files && files.Length > 0)
                 Data.Actions.Yahoo.YahooMinuteChecks.CheckOnBadQuoteAndsplit(files, ShowStatus);
             
-            sw.Stop();
-            Debug.Print($"btnMinuteYahooErrorCheck_Click: {sw.ElapsedMilliseconds:N0} millisecs");
-
             btnMinuteYahooErrorCheck.Enabled = true;
         }
 
