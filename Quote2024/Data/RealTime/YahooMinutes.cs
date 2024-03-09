@@ -12,7 +12,6 @@ namespace Data.RealTime
         // private const string UrlTemplate = @"https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&events=history";
         private const string UrlTemplate = @"https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&includePrePost=true&events=history";
         
-        private const string FileTemplatex = @"E:\Temp\xRealTime\{0}.json";
         private const string FileTemplate = @"{0}.json";
 
         public static async void Start()
