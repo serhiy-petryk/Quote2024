@@ -17,8 +17,8 @@ namespace Data.RealTime
         public static async void Start()
         {
             // var from = Convert.ToInt64((DateTime.UtcNow.Date - new DateTime(1970, 1, 1)).TotalSeconds);
-            var from = Convert.ToInt64((DateTime.UtcNow.AddHours(-3) - new DateTime(1970, 1, 1)).TotalSeconds);
-            var to = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds);
+            var from = Convert.ToInt64((DateTime.UtcNow.AddDays(-3).AddHours(-3) - new DateTime(1970, 1, 1)).TotalSeconds);
+            var to = Convert.ToInt64((DateTime.UtcNow.AddDays(-3) - new DateTime(1970, 1, 1)).TotalSeconds);
 
             var urlsAndFileNames = _symbols
                 .Select(s => (string.Format(UrlTemplate, s, from, to), string.Format(FileTemplate, s)));

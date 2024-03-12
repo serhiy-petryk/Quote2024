@@ -183,7 +183,8 @@ namespace Quote2024
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
 
-            Data.RealTime.YahooMinutes.Start();
+            // Data.RealTime.YahooMinutes.Start();
+            await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
             // await Task.Factory.StartNew(Data.Tests.Twelvedata.TestComplexCall);
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
