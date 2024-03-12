@@ -9,6 +9,7 @@ namespace WebSocketClientApp
     public partial class MainForm : Form
     {
         private Websocket.Client.WebsocketClient _client;
+        private static string _lastSendMessage;
 
         public MainForm()
         {
@@ -24,9 +25,24 @@ namespace WebSocketClientApp
 
             _client = new WebsocketClient(new Uri(host));
 
-            // _client.ReconnectTimeout = TimeSpan.FromSeconds(500)
-            _client.ReconnectionHappened.Subscribe(info => SaveLog("Reconnection happened, type: " + info.Type));
-            _client.DisconnectionHappened.Subscribe(info => SaveLog("Disconnection happened, type: " + info.Type));
+            _client.ReconnectTimeout = TimeSpan.FromSeconds(10);
+            _client.ReconnectionHappened.Subscribe(info =>
+            {
+                if (info.Type == ReconnectionType.Initial)
+                    _lastSendMessage = null;
+                else if (info.Type == ReconnectionType.Lost || info.Type== ReconnectionType.NoMessageReceived)
+                    SendMessage(_lastSendMessage);
+
+                SaveLog("Reconnection happened, type: " + info.Type);
+            });
+
+            _client.DisconnectionHappened.Subscribe(info =>
+            {
+                //if (info.Type != DisconnectionType.Exit && info.Type!= DisconnectionType.ByUser)
+                  //  _client.Reconnect();
+                SaveLog("Disconnection happened, type: " + info.Type);
+            });
+
             _client.MessageReceived.Subscribe(msg =>
             {
                 var messText = $"{DateTime.Now:HH:mm:ss.fff},{msg}";
@@ -61,10 +77,15 @@ namespace WebSocketClientApp
             UpdateUI();
         }
 
-        private void SendButton_Click(object sender, EventArgs e)
+        private void SendButton_Click(object sender, EventArgs e) => SendMessage(SendMessageText.Text);
+
+        private void SendMessage(string message)
         {
-            if (!string.IsNullOrEmpty(SendMessageText.Text))
-                _client?.Send(SendMessageText.Text.Trim());
+            if (!string.IsNullOrEmpty(message))
+            {
+                _client?.Send(message.Trim());
+                _lastSendMessage = message;
+            }
         }
 
         protected override void OnClosed(EventArgs e)
