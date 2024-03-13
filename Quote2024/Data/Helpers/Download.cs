@@ -15,7 +15,7 @@ namespace Data.Helpers
                 // wc.Cookies = cookies;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                    return wc.DownloadDataTaskAsync(url);
+                return wc.DownloadDataTaskAsync(url);
             }
         }
 
