@@ -107,16 +107,14 @@ namespace Data.Actions.MorningStar
 
                 var url = string.Format(UrlTemplate, sector, 1);
                 var o = Helpers.Download.DownloadToBytes(url, true);
-                if (o is Exception ex)
-                    throw new Exception(
-                        $"MorningStarScreenerLoader: Error while download from {url}. Error message: {ex.Message}");
-                var bytes = (byte[])o;
+                if (o.Item2 != null)
+                    throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
                 var entryName = string.Format(entryNameTemplate, sector, "0");
-                var entry = new VirtualFileEntry(entryName, bytes);
+                var entry = new VirtualFileEntry(entryName, o.Item1);
                 virtualFileEntries.Add(entry);
 
-                var oo = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<cRoot>(bytes);
+                var oo = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<cRoot>(o.Item1);
 
                 for (var k = 1; k < oo.pagination.totalPages; k++)
                 {
@@ -125,13 +123,11 @@ namespace Data.Actions.MorningStar
 
                     url = string.Format(UrlTemplate, sector, k + 1);
                     o = Helpers.Download.DownloadToBytes(url, true);
-                    if (o is Exception ex2)
-                        throw new Exception(
-                            $"MorningStarScreenerLoader: Error while download from {url}. Error message: {ex2.Message}");
-                    bytes = (byte[])o;
+                    if (o.Item2 != null)
+                        throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
                     entryName = string.Format(entryNameTemplate, sector, k.ToString());
-                    entry = new VirtualFileEntry(entryName, bytes);
+                    entry = new VirtualFileEntry(entryName, o.Item1);
                     virtualFileEntries.Add(entry);
                 }
             }

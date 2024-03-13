@@ -148,10 +148,9 @@ namespace Data.Actions.MorningStar
                     if (!File.Exists(filename))
                     {
                         var o = Download.DownloadToBytes(url, false);
-                        if (o is Exception ex)
-                            throw new Exception(
-                                $"WA_MorningStarScreenerLoader: Error while download from {url}. Error message: {ex.Message}");
-                        File.WriteAllBytes(filename, (byte[])o);
+                        if (o.Item2 != null)
+                            throw new Exception($"WA_MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                        File.WriteAllBytes(filename, o.Item1);
                         if (!File.Exists(filename))
                         {
 
@@ -169,12 +168,9 @@ namespace Data.Actions.MorningStar
                 var url = string.Format(ListUrlTemplate, sector);
                 var filename = Path.Combine($@"{ListDataFolder}", $"{sector}.txt");
                 var o = Helpers.Download.DownloadToBytes(url, false);
-                if (o is Exception ex)
-                    throw new Exception(
-                        $"WA_MorningStarScreenerLoader: Error while download from {url}. Error message: {ex.Message}");
-                File.WriteAllBytes(filename, (byte[])o);
-
-
+                if (o.Item2 != null)
+                    throw new Exception($"WA_MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                File.WriteAllBytes(filename, o.Item1);
             }
         }
 

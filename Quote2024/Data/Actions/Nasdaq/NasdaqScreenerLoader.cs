@@ -34,19 +34,19 @@ namespace Data.Actions.Nasdaq
                 var stockUrl = string.Format(StockUrlTemplate, exchange);
                 Logger.AddMessage($"Download STOCK data for {exchange} from {stockUrl}");
                 var o = Download.DownloadToBytes(stockUrl, true, true);
-                if (o is Exception ex)
-                    throw new Exception($"NasdaqScreenerLoader: Error while download from {StockUrlTemplate}. Error message: {ex.Message}");
+                if (o.Item2 != null)
+                    throw new Exception($"NasdaqScreenerLoader: Error while download from {StockUrlTemplate}. Error message: {o.Item2.Message}");
 
-                var entry = new VirtualFileEntry($"StockScreener_{exchange}_{timeStamp.Item2}.json", (byte[])o);
+                var entry = new VirtualFileEntry($"StockScreener_{exchange}_{timeStamp.Item2}.json", o.Item1);
                 virtualFileEntries.Add(entry);
             }
 
             Logger.AddMessage($"Download ETF data from {EtfUrl}");
             var o2 = Download.DownloadToBytes(EtfUrl, true, true);
-            if (o2 is Exception ex2)
-                throw new Exception($"NasdaqScreenerLoader: Error while download from {EtfUrl}. Error message: {ex2.Message}");
+            if (o2.Item2 != null)
+                throw new Exception($"NasdaqScreenerLoader: Error while download from {EtfUrl}. Error message: {o2.Item2.Message}");
 
-            var entry2 = new VirtualFileEntry($"EtfScreener_{timeStamp.Item2}.json", (byte[])o2);
+            var entry2 = new VirtualFileEntry($"EtfScreener_{timeStamp.Item2}.json", o2.Item1);
             virtualFileEntries.Add(entry2);
 
             // Zip data

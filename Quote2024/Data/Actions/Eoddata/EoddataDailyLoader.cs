@@ -52,10 +52,10 @@ namespace Data.Actions.Eoddata
 
                 // Get k parameter of eoddata url
                 var o = Download.DownloadToBytes(URL_HOME, false, false, cookies);
-                if (o is Exception ex)
-                    throw new Exception($"EoddataDailyLoader: Error while download from {URL_HOME}. Error message: {ex.Message}");
+                if (o.Item2 != null)
+                    throw new Exception($"EoddataDailyLoader: Error while download from {URL_HOME}. Error message: {o.Item2.Message}");
 
-                var s = System.Text.Encoding.UTF8.GetString((byte[]) o);
+                var s = System.Text.Encoding.UTF8.GetString(o.Item1);
                 var i1 = s.IndexOf("/data/filedownload.aspx?e=", StringComparison.InvariantCulture);
                 var i2 = s.IndexOf("\"", i1 + 20, StringComparison.InvariantCulture);
                 var kParameter = s.Substring(i1 + 20, i2 - i1 - 20).Split('&').FirstOrDefault(a => a.StartsWith("k="));
@@ -68,11 +68,11 @@ namespace Data.Actions.Eoddata
                     Logger.AddMessage($"Download Eoddata daily data for {fileId.Item1} and {fileId.Item2}");
                     var url = string.Format(URL_TEMPLATE, fileId.Item1, fileId.Item2, kParameter.Substring(2));
                     o = Download.DownloadToBytes(url, false, false, cookies);
-                    if (o is Exception ex2)
-                        throw new Exception($"EoddataDailyLoader: Error while download from {url}. Error message: {ex2.Message}");
+                    if (o.Item2 != null)
+                        throw new Exception($"EoddataDailyLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
                     var zipFileName = $"{FILE_FOLDER}{fileId.Item1}_{fileId.Item2}.zip";
-                    var entry = new VirtualFileEntry($"{Path.GetFileNameWithoutExtension(zipFileName)}.txt", (byte[]) o);
+                    var entry = new VirtualFileEntry($"{Path.GetFileNameWithoutExtension(zipFileName)}.txt", o.Item1);
                     ZipUtils.ZipVirtualFileEntries(zipFileName, new[]{entry});
                 }
 

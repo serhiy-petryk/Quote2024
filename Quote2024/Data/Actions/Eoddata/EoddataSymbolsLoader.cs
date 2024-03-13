@@ -29,10 +29,10 @@ namespace Data.Actions.Eoddata
                 Logger.AddMessage($"Download Symbols data for {exchange}");
                 var url = string.Format(UrlTemplate, exchange);
                 var o = Download.DownloadToBytes(url, false, false, cookies);
-                if (o is Exception ex)
-                    throw new Exception($"EoddataSymbolsLoader: Error while download from {url}. Error message: {ex.Message}");
+                if (o.Item2 != null)
+                    throw new Exception($"EoddataSymbolsLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
-                var entry = new VirtualFileEntry($@"{Path.GetFileNameWithoutExtension(zipFileName)}\{exchange}_{timeStamp.Item2}.txt", (byte[])o);
+                var entry = new VirtualFileEntry($@"{Path.GetFileNameWithoutExtension(zipFileName)}\{exchange}_{timeStamp.Item2}.txt", o.Item1);
                 virtualFileEntries.Add(entry);
             }
 

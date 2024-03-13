@@ -23,11 +23,11 @@ namespace Data.Actions.StockAnalysis
 
             // Download html data
             var o = Download.DownloadToBytes(Url, false);
-            if (o is Exception ex)
-                throw new Exception($"StockAnalysisActions: Error while download from {Url}. Error message: {ex.Message}");
+            if (o.Item2 != null)
+                throw new Exception($"StockAnalysisActions: Error while download from {Url}. Error message: {o.Item2.Message}");
 
             // Save html data to zip
-            var entry = new VirtualFileEntry($"StockAnalysisActions_{timeStamp.Item2}.html", (byte[]) o);
+            var entry = new VirtualFileEntry($"StockAnalysisActions_{timeStamp.Item2}.html", o.Item1);
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
 
             // Parse and save to database

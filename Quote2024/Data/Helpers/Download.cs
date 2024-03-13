@@ -19,7 +19,7 @@ namespace Data.Helpers
             }
         }
 
-        public static object DownloadToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieContainer cookies = null)
+        public static (byte[], Exception) DownloadToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieContainer cookies = null)
         {
             using (var wc = new WebClientEx())
             {
@@ -32,14 +32,14 @@ namespace Data.Helpers
                     var response = wc.DownloadData(url);
                     if (isJson && !IsJsonFormat(response))
                         throw new Exception($"Downloaded content is not in JSON format");
-                    return response;
+                    return (response, null);
                 }
                 catch (Exception ex)
                 {
                     if (ex is WebException)
                     {
                         Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
-                        return ex;
+                        return (null, ex);
                     }
                     else
                         throw ex;

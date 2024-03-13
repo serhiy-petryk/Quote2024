@@ -72,8 +72,8 @@ namespace Data.Actions.Nasdaq
             while (url != null)
             {
                 var o = Download.DownloadToBytes(url, false, true);
-                if (o is Exception ex)
-                    throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {ex.Message}");
+                if (o.Item2 != null)
+                    throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
                 /*
                 var filename = string.Format(HtmlFileNameTemplate, cnt.ToString());
@@ -82,7 +82,7 @@ namespace Data.Actions.Nasdaq
 
                 File.WriteAllBytes(filename, (byte[])o);*/
 
-                var htmlContent = System.Text.Encoding.UTF8.GetString((byte[])o);
+                var htmlContent = System.Text.Encoding.UTF8.GetString(o.Item1);
                 url = ParseHtmlPage(htmlContent, commits);
 
                 if (commits.Any(a => a.Key <= lastDate))
@@ -108,13 +108,12 @@ namespace Data.Actions.Nasdaq
                         var url = string.Format(urlTemplate, commit.Value.Item1, exchange.ToLower());
                         // Can't check json format -> last symbol is '\n'
                         var o = Download.DownloadToBytes(url, false, true);
-                        if (o is Exception ex)
-                            throw new Exception(
-                                $"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {ex.Message}");
+                        if (o.Item2 != null)
+                            throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
                         var jsonFileName = Path.Combine(Path.GetFileNameWithoutExtension(zipFileName),
                             string.Format(JsonFileNameTemplate, timeStamp, exchange));
-                        var entry = new VirtualFileEntry(jsonFileName, (byte[])o);
+                        var entry = new VirtualFileEntry(jsonFileName, o.Item1);
                         virtualFileEntries.Add(entry);
                     }
 

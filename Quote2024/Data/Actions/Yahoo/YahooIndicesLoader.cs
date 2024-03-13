@@ -45,11 +45,10 @@ namespace Data.Actions.Yahoo
                 Logger.AddMessage($"Download data for {symbol}");
                 var url = string.Format(UrlTemplate, from, to, symbol);
                 var o = Download.DownloadToBytes(url, false);
-                if (o is Exception ex)
-                    throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {ex.Message}");
+                if (o.Item2 != null)
+                    throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
-                var bytes = (byte[])o;
-                var lines = Encoding.UTF8.GetString(bytes).Split('\n');
+                var lines = Encoding.UTF8.GetString(o.Item1).Split('\n');
                 if (lines.Length == 0)
                     throw new Exception($"Invalid Day Yahoo quote file (no text lines): {o}");
                 if (lines[0] != "Date,Open,High,Low,Close,Adj Close,Volume")

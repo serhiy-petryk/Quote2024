@@ -51,10 +51,10 @@ namespace Data.Actions.Polygon
                         Logger.AddMessage($"Downloading {cnt} data chunk into {Path.GetFileName(filename)} for {date:yyyy-MM-dd}");
 
                         var o = Download.DownloadToBytes(url, true);
-                        if (o is Exception ex)
-                            throw new Exception($"PolygonSymbolsLoader: Error while download from {url}. Error message: {ex.Message}");
+                        if (o.Item2 != null)
+                            throw new Exception($"PolygonSymbolsLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
-                        var entry = new VirtualFileEntry(Path.Combine(Path.GetFileName(folder), $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), (byte[])o);
+                        var entry = new VirtualFileEntry(Path.Combine(Path.GetFileName(folder), $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), o.Item1);
                         virtualFileEntries.Add(entry);
 
                         var oo = ZipUtils.DeserializeBytes<cRoot>(entry.Content);

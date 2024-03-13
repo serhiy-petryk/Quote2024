@@ -34,10 +34,10 @@ namespace Data.Actions.Wikipedia
             foreach (var oo in UrlsAndFilenames)
             {
                 var o = Download.DownloadToBytes(oo.Item1, false);
-                if (o is Exception ex)
-                    throw new Exception($"WikipediaIndexLoader: Error while download from {oo.Item1}. Error message: {ex.Message}");
+                if (o.Item2 != null)
+                    throw new Exception($"WikipediaIndexLoader: Error while download from {oo.Item1}. Error message: {o.Item2.Message}");
 
-                var entry = new VirtualFileEntry(string.Format(oo.Item2, timeStamp.Item2), (byte[]) o);
+                var entry = new VirtualFileEntry(string.Format(oo.Item2, timeStamp.Item2), o.Item1);
                 virtualFileEntries.Add(entry);
             }
 

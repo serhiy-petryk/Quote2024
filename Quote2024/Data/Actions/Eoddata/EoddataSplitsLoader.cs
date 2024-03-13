@@ -21,10 +21,10 @@ namespace Data.Actions.Eoddata
 
             // Download html data
             var o = Download.DownloadToBytes(URL, false, true);
-            if (o is Exception ex)
-                throw new Exception($"EoddataSplitsLoader: Error while download from {URL}. Error message: {ex.Message}");
+            if (o.Item2 != null)
+                throw new Exception($"EoddataSplitsLoader: Error while download from {URL}. Error message: {o.Item2.Message}");
 
-            var htmlContent = System.Text.Encoding.UTF8.GetString((byte[]) o);
+            var htmlContent = System.Text.Encoding.UTF8.GetString(o.Item1);
 
             // Convert data to text format
             var now = DateTime.Now;
