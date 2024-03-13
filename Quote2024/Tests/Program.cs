@@ -27,6 +27,8 @@ namespace Tests
             // Protobuf.Tests.ReadFromZip();
             // Protobuf.Tests.ReadFromCsv();
 
+            Exceptions.HandleExceptionInTask.Start();
+
             Application.Run(new TestMainForm());
         }
     }
