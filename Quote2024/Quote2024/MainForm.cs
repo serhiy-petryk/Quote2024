@@ -164,21 +164,39 @@ namespace Quote2024
         }
 
         private Timer timer1;
-        public void InitTimer()
+        public async void InitTimer()
         {
+            var symbols = await Data.RealTime.YahooMinutes.CheckSymbols();
+
+            if (symbols.Item2.Count > 0)
+            {
+                if (MessageBox.Show($@"There are some invalid symbols: {string.Join(", ", symbols.Item2.Keys)}. Continue?",
+                        null, MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                    return;
+            }
+
+            if (symbols.Item1.Count == 0)
+            {
+                MessageBox.Show(@"No valid symbols", null, MessageBoxButtons.OK);
+                return;
+            }
+
+            Data.RealTime.YahooMinutes.SaveResult(symbols.Item1);
+
             timer1 = new Timer();
+            timer1.Tag = symbols.Item1.Keys.ToArray();
             timer1.Tick += new EventHandler(timer1_Tick);
             timer1.Interval = 61000; // in miliseconds
             timer1.Start();
-            // Data.RealTime.YahooMinutes.Start();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (DateTime.Now.TimeOfDay < new TimeSpan(23, 59, 59))
-                Data.RealTime.YahooMinutes.Start();
+            var timer = (Timer)sender;
+            if (DateTime.Now.TimeOfDay > TimeSpan.Zero)// new TimeSpan(12, 0, 0))
+                Data.RealTime.YahooMinutes.Start((string[])timer.Tag);
             else
-                timer1.Stop();
+                timer.Stop();
         }
 
         private async void btnTest_Click(object sender, EventArgs e)
@@ -202,8 +220,8 @@ namespace Quote2024
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
 
             InitTimer();
+            // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.CheckSymbols);
 
-            // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.StartTimer);
             // await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
             // await Task.Factory.StartNew(Data.Tests.Twelvedata.TestComplexCall);
 
