@@ -43,8 +43,8 @@ namespace Data.Actions.Yahoo
             var zipFileName = $@"D:\Quote\WebData\Minute\Yahoo\Data\YahooMinute_{timeStamp.Item2}.zip";
             var errorFileName = $@"{Path.GetDirectoryName(zipFileName)}\DownloadErrors_{timeStamp.Item2}.txt";
 
-            var fromInSeconds = GetYahooDate(from);
-            var toInSeconds = GetYahooDate(to);
+            var fromInSeconds = new DateTimeOffset(from, TimeSpan.Zero).ToUnixTimeSeconds();
+            var toInSeconds = new DateTimeOffset(to, TimeSpan.Zero).ToUnixTimeSeconds();
 
             var cnt = 0;
             var downloadErrors = new List<string>();
@@ -79,18 +79,6 @@ namespace Data.Actions.Yahoo
                 Logger.AddMessage($"!Finished. Found {downloadErrors.Count} ERRORS. Error file: {errorFileName}. Items: {yahooSymbols.Count:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
             else
                 Logger.AddMessage($"!Finished. No errors. Items: {yahooSymbols.Count:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
-
-            // =========================
-            int GetYahooDate(DateTime dt)
-            {
-                var offsetDate = new DateTime(1970, 1, 1);
-                // var tzi = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-
-                // var seconds = (dt - offsetDate).TotalSeconds + (tzi.GetUtcOffset(dt)).TotalSeconds;
-                var seconds = (dt - offsetDate).TotalSeconds;
-                return Convert.ToInt32(seconds);
-            }
-
         }
 
         private static List<string> GetDefaultYahooSymbolList()

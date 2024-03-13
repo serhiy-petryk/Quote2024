@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Data.Helpers;
 
 namespace Data.RealTime
@@ -14,11 +15,28 @@ namespace Data.RealTime
         
         private const string FileTemplate = @"{0}.json";
 
+        private static Timer timer1;
+        public static async void StartTimer()
+        {
+/*                timer1 = new Timer();
+                timer1.Tick += new EventHandler(timer1_Tick);
+                timer1.Interval = 5000; // in miliseconds
+                timer1.Start();
+                Start();*/
+        }
+
+        private static void timer1_Tick(object sender, EventArgs e)
+        {
+            if (DateTime.Now.TimeOfDay < new TimeSpan(23, 59, 59))
+                Start();
+            else
+                timer1.Stop();
+        }
+
         public static async void Start()
         {
-            // var from = Convert.ToInt64((DateTime.UtcNow.Date - new DateTime(1970, 1, 1)).TotalSeconds);
-            var from = Convert.ToInt64((DateTime.UtcNow.AddDays(-3).AddHours(-3) - new DateTime(1970, 1, 1)).TotalSeconds);
-            var to = Convert.ToInt64((DateTime.UtcNow.AddDays(-3) - new DateTime(1970, 1, 1)).TotalSeconds);
+            var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-30)).ToUnixTimeSeconds();
+            var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
             var urlsAndFileNames = _symbols
                 .Select(s => (string.Format(UrlTemplate, s, from, to), string.Format(FileTemplate, s)));

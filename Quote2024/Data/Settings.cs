@@ -35,8 +35,6 @@ namespace Data
         public static bool IsInMarketTime(DateTime date) => date.TimeOfDay >= MarketStart && date.TimeOfDay < GetMarketEndTime(date);
         public static TimeSpan GetMarketEndTime(DateTime date) => ShortenedDays.ContainsKey(date.Date) ? MarketEndOfShortenedDay : MarketEndCommon;
 
-        public static DateTime StartUnixData = new DateTime(1970, 1, 1);
-
         public static TimeZoneInfo NewYorkTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
     }
 }
