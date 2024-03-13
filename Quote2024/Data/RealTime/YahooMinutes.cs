@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Data.Helpers;
 
 namespace Data.RealTime
@@ -14,24 +14,6 @@ namespace Data.RealTime
         private const string UrlTemplate = @"https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&includePrePost=true&events=history";
         
         private const string FileTemplate = @"{0}.json";
-
-        private static Timer timer1;
-        public static async void StartTimer()
-        {
-/*                timer1 = new Timer();
-                timer1.Tick += new EventHandler(timer1_Tick);
-                timer1.Interval = 5000; // in miliseconds
-                timer1.Start();
-                Start();*/
-        }
-
-        private static void timer1_Tick(object sender, EventArgs e)
-        {
-            if (DateTime.Now.TimeOfDay < new TimeSpan(23, 59, 59))
-                Start();
-            else
-                timer1.Stop();
-        }
 
         public static async void Start()
         {
@@ -51,36 +33,33 @@ namespace Data.RealTime
                 tasks[symbol]= task;
             }
 
-            await Task.WhenAll(tasks.Values);
-
-            /*var requests = _symbols
-                .Select(s => (s, Download.DownloadToBytesAsync(string.Format(UrlTemplate, s, from, to)))).ToArray();
-            
-            await Task.WhenAll(requests.Select(a=>a.Item2));
-
-            sw.Stop();
-            Debug.Print($"SW: {sw.ElapsedMilliseconds}. From: {from}. To: {to}");*/
-
-            /*Parallel.ForEach(urlsAndFileNames, new ParallelOptions { MaxDegreeOfParallelism = 32 }, urlAndFileName =>
+            // await Task.WhenAll(tasks.Values);
+            var results = new Dictionary<string, byte[]>();
+            foreach (var kvp in tasks)
             {
-                var o = Download.DownloadToBytes(urlAndFileName.Item1, false);
-                if (o is Exception ex)
-                    throw new Exception($"EoddataSymbolsLoader: Error while download from {urlAndFileName.Item1}. Error message: {ex.Message}");
-
-                var entry = new VirtualFileEntry(urlAndFileName.Item2, (byte[])o);
-                virtualFileEntries.Add(entry);
-            });*/
+                try
+                {
+                    // release control to the caller until the task is done, which will be near immediate for each task following the first
+                    results.Add(kvp.Key, await kvp.Value);
+                }
+                catch (Exception e)
+                {
+                    results.Add(kvp.Key, Array.Empty<byte>());
+                    Debug.Print($"{DateTime.Now.TimeOfDay}. Error: {e.Message}");
+                }
+            }
 
             sw.Stop();
             Debug.Print($"SW: {sw.ElapsedMilliseconds}. From: {from}. To: {to}");
 
-            var virtualFileEntries = tasks.Select(kvp =>
-                new VirtualFileEntry(string.Format(FileTemplate, kvp.Key), kvp.Value.Result));
-             ZipUtils.ZipVirtualFileEntries($@"E:\Quote\WebData\RealTime\YahooMinute\RTYahooMinutes_{DateTime.Now:yyyyMMddHHmmss}.zip", virtualFileEntries);
-             var aa1 = CsUtils.MemoryUsedInBytes / 1024 / 1024;
-             virtualFileEntries = null;
-             tasks.Clear();
-             var aa2 = CsUtils.MemoryUsedInBytes / 1024 / 1024;
+            var virtualFileEntries =
+                results.Select(kvp => new VirtualFileEntry(string.Format(FileTemplate, kvp.Key), kvp.Value));
+            ZipUtils.ZipVirtualFileEntries($@"E:\Quote\WebData\RealTime\YahooMinute\RTYahooMinutes_{DateTime.Now:yyyyMMddHHmmss}.zip", virtualFileEntries);
+
+            var aa1 = CsUtils.MemoryUsedInBytes / 1024 / 1024;
+            virtualFileEntries = null;
+            tasks.Clear();
+            var aa2 = CsUtils.MemoryUsedInBytes / 1024 / 1024;
         }
 
         public static string[] _symbols = new[]

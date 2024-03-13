@@ -163,6 +163,24 @@ namespace Quote2024
             ((Control)sender).Enabled = true;
         }
 
+        private Timer timer1;
+        public void InitTimer()
+        {
+            timer1 = new Timer();
+            timer1.Tick += new EventHandler(timer1_Tick);
+            timer1.Interval = 61000; // in miliseconds
+            timer1.Start();
+            // Data.RealTime.YahooMinutes.Start();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (DateTime.Now.TimeOfDay < new TimeSpan(23, 59, 59))
+                Data.RealTime.YahooMinutes.Start();
+            else
+                timer1.Stop();
+        }
+
         private async void btnTest_Click(object sender, EventArgs e)
         {
             btnTest.Enabled = false;
@@ -183,8 +201,10 @@ namespace Quote2024
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
 
-            // Data.RealTime.YahooMinutes.Start();
-            await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
+            InitTimer();
+
+            // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.StartTimer);
+            // await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
             // await Task.Factory.StartNew(Data.Tests.Twelvedata.TestComplexCall);
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
