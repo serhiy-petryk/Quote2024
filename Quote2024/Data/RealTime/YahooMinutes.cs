@@ -17,6 +17,7 @@ namespace Data.RealTime
 
         public static async Task<(Dictionary<string, byte[]>, Dictionary<string, Exception>)> CheckSymbols()
         {
+            Logger.AddMessage($"Check Yahoo minute data");
             var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-30)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
@@ -51,12 +52,17 @@ namespace Data.RealTime
 
             sw.Stop();
             Debug.Print($"SW: {sw.ElapsedMilliseconds}. From: {from}. To: {to}");
+
+            Logger.AddMessage($"Yahoo minute data checked. {invalidSymbols.Count} invalid symbols, {validSymbols.Count} valid symbols.");
             return (validSymbols, invalidSymbols);
         }
 
         public static async void Start(string[] symbols)
         {
-            var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-30)).ToUnixTimeSeconds();
+            const int minutes = 30;
+            Logger.AddMessage($"Download Yahoo minute data from {DateTime.UtcNow.AddMinutes(-minutes):HH:mm:ss} to {DateTime.UtcNow:HH:mm:ss} UTC");
+
+            var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
             var urlsAndFileNames =
