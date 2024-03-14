@@ -40,14 +40,14 @@ namespace Data.Scanners
                 var date = oo.Item2;
 
                 var endTimeSpans = Settings.ShortenedDays.ContainsKey(date) ? endTimeSpansShortened : endTimeSpansCommon;
-                var endMarketDateTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.GetMarketEndTime(date)));
+                var endMarketDateTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.GetMarketEndTime(date)));
 
                 var results = new List<TheFirstScanner>();
                 foreach (var o1 in startTimeSpans)
                     foreach (var o2 in endTimeSpans)
                         results.Add(new TheFirstScanner(symbol, date, o1, o2));
 
-                var ticksFrom = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.MarketStart)); // Unix ticks for 9:30
+                var ticksFrom = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.MarketStart)); // Unix ticks for 9:30
                 var quotes = oo.Item3.Where(a => a.t >= ticksFrom).ToArray();
 
                 resultsCount += results.Count;
@@ -101,7 +101,7 @@ namespace Data.Scanners
                         else
                         {
                             result.Final = quote.o;
-                            result.FinalTime = CsUtils.GetEstDateTimeFromUnixMilliseconds(quote.t).TimeOfDay;
+                            result.FinalTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(quote.t).TimeOfDay;
                         }
                     }
                 }
@@ -155,8 +155,8 @@ namespace Data.Scanners
             Date = date;
             From = from;
             To = to;
-            _fromUnixMilliseconds = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(from));
-            _toUnixMilliseconds = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(to));
+            _fromUnixMilliseconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(from));
+            _toUnixMilliseconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(to));
         }
         #endregion
     }

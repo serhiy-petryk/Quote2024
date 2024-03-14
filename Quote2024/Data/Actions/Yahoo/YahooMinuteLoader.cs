@@ -39,7 +39,7 @@ namespace Data.Actions.Yahoo
         {
             Logger.AddMessage($"Started");
 
-            var timeStamp = CsUtils.GetTimeStamp();
+            var timeStamp = TimeHelper.GetTimeStamp();
             var zipFileName = $@"D:\Quote\WebData\Minute\Yahoo\Data\YahooMinute_{timeStamp.Item2}.zip";
             var errorFileName = $@"{Path.GetDirectoryName(zipFileName)}\DownloadErrors_{timeStamp.Item2}.txt";
 

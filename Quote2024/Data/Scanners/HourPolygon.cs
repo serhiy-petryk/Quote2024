@@ -81,8 +81,8 @@ namespace Data.Scanners
             {
                 var symbol = oo.Item1;
                 var date = oo.Item2;
-                var ticksFrom = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.MarketStart)); // Unix ticks for 9:30
-                var tickTo = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.GetMarketEndTime(date)));
+                var ticksFrom = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.MarketStart)); // Unix ticks for 9:30
+                var tickTo = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(Settings.GetMarketEndTime(date)));
                 var quotes = oo.Item3.Where(a => a.t >= ticksFrom && a.t < tickTo && a.IsValid).ToArray();
                 var closes = quotes.Select(q => q.c).ToArray();
                 var wma_10 = StatMethods.Wma(closes, 10);
@@ -104,8 +104,8 @@ namespace Data.Scanners
                     var result = new QuoteScanner(symbol, date, o1);
                     results.Add(result);
 
-                    var fromUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1));
-                    var toUnixTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item2));
+                    var fromUnixTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1));
+                    var toUnixTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item2));
                     var countFull = 0;
                     bool? wma_10_Up = null;
                     bool? wma_20_Up = null;

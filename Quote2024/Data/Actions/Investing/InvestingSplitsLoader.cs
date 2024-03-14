@@ -16,7 +16,7 @@ namespace Data.Actions.Investing
 
         public static void Start()
         {
-            var timeStamp = CsUtils.GetTimeStamp(-9 - 24);
+            var timeStamp = TimeHelper.GetTimeStamp(-9 - 24);
             var postData = string.Format(POST_DATA_TEMPLATE,
                 timeStamp.Item1.AddDays(-30).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 timeStamp.Item1.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));

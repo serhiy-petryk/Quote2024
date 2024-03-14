@@ -16,7 +16,7 @@ namespace Data.Actions.Eoddata
         {
             Logger.AddMessage($"Started");
 
-            var timeStamp = CsUtils.GetTimeStamp();
+            var timeStamp = TimeHelper.GetTimeStamp();
             var virtualFileEntries = new List<VirtualFileEntry>();
             var zipFileName = $@"E:\Quote\WebData\Symbols\Eoddata\SymbolsEoddata_{timeStamp.Item2}.zip";
 

@@ -107,7 +107,7 @@ namespace Data.Actions.Polygon
             // All not valid quotes have volume=0 except one quote of 2004 year where open<low
             public bool IsValid => !(o > h || o < l || c > h || c < l || v < 0.5f || n == 0);
 
-            public DateTime DateTime => CsUtils.GetEstDateTimeFromUnixMilliseconds(t);
+            public DateTime DateTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(t);
 
             public override string ToString()
             {

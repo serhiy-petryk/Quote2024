@@ -25,7 +25,7 @@ namespace Data.Actions.Nasdaq
         {
             Logger.AddMessage($"Started");
 
-            var timeStamp = CsUtils.GetTimeStamp();
+            var timeStamp = TimeHelper.GetTimeStamp();
 
             // Download data
             var virtualFileEntries = new List<VirtualFileEntry>();

@@ -114,8 +114,8 @@ namespace Data.Actions.Polygon
                     var result = new List<(DateTime, PolygonCommon.cMinuteItem[])>();
                     foreach (var date in oo.Item3)
                     {
-                        var fromTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date);
-                        var toTicks = fromTicks + CsUtils.UnixMillisecondsForOneDay; // next day
+                        var fromTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date);
+                        var toTicks = fromTicks + TimeHelper.UnixMillisecondsForOneDay; // next day
                         var data = jsonData.results.Where(a => a.t >= fromTicks && a.t < toTicks).ToArray();
                         result.Add((date, data));
                     }
@@ -142,8 +142,8 @@ namespace Data.Actions.Polygon
                     var result = new List<(DateTime, PolygonCommon.cMinuteItem[])>();
                     foreach (var date in oo.Item3)
                     {
-                        var fromTicks = CsUtils.GetUnixMillisecondsFromEstDateTime(date);
-                        var toTicks = fromTicks + CsUtils.UnixMillisecondsForOneDay; // next day
+                        var fromTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date);
+                        var toTicks = fromTicks + TimeHelper.UnixMillisecondsForOneDay; // next day
                         var data = jsonData.results.Where(a => a.t >= fromTicks && a.t < toTicks).ToArray();
                         result.Add((date, data));
                     }

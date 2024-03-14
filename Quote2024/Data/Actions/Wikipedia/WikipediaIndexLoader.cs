@@ -25,7 +25,7 @@ namespace Data.Actions.Wikipedia
         {
             Logger.AddMessage($"Started");
 
-            var timeStamp = CsUtils.GetTimeStamp();
+            var timeStamp = TimeHelper.GetTimeStamp();
             var zipFileName =
                 $@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\IndexComponents_{timeStamp.Item2}.zip";
             var virtualFileEntries = new List<VirtualFileEntry>();

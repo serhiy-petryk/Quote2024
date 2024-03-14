@@ -125,7 +125,7 @@ namespace Data.Actions.Polygon
             public int n;
 
             public string Symbol => PolygonCommon.GetMyTicker(TT);
-            public DateTime Date => CsUtils.GetEstDateTimeFromUnixMilliseconds(t);
+            public DateTime Date => TimeHelper.GetEstDateTimeFromUnixMilliseconds(t);
             public float Open => o;
             public float High => h;
             public float Low => l;

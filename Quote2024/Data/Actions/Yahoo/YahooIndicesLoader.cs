@@ -35,7 +35,7 @@ namespace Data.Actions.Yahoo
             var from = GetYahooTime(maxDate.AddDays(-30));
             var to = GetYahooTime(DateTime.Now);
 
-            var timeStamp = CsUtils.GetTimeStamp();
+            var timeStamp = TimeHelper.GetTimeStamp();
             var entries = new List<VirtualFileEntry>();
             var data = new List<DayYahoo>();
 
@@ -56,7 +56,7 @@ namespace Data.Actions.Yahoo
 
                 for (var k = 1; k < lines.Length; k++)
                 {
-                    if (!String.IsNullOrEmpty(lines[k].Trim()))
+                    if (!string.IsNullOrEmpty(lines[k].Trim()))
                     {
                         if (lines[k].Contains("null"))
                             Debug.Print($"{symbol}, {lines[k]}");

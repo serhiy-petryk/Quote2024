@@ -18,7 +18,7 @@ namespace Data.Actions.StockAnalysis
         {
             Logger.AddMessage($"Started");
 
-            var timeStamp = CsUtils.GetTimeStamp();
+            var timeStamp = TimeHelper.GetTimeStamp();
             var zipFileName = Folder + $"StockAnalysisActions_{timeStamp.Item2}.zip";
 
             // Download html data
