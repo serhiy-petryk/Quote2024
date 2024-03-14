@@ -32,10 +32,10 @@ namespace Data.Actions.MorningStar
         public static void SaveToDb(Dictionary<string, List<DbItem>> data)
         {
             var items = data.SelectMany(a => a.Value).OrderBy(a=>a.Symbol).ToArray();
-            DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..HScreenerMorningStar", "Symbol", "Date", "LastUpdated",
+            DbHelper.ClearAndSaveToDbTable(items, "dbQ2023Others..HScreenerMorningStar", "Symbol", "Date", "LastUpdated",
                 "Exchange", "Sector", "Name");
             
-            DbUtils.ExecuteSql("UPDATE a SET Sector=b.CorrectSectorName FROM dbQ2023Others..HScreenerMorningStar a "+
+            DbHelper.ExecuteSql("UPDATE a SET Sector=b.CorrectSectorName FROM dbQ2023Others..HScreenerMorningStar a "+
                                "INNER JOIN dbQ2024..SectorXref b on a.Sector = b.BadSectorName");
         }
 

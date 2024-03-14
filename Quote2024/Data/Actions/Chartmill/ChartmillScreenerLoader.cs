@@ -93,10 +93,10 @@ namespace Data.Actions.Chartmill
                     }
                 }
 
-            DbUtils.ClearAndSaveToDbTable(data.Values, "dbQ2023Others..Bfr_ScreenerChartmill", "Symbol", "Date",
+            DbHelper.ClearAndSaveToDbTable(data.Values, "dbQ2023Others..Bfr_ScreenerChartmill", "Symbol", "Date",
                 "Exchange", "Sector", "Industry", "Name", "ISIN", "Country", "Type", "Etf");
 
-            DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerChartmill");
+            DbHelper.RunProcedure("dbQ2023Others..pUpdateScreenerChartmill");
         }
 
         private static string DownloadAndSaveToZip(DateTime? date)

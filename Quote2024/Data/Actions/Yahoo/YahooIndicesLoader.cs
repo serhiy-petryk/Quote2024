@@ -72,19 +72,19 @@ namespace Data.Actions.Yahoo
 
             if (data.Count > 0)
             {
-                DbUtils.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
+                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
                     "Close", "Volume", "AdjClose");
-                DbUtils.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
+                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
                                    "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
                                    "from dbQ2023Others..Bfr_DayYahooIndexes a " +
                                    "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
                                    "where b.Symbol is null");
 
                 Logger.AddMessage($"Update trading days in dbQ2023Others database");
-                DbUtils.RunProcedure("dbQ2023Others..pRefreshTradingDays");
+                DbHelper.RunProcedure("dbQ2023Others..pRefreshTradingDays");
                 
                 Logger.AddMessage($"Update trading days in dbQ2024 database");
-                DbUtils.RunProcedure("dbQ2024..pRefreshTradingDays");
+                DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
             }
 
             Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");

@@ -114,7 +114,7 @@ namespace Data.Actions.Eoddata
             if (newFileCount > 0)
             {
                 Logger.AddMessage($"Update data in database ('pUpdateDayEoddata' procedure)");
-                DbUtils.RunProcedure("dbQ2023Others..pUpdateDayEoddata");
+                DbHelper.RunProcedure("dbQ2023Others..pUpdateDayEoddata");
             }
 
             Logger.AddMessage($"!Finished. Loaded quotes into DayEoddata table. Quotes: {itemCount:N0}. Number of files: {newFileCount}. Size of files: {fileSize:N0}KB");
@@ -144,7 +144,7 @@ namespace Data.Actions.Eoddata
                 }
             }
 
-            DbUtils.SaveToDbTable(quotes, "dbQ2023Others..DayEoddata", "Symbol", "Exchange", "Date", "Open", "High", "Low", "Close", "Volume");
+            DbHelper.SaveToDbTable(quotes, "dbQ2023Others..DayEoddata", "Symbol", "Exchange", "Date", "Open", "High", "Low", "Close", "Volume");
             return itemCount;
         }
 

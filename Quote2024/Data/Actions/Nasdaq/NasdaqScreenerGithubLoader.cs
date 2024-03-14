@@ -126,7 +126,7 @@ namespace Data.Actions.Nasdaq
 
         private static void ParseAndSaveToDbZipFile(string zipFileName)
         {
-            DbUtils.ClearAndSaveToDbTable(Array.Empty<object>(), "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
+            DbHelper.ClearAndSaveToDbTable(Array.Empty<object>(), "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
                 "Name", "LastSale", "Volume", "NetChange", "Change", "MarketCap", "Country", "IpoYear",
                 "Sector", "Industry", "TimeStamp", "Date");
             var timestamp = File.GetLastWriteTime(zipFileName);
@@ -141,11 +141,11 @@ namespace Data.Actions.Nasdaq
                     var dbItems = items.Select(a =>
                         new NasdaqScreenerLoader.DbStockRow(exchange, timestamp, a, dateKey));
 
-                    DbUtils.SaveToDbTable(dbItems, "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
+                    DbHelper.SaveToDbTable(dbItems, "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
                         "Name", "LastSale", "Volume", "NetChange", "Change", "MarketCap", "Country", "IpoYear",
                         "Sector", "Industry", "TimeStamp", "Date");
                 }
-                DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqGithub");
+                DbHelper.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqGithub");
             }
         }
 

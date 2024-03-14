@@ -65,15 +65,15 @@ namespace Data.Actions.StockAnalysis
                     // Save data to database
                     if (items.Count > 0)
                     {
-                        DbUtils.ClearAndSaveToDbTable(items.Where(a => !a.IsBad), "dbQ2023Others..Bfr_ActionsStockAnalysis",
+                        DbHelper.ClearAndSaveToDbTable(items.Where(a => !a.IsBad), "dbQ2023Others..Bfr_ActionsStockAnalysis",
                             "Date", "Type", "Symbol", "OtherSymbolOrName", "Name", "Description", "SplitRatio", "SplitK",
                             "TimeStamp");
 
-                        DbUtils.ClearAndSaveToDbTable(items.Where(a => a.IsBad),
+                        DbHelper.ClearAndSaveToDbTable(items.Where(a => a.IsBad),
                             "dbQ2023Others..Bfr_ActionsStockAnalysisError", "Date", "Type", "Symbol", "OtherSymbolOrName",
                             "Description", "TimeStamp");
 
-                        DbUtils.RunProcedure("dbQ2023Others..pUpdateActionsStockAnalysis");
+                        DbHelper.RunProcedure("dbQ2023Others..pUpdateActionsStockAnalysis");
                     }
                 }
 

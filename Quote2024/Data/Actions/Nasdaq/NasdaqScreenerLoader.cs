@@ -104,17 +104,17 @@ namespace Data.Actions.Nasdaq
 
                     if (stockItems.Count > 0)
                     {
-                        DbUtils.ClearAndSaveToDbTable(stockItems, "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
+                        DbHelper.ClearAndSaveToDbTable(stockItems, "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
                             "Name", "LastSale", "Volume", "NetChange", "Change", "MarketCap", "Country", "IpoYear",
                             "Sector", "Industry", "TimeStamp");
-                        DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqStock");
+                        DbHelper.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqStock");
                     }
 
                     if (etfItems.Count > 0)
                     {
-                        DbUtils.ClearAndSaveToDbTable(etfItems, "dbQ2023Others..Bfr_ScreenerNasdaqEtf", "Symbol", "Name",
+                        DbHelper.ClearAndSaveToDbTable(etfItems, "dbQ2023Others..Bfr_ScreenerNasdaqEtf", "Symbol", "Name",
                             "LastSale", "NetChange", "Change", "TimeStamp");
-                        DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqEtf");
+                        DbHelper.RunProcedure("dbQ2023Others..pUpdateScreenerNasdaqEtf");
                     }
                     itemCount += stockItems.Count + etfItems.Count;
 

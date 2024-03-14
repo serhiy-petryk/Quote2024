@@ -11,11 +11,11 @@ namespace Data.Models
         {
             if (items.Count > 0)
             {
-                DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..Bfr_Indices", "Index", "Symbol", "Name", "Sector",
+                DbHelper.ClearAndSaveToDbTable(items, "dbQ2023Others..Bfr_Indices", "Index", "Symbol", "Name", "Sector",
                     "Industry", "TimeStamp");
 
-                DbUtils.RunProcedure("dbQ2023Others..pUpdateIndices");
-                DbUtils.RunProcedure("dbQ2023Others..pUpdateIndices2");
+                DbHelper.RunProcedure("dbQ2023Others..pUpdateIndices");
+                DbHelper.RunProcedure("dbQ2023Others..pUpdateIndices2");
             }
         }
 
@@ -33,9 +33,9 @@ namespace Data.Models
         {
             if (items.Count > 0)
             {
-                DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..Bfr_IndexChanges", "Index", "Date", "Symbols",
+                DbHelper.ClearAndSaveToDbTable(items, "dbQ2023Others..Bfr_IndexChanges", "Index", "Date", "Symbols",
                     "AddedSymbol", "AddedName", "RemovedSymbol", "RemovedName", "TimeStamp");
-                DbUtils.RunProcedure("dbQ2023Others..pUpdateIndexChanges");
+                DbHelper.RunProcedure("dbQ2023Others..pUpdateIndexChanges");
             }
         }
 

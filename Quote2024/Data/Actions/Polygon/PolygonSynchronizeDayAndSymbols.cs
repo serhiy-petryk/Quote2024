@@ -7,7 +7,7 @@ namespace Data.Actions.Polygon
         public static void Start()
         {
             Logger.AddMessage($"Synchronize Polygon Day and Symbols data");
-            DbUtils.RunProcedure("dbQ2024..pSynchronizePolygonDayAndSymbols");
+            DbHelper.RunProcedure("dbQ2024..pSynchronizePolygonDayAndSymbols");
             Logger.AddMessage($"!Finished.");
         }
     }

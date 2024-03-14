@@ -8,7 +8,7 @@ namespace Data.Models
     {
         public static void RefreshSplitData()
         {
-            DbUtils.RunProcedure("dbQ2023Others..pRefreshSplits");
+            DbHelper.RunProcedure("dbQ2023Others..pRefreshSplits");
             Logger.AddMessage($"!Run RefreshSplitData");
         }
 

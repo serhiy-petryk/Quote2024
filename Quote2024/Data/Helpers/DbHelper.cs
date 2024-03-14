@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Data.Helpers
 {
-    public static class DbUtils
+    public static class DbHelper
     {
         public static void ClearAndSaveToDbTable<T>(IEnumerable<T> items, string destinationTable, params string[] properties) =>
             SaveToDbTable(items, destinationTable, true, properties);

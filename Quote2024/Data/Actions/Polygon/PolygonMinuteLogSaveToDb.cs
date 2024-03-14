@@ -37,8 +37,8 @@ namespace Data.Actions.Polygon
                 var folderId = Path.GetFileNameWithoutExtension(zipFileName);
 
                 Logger.AddMessage($"Started. Delete old log in database for {folderId} folder");
-                DbUtils.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog WHERE folder='{folderId}'");
-                DbUtils.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog_BlankFiles WHERE folder='{folderId}'");
+                DbHelper.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog WHERE folder='{folderId}'");
+                DbHelper.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog_BlankFiles WHERE folder='{folderId}'");
 
                 var errorLog = new List<string>();
                 ProcessZipFile(zipFileName, errorLog);
@@ -61,7 +61,7 @@ namespace Data.Actions.Polygon
             }
 
             Logger.AddMessage($"Update MinutePoligonLog");
-            DbUtils.RunProcedure("dbQ2024Minute..pUpdateMinutePoligonLog");
+            DbHelper.RunProcedure("dbQ2024Minute..pUpdateMinutePoligonLog");
 
             if (totalErrors > 0)
                 Logger.AddMessage($"!Finished. Files: {zipFiles.Count}. Found {totalErrors} errors");
@@ -74,8 +74,8 @@ namespace Data.Actions.Polygon
             var folderId = Path.GetFileNameWithoutExtension(zipFileName);
 
             Logger.AddMessage($"Started. Delete old log in database.");
-            DbUtils.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog WHERE folder='{folderId}'");
-            DbUtils.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog_BlankFiles WHERE folder='{folderId}'");
+            DbHelper.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog WHERE folder='{folderId}'");
+            DbHelper.ExecuteSql($"DELETE dbQ2024Minute..MinutePolygonLog_BlankFiles WHERE folder='{folderId}'");
 
             var errorLog = new List<string>();
             ProcessZipFile(zipFileName, errorLog);
@@ -261,13 +261,13 @@ namespace Data.Actions.Polygon
         private static void SaveToDb(List<LogEntry> log, List<BlankFile> blankFiles)
         {
             Logger.AddMessage($"Save data to database ...");
-            DbUtils.SaveToDbTable(log, "dbQ2024Minute..MinutePolygonLog", "Folder", "Symbol", "Date",
+            DbHelper.SaveToDbTable(log, "dbQ2024Minute..MinutePolygonLog", "Folder", "Symbol", "Date",
                 "MinTime", "MaxTime", "Count", "CountFull", "Open", "High", "Low", "Close", "Volume", "VolumeFull",
                 "TradeCount", "TradeCountFull", "HighBefore", "LowBefore", "VolumeBefore", "CountBefore",
                 "TradeCountBefore", "OpenIn", "HighIn", "LowIn", "CloseIn", "FinalIn", "VolumeIn", "CountIn",
                 "TradeCountIn", "Errors", "Position", "RowStatus", "Created", "TimeStamp");
 
-            DbUtils.SaveToDbTable(blankFiles, "dbQ2024Minute..MinutePolygonLog_BlankFiles", "Folder", "FileName",
+            DbHelper.SaveToDbTable(blankFiles, "dbQ2024Minute..MinutePolygonLog_BlankFiles", "Folder", "FileName",
                 "FileCreated", "Symbol");
 
             log.Clear();

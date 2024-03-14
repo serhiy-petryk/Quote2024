@@ -31,7 +31,7 @@ namespace Data.Scanners
             var allResults = new List<TheFirstScanner>();
             var resultsCount = 0;
 
-            DbUtils.ClearAndSaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
+            DbHelper.ClearAndSaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
                 "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
             
             foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes())
@@ -109,7 +109,7 @@ namespace Data.Scanners
                 allResults.AddRange(results);
                 if (allResults.Count > 100000)
                 {
-                    DbUtils.SaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
+                    DbHelper.SaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
                         "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
                     allResults.Clear();
                 }
@@ -117,7 +117,7 @@ namespace Data.Scanners
 
             if (allResults.Count > 0)
             {
-                DbUtils.SaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
+                DbHelper.SaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
                     "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
                 allResults.Clear();
             }

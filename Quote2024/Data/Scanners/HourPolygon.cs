@@ -64,7 +64,7 @@ namespace Data.Scanners
             var allResults = new List<QuoteScanner>();
             var resultsCount = 0;
 
-            DbUtils.ClearAndSaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
+            DbHelper.ClearAndSaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                 "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
                 "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext",
                 "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
@@ -233,7 +233,7 @@ namespace Data.Scanners
                 allResults.AddRange(results);
                 if (allResults.Count > 100000)
                 {
-                    DbUtils.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
+                    DbHelper.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                         "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
                         "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext",
                         "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
@@ -251,7 +251,7 @@ namespace Data.Scanners
 
             if (allResults.Count > 0)
             {
-                DbUtils.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
+                DbHelper.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
                     "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count",
                     "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext",
                     "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",

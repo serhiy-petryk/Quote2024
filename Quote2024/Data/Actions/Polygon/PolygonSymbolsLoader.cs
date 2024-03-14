@@ -106,10 +106,10 @@ namespace Data.Actions.Polygon
                     items.AddRange(oo.results.Where(a => string.Equals(a.market, "stocks")));
                 }
 
-            DbUtils.ClearAndSaveToDbTable(items, "dbQ2024..Bfr_SymbolsPolygon", "pSymbol", "pDate", "pExchange",
+            DbHelper.ClearAndSaveToDbTable(items, "dbQ2024..Bfr_SymbolsPolygon", "pSymbol", "pDate", "pExchange",
                 "pName", "type", "cik", "composite_figi", "share_class_figi", "last_updated_utc", "pTimeStamp");
 
-            DbUtils.RunProcedure("dbQ2024..pUpdateSymbolsPolygon");
+            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsPolygon");
 
             return items.Count;
         }

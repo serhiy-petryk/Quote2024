@@ -88,10 +88,10 @@ namespace Data.Actions.MorningStar
                 throw new Exception($"There are {badTickers.Count} bad morning star tickers. Please, check MorningStarMethod.GetMyTicker");
 
             var itemsToSave = data.Values.SelectMany(a => a.Values).ToArray();
-            DbUtils.ClearAndSaveToDbTable(itemsToSave, "dbQ2023Others..Bfr_ScreenerMorningStar", "Symbol", "Date",
+            DbHelper.ClearAndSaveToDbTable(itemsToSave, "dbQ2023Others..Bfr_ScreenerMorningStar", "Symbol", "Date",
                 "Exchange", "Sector", "Name", "TimeStamp");
 
-            DbUtils.RunProcedure("dbQ2023Others..pUpdateScreenerMorningStar");
+            DbHelper.RunProcedure("dbQ2023Others..pUpdateScreenerMorningStar");
         }
 
         private static string DownloadAndSaveToZip()

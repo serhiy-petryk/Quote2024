@@ -158,10 +158,10 @@ namespace Data.Actions.Investing
 
         private static void SaveToDb(IEnumerable<SplitModel> items)
         {
-            DbUtils.ClearAndSaveToDbTable(items.Where(a => a.Date <= a.TimeStamp), "dbQ2023Others..Bfr_SplitInvesting",
+            DbHelper.ClearAndSaveToDbTable(items.Where(a => a.Date <= a.TimeStamp), "dbQ2023Others..Bfr_SplitInvesting",
                 "Symbol", "Date", "Name", "Ratio", "K", "TimeStamp");
 
-            DbUtils.ExecuteSql("INSERT INTO dbQ2023Others..SplitInvesting (Symbol,[Date],Name,Ratio,K,[TimeStamp]) " +
+            DbHelper.ExecuteSql("INSERT INTO dbQ2023Others..SplitInvesting (Symbol,[Date],Name,Ratio,K,[TimeStamp]) " +
                                "SELECT a.Symbol, a.[Date], a.Name, a.Ratio, a.K, a.[TimeStamp] FROM dbQ2023Others..Bfr_SplitInvesting a " +
                                "LEFT JOIN dbQ2023Others..SplitInvesting b ON a.Symbol = b.Symbol AND a.Date = b.Date " +
                                "WHERE b.Symbol IS NULL");

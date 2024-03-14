@@ -44,7 +44,7 @@ namespace Data.Actions.Eoddata
             var itemCount = ParseAndSaveToDb(zipFileName);
 
             Logger.AddMessage($"Run sql procedure: pUpdateSymbolsXref");
-            DbUtils.RunProcedure("dbQ2023Others..pUpdateSymbolsXref");
+            DbHelper.RunProcedure("dbQ2023Others..pUpdateSymbolsXref");
 
             Logger.AddMessage($"!Finished. Items: {itemCount:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
         }
@@ -72,9 +72,9 @@ namespace Data.Actions.Eoddata
                     itemCount += items.Length;
 
                     // Save data to buffer table of data server
-                    DbUtils.ClearAndSaveToDbTable(items, "dbQ2023Others..Bfr_SymbolsEoddata", "Symbol", "Exchange", "Name",
+                    DbHelper.ClearAndSaveToDbTable(items, "dbQ2023Others..Bfr_SymbolsEoddata", "Symbol", "Exchange", "Name",
                         "TimeStamp");
-                    DbUtils.RunProcedure("dbQ2023Others..pUpdateSymbolsEoddata");
+                    DbHelper.RunProcedure("dbQ2023Others..pUpdateSymbolsEoddata");
                 }
 
             return itemCount;
