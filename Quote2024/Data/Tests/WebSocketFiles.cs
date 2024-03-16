@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Data.Helpers;
 using Data.Models;
 
 namespace Data.Tests
@@ -63,14 +64,13 @@ namespace Data.Tests
                 {
                     itemCount++;
                     var data = PricingData.GetPricingData(line.Substring(13));
-                    var dataDate = DateTimeOffset.FromUnixTimeMilliseconds(data.time / 2);
-                    var etcDataDate = TimeZoneInfo.ConvertTimeFromUtc(dataDate.DateTime, Settings.NewYorkTimeZone);
+                    var etcDataDate = TimeHelper.GetEstDateTimeFromUnixMilliseconds(data.time/2);
 
                     var timeSpan = TimeSpan.ParseExact(line.Substring(0, 12), @"hh\:mm\:ss\.FFF", CultureInfo.InvariantCulture);
                     var recordDate = fileDate.Add(timeSpan);
                     if (timeSpan < fileTime)
                         recordDate = recordDate.AddDays(1);
-                    var etcRecordDate = TimeZoneInfo.ConvertTimeFromUtc(recordDate.ToUniversalTime(), Settings.NewYorkTimeZone);
+                    var etcRecordDate = TimeZoneInfo.ConvertTimeFromUtc(recordDate.ToUniversalTime(), TimeHelper.EstTimeZone);
 
                     var difference = etcRecordDate - etcDataDate;
                     delayTotal += difference.TotalSeconds;

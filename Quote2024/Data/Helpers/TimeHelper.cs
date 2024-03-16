@@ -4,7 +4,8 @@ namespace Data.Helpers
 {
     public static class TimeHelper
     {
-        private static readonly TimeZoneInfo EstTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+        // New York time zone
+        public static readonly TimeZoneInfo EstTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
         /// <summary>
         /// For date id in downloaded filenames
@@ -18,12 +19,12 @@ namespace Data.Helpers
         /// <summary>
         /// Get NewYork time from Unix UTC milliseconds
         /// </summary>
-        /// <param name="unixTimeInSeconds"></param>
+        /// <param name="unixTimeInMilliseconds"></param>
         /// <returns></returns>
-        public static DateTime GetEstDateTimeFromUnixMilliseconds(long unixTimeInSeconds)
+        public static DateTime GetEstDateTimeFromUnixMilliseconds(long unixTimeInMilliseconds)
         {
-            var aa2 = DateTimeOffset.FromUnixTimeMilliseconds(unixTimeInSeconds);
-            return (aa2 + EstTimeZone.GetUtcOffset(aa2)).DateTime;
+            return TimeZoneInfo.ConvertTimeFromUtc(
+                DateTimeOffset.FromUnixTimeMilliseconds(unixTimeInMilliseconds).DateTime, EstTimeZone);
         }
 
         /// <summary>
@@ -35,7 +36,5 @@ namespace Data.Helpers
             Convert.ToInt64((new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeMilliseconds());
 
         public const long UnixMillisecondsForOneDay = 86400000L;
-
-
     }
 }
