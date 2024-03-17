@@ -10,11 +10,13 @@ namespace Data.Helpers
         /// <summary>
         /// For date id in downloaded filenames
         /// </summary>
-        /// <param name="hourOffset"></param>
         /// <returns></returns>
-        public static (DateTime, string, string) GetTimeStamp(int hourOffset = -9) => (
-            DateTime.Now.AddHours(hourOffset), DateTime.Now.AddHours(hourOffset).ToString("yyyyMMdd"),
-            DateTime.Now.AddHours(0).ToString("yyyyMMddHHmmss"));
+        public static (DateTime, string, string) GetTimeStamp()
+        {
+            var msecs = (new DateTimeOffset(DateTime.Now)).ToUnixTimeMilliseconds();
+            var newYorkDateTime = GetEstDateTimeFromUnixMilliseconds(msecs);
+            return (newYorkDateTime, newYorkDateTime.ToString("yyyyMMdd"), DateTime.Now.ToString("yyyyMMddHHmmss"));
+        }
 
         /// <summary>
         /// Get NewYork time from Unix UTC milliseconds

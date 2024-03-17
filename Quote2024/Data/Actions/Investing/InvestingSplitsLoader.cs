@@ -16,7 +16,7 @@ namespace Data.Actions.Investing
 
         public static void Start()
         {
-            var timeStamp = TimeHelper.GetTimeStamp(-9 - 24);
+            var timeStamp = TimeHelper.GetTimeStamp();
             var postData = string.Format(POST_DATA_TEMPLATE,
                 timeStamp.Item1.AddDays(-30).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 timeStamp.Item1.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
@@ -173,7 +173,6 @@ namespace Data.Actions.Investing
             public string data;
             public int rows_num;
             public string last_time_scope;
-            public DateTime From => new DateTime(1970, 1, 1).AddSeconds(long.Parse(last_time_scope));
         }
         #endregion
     }
