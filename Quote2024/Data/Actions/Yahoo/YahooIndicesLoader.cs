@@ -11,6 +11,7 @@ namespace Data.Actions.Yahoo
 {
     public static class YahooIndicesLoader
     {
+        // Valid time for period is (date + 09:30 of NewYork time zone)
         private const string UrlTemplate = "https://query1.finance.yahoo.com/v7/finance/download/{2}?period1={0}&period2={1}&interval=1d&events=history&includeAdjustedClose=true";
         private static readonly string[] Symbols = new[] { "^DJI", "^GSPC" };
 
@@ -32,8 +33,8 @@ namespace Data.Actions.Yahoo
                     }
             }
 
-            var from = GetYahooTime(maxDate.AddDays(-30));
-            var to = GetYahooTime(DateTime.Now);
+            var from = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30))/1000;
+            var to = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1;
 
             var timeStamp = TimeHelper.GetTimeStamp();
             var entries = new List<VirtualFileEntry>();
@@ -88,8 +89,6 @@ namespace Data.Actions.Yahoo
             }
 
             Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
-
-            long GetYahooTime(DateTime dt) => Convert.ToInt64((dt - new DateTime(1970, 1, 1)).TotalSeconds + 18000);
         }
     }
 

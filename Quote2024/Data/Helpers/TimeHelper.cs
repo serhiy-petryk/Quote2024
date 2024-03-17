@@ -33,7 +33,7 @@ namespace Data.Helpers
         /// <param name="dt"></param>
         /// <returns></returns>
         public static long GetUnixMillisecondsFromEstDateTime(DateTime dt) =>
-            Convert.ToInt64((new DateTimeOffset(dt, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeMilliseconds());
+            Convert.ToInt64((new DateTimeOffset(dt.Ticks, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeMilliseconds());
 
         public const long UnixMillisecondsForOneDay = 86400000L;
     }
