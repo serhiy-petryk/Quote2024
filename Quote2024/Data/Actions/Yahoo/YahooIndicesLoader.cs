@@ -16,11 +16,11 @@ namespace Data.Actions.Yahoo
         // actual url: https://query1.finance.yahoo.com/v7/finance/download/AA?period1=1679112201&period2=1710734601&interval=1d&events=history&includeAdjustedClose=true
         private static readonly string[] Symbols = new[] { "^DJI", "^GSPC" };
 
-        public static DateTime[] GetTradingDays(DateTime fromDate, DateTime toDate)
+        public static DateTime[] GetTradingDays(DateTime toDate, int days)
         {
             Logger.AddMessage($"Started");
 
-            var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(fromDate.Date) / 1000;
+            var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddDays(-days + 1)) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddHours(23)) / 1000;
             var data = new List<DayYahoo>();
             DownloadData(Symbols[0], fromUnixSeconds, toUnixSeconds, data);
