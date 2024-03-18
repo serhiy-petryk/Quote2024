@@ -27,7 +27,7 @@ namespace Data.Actions.Yahoo
 
             Logger.AddMessage($"!Finished");
 
-            return data.Select(a => a.Date).OrderBy(a => a).ToArray();
+            return data.Select(a => a.Date).OrderByDescending(a => a).ToArray();
         }
 
         public static void Start()
@@ -40,12 +40,8 @@ namespace Data.Actions.Yahoo
             {
                 conn.Open();
                 cmd.CommandText = "select max([date]) MaxDate from dbQ2023Others..TradingDays";
-                using (var rdr = cmd.ExecuteReader())
-                    while (rdr.Read())
-                    {
-                        maxDate = (DateTime)rdr["MaxDate"];
-                        break;
-                    }
+                var o = cmd.ExecuteScalar();
+                if (o is DateTime) maxDate = (DateTime)o;
             }
 
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30))/1000;
