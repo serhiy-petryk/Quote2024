@@ -13,8 +13,7 @@ namespace Data.Helpers
         /// <returns></returns>
         public static (DateTime, string, string) GetTimeStamp()
         {
-            var msecs = (new DateTimeOffset(DateTime.Now)).ToUnixTimeMilliseconds();
-            var newYorkDateTime = GetEstDateTimeFromUnixMilliseconds(msecs);
+            var newYorkDateTime = GetCurrentEstDateTime();
             return (newYorkDateTime, newYorkDateTime.ToString("yyyyMMdd"), DateTime.Now.ToString("yyyyMMddHHmmss"));
         }
 
@@ -36,6 +35,13 @@ namespace Data.Helpers
         /// <returns></returns>
         public static long GetUnixMillisecondsFromEstDateTime(DateTime dt) =>
             Convert.ToInt64((new DateTimeOffset(dt.Ticks, EstTimeZone.GetUtcOffset(dt))).ToUnixTimeMilliseconds());
+
+        public static DateTime GetCurrentEstDateTime()
+        {
+            var msecs = (new DateTimeOffset(DateTime.Now)).ToUnixTimeMilliseconds();
+            var newYorkDateTime = GetEstDateTimeFromUnixMilliseconds(msecs);
+            return newYorkDateTime;
+        }
 
         public const long UnixMillisecondsForOneDay = 86400000L;
     }
