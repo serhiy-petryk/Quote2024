@@ -13,7 +13,22 @@ namespace Data.Actions.Yahoo
     {
         // Valid time for period is (date + 09:30 of NewYork time zone)
         private const string UrlTemplate = "https://query1.finance.yahoo.com/v7/finance/download/{2}?period1={0}&period2={1}&interval=1d&events=history&includeAdjustedClose=true";
+        // actual url: https://query1.finance.yahoo.com/v7/finance/download/AA?period1=1679112201&period2=1710734601&interval=1d&events=history&includeAdjustedClose=true
         private static readonly string[] Symbols = new[] { "^DJI", "^GSPC" };
+
+        public static DateTime[] GetTradingDays(DateTime fromDate, DateTime toDate)
+        {
+            Logger.AddMessage($"Started");
+
+            var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(fromDate.Date) / 1000;
+            var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddHours(23)) / 1000;
+            var data = new List<DayYahoo>();
+            DownloadData(Symbols[0], fromUnixSeconds, toUnixSeconds, data);
+
+            Logger.AddMessage($"!Finished");
+
+            return data.Select(a => a.Date).OrderBy(a => a).ToArray();
+        }
 
         public static void Start()
         {
@@ -33,43 +48,11 @@ namespace Data.Actions.Yahoo
                     }
             }
 
-            var from = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30))/1000;
-            var to = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1;
-
-            var timeStamp = TimeHelper.GetTimeStamp();
-            var entries = new List<VirtualFileEntry>();
+            var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30))/1000;
+            var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1;
             var data = new List<DayYahoo>();
-
-            // Download data
             foreach (var symbol in Symbols)
-            {
-                Logger.AddMessage($"Download data for {symbol}");
-                var url = string.Format(UrlTemplate, from, to, symbol);
-                var o = Download.DownloadToBytes(url, false);
-                if (o.Item2 != null)
-                    throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
-
-                var lines = Encoding.UTF8.GetString(o.Item1).Split('\n');
-                if (lines.Length == 0)
-                    throw new Exception($"Invalid Day Yahoo quote file (no text lines): {o}");
-                if (lines[0] != "Date,Open,High,Low,Close,Adj Close,Volume")
-                    throw new Exception($"Invalid YahooIndex quotes file (check file header): {lines[0]}");
-
-                for (var k = 1; k < lines.Length; k++)
-                {
-                    if (!string.IsNullOrEmpty(lines[k].Trim()))
-                    {
-                        if (lines[k].Contains("null"))
-                            Debug.Print($"{symbol}, {lines[k]}");
-                        else
-                        {
-                            var ss = lines[k].Split(',');
-                            var item = new DayYahoo(symbol, ss);
-                            data.Add(item);
-                        }
-                    }
-                }
-            }
+                DownloadData(symbol, fromUnixSeconds, toUnixSeconds, data);
 
             if (data.Count > 0)
             {
@@ -90,6 +73,38 @@ namespace Data.Actions.Yahoo
 
             Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
         }
+
+        private static void DownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DayYahoo> data)
+        {
+            // Download data
+            Logger.AddMessage($"Download data for {symbol}");
+            var url = string.Format(UrlTemplate, fromUnixSeconds, toUnixSeconds, symbol);
+            var o = Download.DownloadToBytes(url, false);
+            if (o.Item2 != null)
+                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+
+            var lines = Encoding.UTF8.GetString(o.Item1).Split('\n');
+            if (lines.Length == 0)
+                throw new Exception($"Invalid Day Yahoo quote file (no text lines): {o}");
+            if (lines[0] != "Date,Open,High,Low,Close,Adj Close,Volume")
+                throw new Exception($"Invalid YahooIndex quotes file (check file header): {lines[0]}");
+
+            for (var k = 1; k < lines.Length; k++)
+            {
+                if (!string.IsNullOrEmpty(lines[k].Trim()))
+                {
+                    if (lines[k].Contains("null"))
+                        Debug.Print($"{symbol}, {lines[k]}");
+                    else
+                    {
+                        var ss = lines[k].Split(',');
+                        var item = new DayYahoo(symbol, ss);
+                        data.Add(item);
+                    }
+                }
+            }
+        }
+
     }
 
     #region ===========  DayYahoo Model  ===============
