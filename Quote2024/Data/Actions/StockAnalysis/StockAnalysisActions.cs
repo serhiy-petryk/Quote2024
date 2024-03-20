@@ -180,8 +180,8 @@ namespace Data.Actions.StockAnalysis
 
             public DateTime pDate => DateTime.Parse(date, CultureInfo.InvariantCulture);
             public string pSymbol => symbol.StartsWith("$") ? symbol.Substring(1) : symbol;
-            public string pOther => other == "N/A" || string.IsNullOrEmpty(other) ? null : other;
-            public string pName => string.IsNullOrEmpty(name) ? null : name;
+            public string pOther => other == "N/A" || string.IsNullOrWhiteSpace(other) ? null : other;
+            public string pName => string.IsNullOrWhiteSpace(name) ? null : name;
 
             public override string ToString() => $"{pDate:yyyy-MM-dd}, {pSymbol}, {type}, {pOther}, {text}";
         }

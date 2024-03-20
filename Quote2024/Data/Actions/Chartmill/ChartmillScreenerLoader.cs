@@ -83,8 +83,8 @@ namespace Data.Actions.Chartmill
                             Exchange = item.exchange.shortName,
                             Sector = item.gicsSubIndustry?.sector.name,
                             Industry = item.gicsSubIndustry?.name,
-                            Name = string.IsNullOrEmpty(item.name) ? null: item.name,
-                            ISIN = string.IsNullOrEmpty(item.isin) ? null : item.isin,
+                            Name = string.IsNullOrWhiteSpace(item.name) ? null: item.name,
+                            ISIN = string.IsNullOrWhiteSpace(item.isin) ? null : item.isin,
                             Country = item.country,
                             Type = item.type,
                             Etf = item.etf ? true : null

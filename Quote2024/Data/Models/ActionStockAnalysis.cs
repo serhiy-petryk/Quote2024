@@ -99,16 +99,16 @@ namespace Data.Models
                 if (Description.EndsWith(" was listed"))
                 {
                     Symbol = symbol;
-                    if (string.IsNullOrEmpty(Name))
+                    if (string.IsNullOrWhiteSpace(Name))
                         Name = Description.Substring(0, Description.Length - 11).Trim();
                 }
                 else if (Description.Contains(" Listed - "))
                 {
                     Symbol = GetFirstWord(Description);
-                    if (string.IsNullOrEmpty(Name))
+                    if (string.IsNullOrWhiteSpace(Name))
                     {
                         var ss = Description.Split(new[] {" Listed - "}, StringSplitOptions.None);
-                        if (!string.IsNullOrEmpty(ss[1].Trim()))
+                        if (!string.IsNullOrWhiteSpace(ss[1]))
                             Name = ss[1].Trim();
                     }
                 }
@@ -122,16 +122,16 @@ namespace Data.Models
                 if (Description.EndsWith(" was delisted"))
                 {
                     Symbol = symbol;
-                    if (string.IsNullOrEmpty(Name))
+                    if (string.IsNullOrWhiteSpace(Name))
                         Name = Description.Substring(0, Description.Length - 13).Trim();
                 }
                 else if (Description.Contains(" Delisted - "))
                 {
                     Symbol = GetFirstWord(Description);
-                    if (string.IsNullOrEmpty(Name))
+                    if (string.IsNullOrWhiteSpace(Name))
                     {
                         var ss = Description.Split(new[] { " Delisted - " }, StringSplitOptions.None);
-                        if (!string.IsNullOrEmpty(ss[1].Trim()))
+                        if (!string.IsNullOrWhiteSpace(ss[1]))
                             Name = ss[1].Trim();
                     }
                 }
@@ -184,9 +184,9 @@ namespace Data.Models
                 return;
             }
 
-            if (string.IsNullOrEmpty(Symbol))
+            if (string.IsNullOrWhiteSpace(Symbol))
                 throw new Exception("Check symbol");
-            if (!string.IsNullOrEmpty(symbol) && !string.Equals(symbol, Symbol))
+            if (!string.IsNullOrWhiteSpace(symbol) && !string.Equals(symbol, Symbol))
             {
                 if (Type == Action.Split)
                 {

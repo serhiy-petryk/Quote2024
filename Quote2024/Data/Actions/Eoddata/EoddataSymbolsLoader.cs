@@ -93,7 +93,7 @@ namespace Data.Actions.Eoddata
                 this.Exchange = exchange.ToUpper();
                 Symbol = ss[0].Trim().ToUpper();
                 Name = ss[1].Trim();
-                if (string.IsNullOrEmpty(Name)) Name = null;
+                if (string.IsNullOrWhiteSpace(Name)) Name = null;
                 TimeStamp = timeStamp;
             }
 

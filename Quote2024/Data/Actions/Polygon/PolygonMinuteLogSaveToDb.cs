@@ -116,7 +116,7 @@ namespace Data.Actions.Polygon
                     if (oo.adjusted || oo.status != "OK")
                         throw new Exception("Check parser");
 
-                    if (!string.IsNullOrEmpty(oo.next_url))
+                    if (!string.IsNullOrWhiteSpace(oo.next_url))
                     {
                         Debug.Print($"NEXT URL:\t{entry.Name}\t{oo.next_url}");
                         errorLog.Add($"{entry.Name}\tPartial downloading\tNext url: {oo.next_url}");

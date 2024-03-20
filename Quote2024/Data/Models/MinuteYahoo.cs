@@ -35,7 +35,7 @@ namespace Data.Models
             {
                 _allCorrections=new Dictionary<string, Dictionary<DateTime, QuoteCorrection>>();
                 var lines = File.ReadAllLines(YahooCommon.MinuteYahooCorrectionFiles)
-                    .Where(a => !string.IsNullOrEmpty(a) && !a.Trim().StartsWith("#"));
+                    .Where(a => !string.IsNullOrWhiteSpace(a) && !a.Trim().StartsWith("#"));
                 foreach (var line in lines)
                 {
                     var ss = line.Split('\t');

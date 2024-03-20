@@ -180,9 +180,9 @@ namespace Data.Actions.Wikipedia
                                 var addedSymbols = new[] {addedSymbol};
                                 if (addedSymbol != null)
                                     addedSymbols = addedSymbol.Split(',');
-                                foreach (var aSymbol in addedSymbols.Where(a=>!string.IsNullOrEmpty(a)))
+                                foreach (var aSymbol in addedSymbols.Where(a=>!string.IsNullOrWhiteSpace(a)))
                                 {
-                                    var aSymbol2 = string.IsNullOrEmpty(aSymbol) ? null : aSymbol.Trim();
+                                    var aSymbol2 = string.IsNullOrWhiteSpace(aSymbol) ? null : aSymbol.Trim();
                                     var item = new Models.IndexDbChangeItem
                                     {
                                         Index = indexName,

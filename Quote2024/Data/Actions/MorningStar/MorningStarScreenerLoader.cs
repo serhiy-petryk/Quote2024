@@ -50,15 +50,15 @@ namespace Data.Actions.MorningStar
                         var name = item.fields.name.value;
 
                         var symbol = originalSymbol;
-                        if (string.IsNullOrEmpty(symbol) && name == "Nano Labs Ltd Ordinary Shares - Class A")
+                        if (string.IsNullOrWhiteSpace(symbol) && name == "Nano Labs Ltd Ordinary Shares - Class A")
                             symbol = "NA";
 
                         if (!MorningStarCommon.Exchanges.Any(exchange.Contains)) continue;
                         if (symbol == "SANP1") continue;
 
-                        if (string.IsNullOrEmpty(symbol))
+                        if (string.IsNullOrWhiteSpace(symbol))
                             throw new Exception($"No ticker code. Please, check. Security name is {name}. File: {entry.Name}");
-                        if (string.IsNullOrEmpty(name))
+                        if (string.IsNullOrWhiteSpace(name))
                             throw new Exception($"Name of '{originalSymbol}' ticker is blank. Please, adjust structure (Bfr_)ScreenerMorningStar tables in database. File: {entry.Name}");
                         symbol = MorningStarCommon.GetMyTicker(symbol);
 

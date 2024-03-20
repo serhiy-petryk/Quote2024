@@ -27,7 +27,7 @@ namespace Data.Helpers
         {
             using (var ofd = new OpenFileDialog())
             {
-                if (!string.IsNullOrEmpty(title))
+                if (!string.IsNullOrWhiteSpace(title))
                     ofd.Title = title;
                 ofd.InitialDirectory = folder;
                 ofd.RestoreDirectory = true;

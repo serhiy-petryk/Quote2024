@@ -136,7 +136,7 @@ namespace Data.Actions.Yahoo
                 //============================
                 void CheckSplit()
                 {
-                    if (string.IsNullOrEmpty(lastSymbol)) return;
+                    if (string.IsNullOrWhiteSpace(lastSymbol)) return;
                     if (MinuteYahoo.IsQuoteSplitChecked(new Quote { Symbol = lastSymbol, Timed = lastDate }))
                         return;
 
@@ -166,7 +166,7 @@ namespace Data.Actions.Yahoo
                 void CheckVolume()
                 {
                     // return; // Not active because there are a lot of corrections
-                    if (string.IsNullOrEmpty(lastSymbol)) return;
+                    if (string.IsNullOrWhiteSpace(lastSymbol)) return;
 
                     var volume = lastQuotes.Sum(a => a.Volume);
                     var qKey = Tuple.Create(lastSymbol, lastDate);

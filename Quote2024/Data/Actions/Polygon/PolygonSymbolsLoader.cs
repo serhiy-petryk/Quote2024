@@ -142,8 +142,8 @@ namespace Data.Actions.Polygon
 
             public string pSymbol => PolygonCommon.GetMyTicker(ticker);
             public DateTime pDate;
-            public string pName => string.IsNullOrEmpty(name) ? null : name;
-            public string pExchange => string.IsNullOrEmpty(primary_exchange) ? "No" : primary_exchange;
+            public string pName => string.IsNullOrWhiteSpace(name) ? null : name;
+            public string pExchange => string.IsNullOrWhiteSpace(primary_exchange) ? "No" : primary_exchange;
 
             public DateTime pTimeStamp;
         }

@@ -89,7 +89,7 @@ namespace Data.Actions.Investing
                 var row = rows[k];
                 var cells = row.Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
                 var sDateOriginal = GetCellValue(cells[0]);
-                var sDate = string.IsNullOrEmpty(sDateOriginal) ? lastDate : sDateOriginal;
+                var sDate = string.IsNullOrWhiteSpace(sDateOriginal) ? lastDate : sDateOriginal;
                 var date = DateTime.Parse(sDate, CultureInfo.InvariantCulture);
 
                 cells[1] = System.Net.WebUtility.HtmlDecode(cells[1]).Trim();
@@ -134,9 +134,9 @@ namespace Data.Actions.Investing
                 var ss = lines[k].Split('\t');
                 if (ss.Length != 3)
                     throw new Exception($"Invalid line of Investing.com split file! Line: {lines[k]}, file: {txtFileName}");
-                if (string.IsNullOrEmpty(ss[0]) && !lastDate.HasValue)
+                if (string.IsNullOrWhiteSpace(ss[0]) && !lastDate.HasValue)
                     throw new Exception($"Error: Empty first date in Investing.com split file! Line: {lines[k]}, file: {txtFileName}");
-                var date = string.IsNullOrEmpty(ss[0]) ? lastDate.Value : DateTime.ParseExact(ss[0], "MMM dd, yyyy", CultureInfo.InvariantCulture);
+                var date = string.IsNullOrWhiteSpace(ss[0]) ? lastDate.Value : DateTime.ParseExact(ss[0], "MMM dd, yyyy", CultureInfo.InvariantCulture);
                 var s = ss[1].Trim();
                 if (!s.EndsWith(")"))
                     throw new Exception($"Error: The line must be ended with ')'! Line: {lines[k]}, file: {txtFileName}");

@@ -160,11 +160,11 @@ namespace Data.Actions.Nasdaq
             public string Name => NullCheck(Row.name);
             public float? LastSale => Row.lastsale == "NA" ? (float?)null : float.Parse(Row.lastsale, NumberStyles.Any, culture);
             public float Volume => Convert.ToSingle(Math.Round(float.Parse(Row.volume, NumberStyles.Any, culture) / 1000000.0, 3));
-            public float? NetChange => string.IsNullOrEmpty(Row.netchange) ? (float?)null : float.Parse(Row.netchange, NumberStyles.Any, culture);
-            public float? Change => string.IsNullOrEmpty(Row.pctchange) ? (float?)null : float.Parse(Row.pctchange.Replace("%", ""), NumberStyles.Any, culture);
-            public float? MarketCap => string.IsNullOrEmpty(Row.marketCap) ? (float?)null : Convert.ToSingle(Math.Round(float.Parse(Row.marketCap, NumberStyles.Any, culture) / 1000000.0, 3));
+            public float? NetChange => string.IsNullOrWhiteSpace(Row.netchange) ? (float?)null : float.Parse(Row.netchange, NumberStyles.Any, culture);
+            public float? Change => string.IsNullOrWhiteSpace(Row.pctchange) ? (float?)null : float.Parse(Row.pctchange.Replace("%", ""), NumberStyles.Any, culture);
+            public float? MarketCap => string.IsNullOrWhiteSpace(Row.marketCap) ? (float?)null : Convert.ToSingle(Math.Round(float.Parse(Row.marketCap, NumberStyles.Any, culture) / 1000000.0, 3));
             public string Country => NullCheck(Row.country);
-            public short? IpoYear => string.IsNullOrEmpty(Row.ipoyear) ? (short?)null : short.Parse(Row.ipoyear, NumberStyles.Any, culture);
+            public short? IpoYear => string.IsNullOrWhiteSpace(Row.ipoyear) ? (short?)null : short.Parse(Row.ipoyear, NumberStyles.Any, culture);
             public string Sector => NullCheck(Row.sector);
             public string Industry => NullCheck(Row.industry);
             public DateTime TimeStamp;
@@ -185,7 +185,7 @@ namespace Data.Actions.Nasdaq
             }
         }
 
-        private static string NullCheck(string s) => string.IsNullOrEmpty(s) ? null : s.Trim();
+        private static string NullCheck(string s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
 
         //========================
         private class cEtfRoot
@@ -221,7 +221,7 @@ namespace Data.Actions.Nasdaq
 
             public float? LastSale => string.Equals(Row.lastSalePrice, "$")? (float?) null : float.Parse(Row.lastSalePrice, NumberStyles.Any, culture);
             public float NetChange => float.Parse(Row.netChange, NumberStyles.Any, culture);
-            public float? Change => string.IsNullOrEmpty(Row.percentageChange) ? (float?)null : float.Parse(Row.percentageChange.Replace("%", ""), culture);
+            public float? Change => string.IsNullOrWhiteSpace(Row.percentageChange) ? (float?)null : float.Parse(Row.percentageChange.Replace("%", ""), culture);
             public DateTime TimeStamp;
 
             public DbEtfRow(DateTime timeStamp, cEtfRow row)

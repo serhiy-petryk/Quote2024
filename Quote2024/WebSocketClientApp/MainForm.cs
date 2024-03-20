@@ -46,7 +46,7 @@ namespace WebSocketClientApp
             _client.MessageReceived.Subscribe(msg =>
             {
                 var messText = $"{DateTime.Now:HH:mm:ss.fff},{msg}";
-                if (cbSaveLogToFile.Checked && !string.IsNullOrEmpty(txtLogFileName.Text))
+                if (cbSaveLogToFile.Checked && !string.IsNullOrWhiteSpace(txtLogFileName.Text))
                     File.AppendAllText(txtLogFileName.Text, messText + Environment.NewLine);
                 if (cbLogMessages.Checked)
                     SaveLog(messText);
@@ -65,7 +65,7 @@ namespace WebSocketClientApp
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(WebServerUri.Text))
+            if (!string.IsNullOrWhiteSpace(WebServerUri.Text))
                 InitClient(WebServerUri.Text);
         }
 
@@ -81,7 +81,7 @@ namespace WebSocketClientApp
 
         private void SendMessage(string message)
         {
-            if (!string.IsNullOrEmpty(message))
+            if (!string.IsNullOrWhiteSpace(message))
             {
                 _client?.Send(message.Trim());
                 _lastSendMessage = message;

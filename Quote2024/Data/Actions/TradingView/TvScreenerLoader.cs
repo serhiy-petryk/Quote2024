@@ -107,7 +107,7 @@ namespace Data.Actions.TradingView
                     if (!s.StartsWith('"') || !s.EndsWith('"'))
                         throw new Exception($"Invalid string in SpanJsonDynamic<Byte>: {input}");
                     s = s.Substring(1, s.Length - 2);
-                    return string.IsNullOrEmpty(s) ? null : s;
+                    return string.IsNullOrWhiteSpace(s) ? null : s;
                 }
                 float? GetSingle(object input)
                 {
@@ -115,7 +115,7 @@ namespace Data.Actions.TradingView
 
                     var span = (SpanJsonDynamic<Byte>)input;
                     var s = System.Text.Encoding.UTF8.GetString(span.Symbols);
-                    return string.IsNullOrEmpty(s) ? (float?)null : float.Parse(s, CultureInfo.InvariantCulture);
+                    return string.IsNullOrWhiteSpace(s) ? (float?)null : float.Parse(s, CultureInfo.InvariantCulture);
                 }
             }
         }

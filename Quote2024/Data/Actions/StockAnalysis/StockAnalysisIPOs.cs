@@ -86,8 +86,8 @@ namespace Data.Actions.StockAnalysis
             public string pName => n;
             public float pIpoPrice => ipoPrice;
             public float pCurrentPrice => ippc;
-            public string pSector => string.IsNullOrEmpty(sector) ? null : sector;
-            public string pIndustry => string.IsNullOrEmpty(industry) ? null : industry;
+            public string pSector => string.IsNullOrWhiteSpace(sector) ? null : sector;
+            public string pIndustry => string.IsNullOrWhiteSpace(industry) ? null : industry;
             public DateTime TimeStamp;
         }
         #endregion
