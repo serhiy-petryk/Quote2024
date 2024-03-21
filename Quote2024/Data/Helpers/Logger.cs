@@ -6,9 +6,7 @@ namespace Data.Helpers
 {
     public static class Logger
     {
-        public delegate void MessageAddedEventHandler(object sender, MessageAddedEventArgs e);
-        public static event MessageAddedEventHandler MessageAdded;
-
+        public static Action<string> DefaultShowStatus = null;
         private static readonly ConcurrentBag<MessageAddedEventArgs> Messages = new ConcurrentBag<MessageAddedEventArgs>();
 
         public static void AddMessage(string message, Action<string> fnShowStatus = null)
@@ -19,10 +17,7 @@ namespace Data.Helpers
 
             var oMessage = new MessageAddedEventArgs(message, callMethodName);
             Messages.Add(oMessage);
-            if (fnShowStatus != null)
-                fnShowStatus(oMessage.FullMessage);
-            else
-                MessageAdded?.Invoke(null, oMessage);
+            (fnShowStatus ?? DefaultShowStatus)?.Invoke(oMessage.FullMessage);
         }
 
         public class MessageAddedEventArgs : EventArgs

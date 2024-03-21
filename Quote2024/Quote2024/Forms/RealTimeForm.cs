@@ -118,6 +118,6 @@ namespace Quote2024.Forms
 
         private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers ({Tickers.Length} items):";
         
-        public void ShowStatus(string message) => lblStatus.Text = message;
+        private void ShowStatus(string message) => lblStatus.Text = message;
     }
 }

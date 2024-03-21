@@ -116,10 +116,10 @@ namespace Data.RealTime
             return (validTickers, invalidTickers);
         }
 
-        public static async Task<Dictionary<string, byte[]>> Run(string[] symbols, string dataFolder, Action<string, Exception> onError)
+        public static async Task<Dictionary<string, byte[]>> Run(Action<string> fnShowStatus, string[] symbols, string dataFolder, Action<string, Exception> onError)
         {
             const int minutes = 30;
-            Logger.AddMessage($"Download Yahoo minute data from {DateTime.UtcNow.AddMinutes(-minutes):HH:mm:ss} to {DateTime.UtcNow:HH:mm:ss} UTC");
+            Logger.AddMessage($"Download Yahoo minute data from {DateTime.UtcNow.AddMinutes(-minutes):HH:mm:ss} to {DateTime.UtcNow:HH:mm:ss} UTC", fnShowStatus);
 
             var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
@@ -199,10 +199,10 @@ namespace Data.RealTime
             _timer = new Timer(TimerTick, symbols.Item1.Keys.ToArray(), interval, interval);*/
         }
 
-        private static void TimerTick(object state)
+        private static void TimerTick(Action<string> fnShowStatus, object state)
         {
             if (TimeHelper.GetCurrentEstDateTime().TimeOfDay <= Settings.MarketEndCommon) // new TimeSpan(12, 0, 0))
-                Data.RealTime.YahooMinutes.Start((string[])state);
+                Data.RealTime.YahooMinutes.Start(fnShowStatus, (string[])state);
             else
             {
                 _timer.Dispose();
@@ -256,10 +256,10 @@ namespace Data.RealTime
             return (validSymbols, invalidSymbols);
         }*/
 
-        public static async void Start(string[] symbols)
+        public static async void Start(Action<string> fnShowStatus, string[] symbols)
         {
             const int minutes = 30;
-            Logger.AddMessage($"Download Yahoo minute data from {DateTime.UtcNow.AddMinutes(-minutes):HH:mm:ss} to {DateTime.UtcNow:HH:mm:ss} UTC");
+            Logger.AddMessage($"Download Yahoo minute data from {DateTime.UtcNow.AddMinutes(-minutes):HH:mm:ss} to {DateTime.UtcNow:HH:mm:ss} UTC", fnShowStatus);
 
             var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();

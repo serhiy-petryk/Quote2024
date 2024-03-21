@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.OffScreen;
 using Data.Helpers;
-using Quote2024.Helpers;
 
 namespace Quote2024.Forms
 {
@@ -27,6 +26,8 @@ namespace Quote2024.Forms
 
             //=========================
             StatusLabel.Text = "";
+            Data.Helpers.Logger.DefaultShowStatus = ShowStatus;
+
             /*clbIntradayDataList.Items.AddRange(IntradayResults.ActionList.Select(a => a.Key).ToArray());
             cbIntradayStopInPercent_CheckedChanged(null, null);
             for (var item = 0; item < clbIntradayDataList.Items.Count; item++)
@@ -35,9 +36,6 @@ namespace Quote2024.Forms
             }*/
 
             StartImageAnimation();
-
-            // Logger.MessageAdded += (sender, args) => StatusLabel.Text = args.FullMessage;
-            Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() => StatusLabel.Text = args.FullMessage));
 
             browser = new ChromiumWebBrowser("www.eoddata.com");
             browser.FrameLoadEnd += Browser_FrameLoadEnd;
@@ -52,7 +50,7 @@ namespace Quote2024.Forms
                 {
                     // MessageBox.Show("OK");
                     var cookieManager = Cef.GetGlobalCookieManager();
-                    var visitor = new CookieCollector();
+                    var visitor = new Quote2024.Helpers.CookieCollector();
 
                     cookieManager.VisitUrlCookies(browser.Address, true, visitor);
 
@@ -194,7 +192,7 @@ namespace Quote2024.Forms
         {
             var timer = (Timer)sender;
             if (DateTime.Now.TimeOfDay > TimeSpan.Zero)// new TimeSpan(12, 0, 0))
-                Data.RealTime.YahooMinutes.Start((string[])timer.Tag);
+                Data.RealTime.YahooMinutes.Start(ShowStatus, (string[])timer.Tag);
             else
                 timer.Stop();
         }

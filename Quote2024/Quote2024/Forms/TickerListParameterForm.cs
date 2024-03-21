@@ -47,6 +47,6 @@ namespace Quote2024.Forms
             lblTickerList.Text = $@"Tickers: ({itemCount} items)";
         }
 
-        public void ShowStatus(string message) => lblStatus.Text = message;
+        private void ShowStatus(string message) => lblStatus.Text = message;
     }
 }
