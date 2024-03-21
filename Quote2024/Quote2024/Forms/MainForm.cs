@@ -9,7 +9,7 @@ using CefSharp.OffScreen;
 using Data.Helpers;
 using Quote2024.Helpers;
 
-namespace Quote2024
+namespace Quote2024.Forms
 {
     public partial class MainForm : Form
     {
@@ -37,7 +37,11 @@ namespace Quote2024
             StartImageAnimation();
 
             // Logger.MessageAdded += (sender, args) => StatusLabel.Text = args.FullMessage;
-            Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() => StatusLabel.Text = args.FullMessage));
+            Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() =>
+            {
+                if (args.Application == Logger.Application.Main)
+                    StatusLabel.Text = args.FullMessage;
+            }));
 
             browser = new ChromiumWebBrowser("www.eoddata.com");
             browser.FrameLoadEnd += Browser_FrameLoadEnd;
@@ -166,7 +170,7 @@ namespace Quote2024
         private Timer timer1;
         public async void InitTimer()
         {
-            var symbols = await Data.RealTime.YahooMinutes.CheckSymbols();
+            /*var symbols = await Data.RealTime.YahooMinutes.CheckSymbols();
 
             if (symbols.Item2.Count > 0)
             {
@@ -187,7 +191,7 @@ namespace Quote2024
             timer1.Tag = symbols.Item1.Keys.ToArray();
             timer1.Tick += new EventHandler(timer1_Tick);
             timer1.Interval = 61000; // in miliseconds
-            timer1.Start();
+            timer1.Start();*/
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -221,8 +225,10 @@ namespace Quote2024
 
             // InitTimer();
             // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.CheckSymbols);
+            // await Task.Factory.StartNew((() => Data.RealTime.YahooMinutes.GetTickerList(1)));
+            // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.InitTimer);
 
-            await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
+            // await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
             // await Task.Factory.StartNew(Data.Tests.Twelvedata.TestComplexCall);
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
@@ -252,11 +258,10 @@ namespace Quote2024
 
         private void btnMinuteYahooLog_Click(object sender, EventArgs e)
         {
-
-        btnMinuteYahooLog.Enabled = false;
-            if (CsUtils.OpenZipFileDialog(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder) is string fn && !string.IsNullOrEmpty(fn))
+            btnMinuteYahooLog.Enabled = false;
+            if (CsUtils.OpenZipFileDialog(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder) is string fn &&
+                !string.IsNullOrWhiteSpace(fn))
                 Data.Actions.Yahoo.YahooMinuteLogToTextFile.YahooMinuteLogSaveToTextFile(new[] { fn }, ShowStatus);
-
             btnMinuteYahooLog.Enabled = true;
         }
 
@@ -276,7 +281,7 @@ namespace Quote2024
             btnMinuteYahooSaveLogToDb.Enabled = false;
 
             if (CsUtils.OpenFileDialogMultiselect(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder, @"zip files (*.zip)|*.zip") is string[] files && files.Length > 0)
-              Data.Actions.Yahoo.YahooMinuteSaveLogToDb.Start(files, ShowStatus);
+                Data.Actions.Yahoo.YahooMinuteSaveLogToDb.Start(files, ShowStatus);
 
             btnMinuteYahooSaveLogToDb.Enabled = true;
         }
@@ -284,6 +289,12 @@ namespace Quote2024
         private void btnOpenWebSocket_Click(object sender, EventArgs e)
         {
             var form = new WebSocketClientApp.MainForm();
+            form.Show();
+        }
+
+        private void btnOpenRealTime_Click(object sender, EventArgs e)
+        {
+            var form = new RealTimeForm();
             form.Show();
         }
     }

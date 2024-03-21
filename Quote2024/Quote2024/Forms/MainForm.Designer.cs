@@ -1,5 +1,5 @@
 ﻿
-namespace Quote2024
+namespace Quote2024.Forms
 {
     partial class MainForm
     {
@@ -49,6 +49,7 @@ namespace Quote2024
             this.btnTest = new System.Windows.Forms.Button();
             this.lblEoddataLogged = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnOpenRealTime = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
@@ -86,6 +87,7 @@ namespace Quote2024
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnOpenRealTime);
             this.tpLoader.Controls.Add(this.btnOpenWebSocket);
             this.tpLoader.Controls.Add(this.btnMinuteYahooSaveLogToDb);
             this.tpLoader.Controls.Add(this.btnMinuteYahooErrorCheck);
@@ -105,7 +107,7 @@ namespace Quote2024
             // btnOpenWebSocket
             // 
             this.btnOpenWebSocket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenWebSocket.Location = new System.Drawing.Point(617, 218);
+            this.btnOpenWebSocket.Location = new System.Drawing.Point(618, 196);
             this.btnOpenWebSocket.Name = "btnOpenWebSocket";
             this.btnOpenWebSocket.Size = new System.Drawing.Size(170, 33);
             this.btnOpenWebSocket.TabIndex = 72;
@@ -274,6 +276,17 @@ namespace Quote2024
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // btnOpenRealTime
+            // 
+            this.btnOpenRealTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenRealTime.Location = new System.Drawing.Point(617, 235);
+            this.btnOpenRealTime.Name = "btnOpenRealTime";
+            this.btnOpenRealTime.Size = new System.Drawing.Size(170, 33);
+            this.btnOpenRealTime.TabIndex = 73;
+            this.btnOpenRealTime.Text = "Open RealTime form";
+            this.btnOpenRealTime.UseVisualStyleBackColor = true;
+            this.btnOpenRealTime.Click += new System.EventHandler(this.btnOpenRealTime_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -315,5 +328,6 @@ namespace Quote2024
         private System.Windows.Forms.Button btnMinuteYahooSaveLogToDb;
         private System.Windows.Forms.Button btnMinuteYahooErrorCheck;
         private System.Windows.Forms.Button btnOpenWebSocket;
+        private System.Windows.Forms.Button btnOpenRealTime;
     }
 }

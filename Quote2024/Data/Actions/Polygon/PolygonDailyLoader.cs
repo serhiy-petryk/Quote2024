@@ -101,7 +101,7 @@ namespace Data.Actions.Polygon
         }
 
         #region ===========  Json SubClasses  ===========
-        private class cRoot
+        public class cRoot
         {
             public int queryCount;
             public int resultsCount;
@@ -112,7 +112,7 @@ namespace Data.Actions.Polygon
             public int count;
         }
 
-        private class cItem
+        public class cItem
         {
             public string TT;
             public float v;

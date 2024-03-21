@@ -13,7 +13,10 @@ namespace Data.Actions.Yahoo
     {
         // Valid time for period is (date + 09:30 of NewYork time zone)
         private const string UrlTemplate = "https://query1.finance.yahoo.com/v7/finance/download/{2}?period1={0}&period2={1}&interval=1d&events=history&includeAdjustedClose=true";
-        // actual url: https://query1.finance.yahoo.com/v7/finance/download/AA?period1=1679112201&period2=1710734601&interval=1d&events=history&includeAdjustedClose=true
+        // actual url (may be error: Unauthorized): https://query1.finance.yahoo.com/v7/finance/download/AA?period1=1679112201&period2=1710734601&interval=1d&events=history&includeAdjustedClose=true
+
+        // UrlTemplateForTradingDaysOnly is more reliable
+        private const string UrlTemplateForTradingDaysOnly = "https://query2.finance.yahoo.com/v8/finance/chart/{2}?period1={0}&period2={1}&interval=1d&events=history&includePrePost=false";
         private static readonly string[] Symbols = new[] { "^DJI", "^GSPC" };
 
         public static DateTime[] GetTradingDays(DateTime toDate, int days)
@@ -22,12 +25,12 @@ namespace Data.Actions.Yahoo
 
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddDays(-days + 1)) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddHours(23)) / 1000;
-            var data = new List<DayYahoo>();
-            DownloadData(Symbols[0], fromUnixSeconds, toUnixSeconds, data);
+            var dates = new List<DateTime>();
+            DownloadData(Symbols[0], fromUnixSeconds, toUnixSeconds, dates);
 
             Logger.AddMessage($"!Finished");
 
-            return data.Select(a => a.Date).OrderByDescending(a => a).ToArray();
+            return dates.Select(a => a.Date).OrderByDescending(a => a).ToArray();
         }
 
         public static void Start()
@@ -79,6 +82,10 @@ namespace Data.Actions.Yahoo
             if (o.Item2 != null)
                 throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
+            /*var content = Encoding.UTF8.GetString(o.Item1).Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
+            var oo = ZipUtils.DeserializeString<Models.MinuteYahoo>(content);*/
+
+
             var lines = Encoding.UTF8.GetString(o.Item1).Split('\n');
             if (lines.Length == 0)
                 throw new Exception($"Invalid Day Yahoo quote file (no text lines): {o}");
@@ -87,7 +94,7 @@ namespace Data.Actions.Yahoo
 
             for (var k = 1; k < lines.Length; k++)
             {
-                if (!string.IsNullOrEmpty(lines[k].Trim()))
+                if (!string.IsNullOrWhiteSpace(lines[k]))
                 {
                     if (lines[k].Contains("null"))
                         Debug.Print($"{symbol}, {lines[k]}");
@@ -101,6 +108,21 @@ namespace Data.Actions.Yahoo
             }
         }
 
+        private static void DownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DateTime> dates)
+        {
+            // Download data
+            Logger.AddMessage($"Download data for {symbol}");
+            var url = string.Format(UrlTemplateForTradingDaysOnly, fromUnixSeconds, toUnixSeconds, symbol);
+            var o = Download.DownloadToBytes(url, false);
+            if (o.Item2 != null)
+                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+
+            var content = Encoding.UTF8.GetString(o.Item1).Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
+            var oo = ZipUtils.DeserializeString<Models.MinuteYahoo>(content);
+
+            var aa1 = oo.chart.result[0].timestamp.Select(a=>TimeHelper.GetEstDateTimeFromUnixMilliseconds(a*1000));
+            dates.AddRange(aa1);
+        }
     }
 
     #region ===========  DayYahoo Model  ===============
