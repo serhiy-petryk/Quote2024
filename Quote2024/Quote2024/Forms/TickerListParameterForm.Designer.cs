@@ -228,7 +228,7 @@ namespace Quote2024.Forms
             this.numMaxClose.TabIndex = 11;
             this.numMaxClose.ThousandsSeparator = true;
             this.numMaxClose.Value = new decimal(new int[] {
-            999999,
+            5000,
             0,
             0,
             0});

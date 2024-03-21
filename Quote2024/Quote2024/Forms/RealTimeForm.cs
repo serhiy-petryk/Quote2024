@@ -27,7 +27,8 @@ namespace Quote2024.Forms
         }
 
 
-        private string[] Tickers => txtTickerList.Text.Split('\n').Where(a => !string.IsNullOrWhiteSpace(a)).ToArray();
+        private string[] Tickers => txtTickerList.Text.Split('\n').Where(a => !string.IsNullOrWhiteSpace(a))
+            .Select(a => a.Trim()).ToArray();
 
         private int _errorCount;
         private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
