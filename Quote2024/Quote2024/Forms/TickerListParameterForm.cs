@@ -13,7 +13,7 @@ namespace Quote2024.Forms
         public TickerListParameterForm(string[] tickers)
         {
             InitializeComponent();
-
+            lblStatus.Text = "";
             txtTickerList.Text = string.Join('\t', tickers);
         }
 
@@ -23,7 +23,7 @@ namespace Quote2024.Forms
             txtTickerList.Text = "";
             await Task.Factory.StartNew((() =>
             {
-                var tickers = Data.RealTime.YahooMinutes.GetTickerList(Convert.ToInt32(numPreviousDays.Value),
+                var tickers = Data.RealTime.YahooMinutes.GetTickerList(ShowStatus,Convert.ToInt32(numPreviousDays.Value),
                     Convert.ToSingle(numMinTradeValue.Value), Convert.ToSingle(numMaxTradeValue.Value),
                     Convert.ToInt32(numMinTradeCount.Value), Convert.ToSingle(numMinClose.Value),
                     Convert.ToSingle(numMaxClose.Value));
@@ -46,5 +46,7 @@ namespace Quote2024.Forms
             var itemCount = txtTickerList.Text.Split('\t').Count(a => !string.IsNullOrWhiteSpace(a));
             lblTickerList.Text = $@"Tickers: ({itemCount} items)";
         }
+
+        public void ShowStatus(string message) => lblStatus.Text = message;
     }
 }

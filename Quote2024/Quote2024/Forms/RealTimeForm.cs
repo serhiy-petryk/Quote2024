@@ -40,14 +40,7 @@ namespace Quote2024.Forms
             _timer.Interval = 2000;
             _timer.Elapsed += _timer_Elapsed;
             lblTickCount.Text = lblStatus.Text = "";
-
             RefreshUI();
-
-            Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() =>
-            {
-                if (args.Application == Logger.Application.RealTime)
-                    lblStatus.Text = args.FullMessage;
-            }));
         }
 
         private async void btnStart_Click(object sender, EventArgs e)
@@ -57,7 +50,7 @@ namespace Quote2024.Forms
 
             Debug.Print($"RealTime start: {DateTime.Now.TimeOfDay}");
 
-            var tickers = await Data.RealTime.YahooMinutes.CheckTickers(Tickers);
+            var tickers = await Data.RealTime.YahooMinutes.CheckTickers(ShowStatus, Tickers);
 
             if (tickers.Item2.Count > 0)
             {
@@ -106,6 +99,7 @@ namespace Quote2024.Forms
 
             _timer.Elapsed -= _timer_Elapsed;
             _timer.Dispose();
+            _frmTickerListParameter?.Dispose();
         }
 
         private TickerListParameterForm _frmTickerListParameter;
@@ -123,5 +117,7 @@ namespace Quote2024.Forms
         }
 
         private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers ({Tickers.Length} items):";
+        
+        public void ShowStatus(string message) => lblStatus.Text = message;
     }
 }

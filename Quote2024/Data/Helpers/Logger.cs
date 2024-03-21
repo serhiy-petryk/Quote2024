@@ -6,22 +6,23 @@ namespace Data.Helpers
 {
     public static class Logger
     {
-        public enum Application {Main, RealTime};
-
         public delegate void MessageAddedEventHandler(object sender, MessageAddedEventArgs e);
         public static event MessageAddedEventHandler MessageAdded;
 
         private static readonly ConcurrentBag<MessageAddedEventArgs> Messages = new ConcurrentBag<MessageAddedEventArgs>();
 
-        public static void AddMessage(string message, Application application = Application.Main)
+        public static void AddMessage(string message, Action<string> fnShowStatus = null)
         {
             var sf = new StackFrame(1);
             var method = sf.GetMethod();
             var callMethodName = method.DeclaringType?.Name + "." + method.Name;
 
-            var oMessage = new MessageAddedEventArgs(message, callMethodName, application);
+            var oMessage = new MessageAddedEventArgs(message, callMethodName);
             Messages.Add(oMessage);
-            MessageAdded?.Invoke(null, oMessage);
+            if (fnShowStatus != null)
+                fnShowStatus(oMessage.FullMessage);
+            else
+                MessageAdded?.Invoke(null, oMessage);
         }
 
         public class MessageAddedEventArgs : EventArgs
@@ -29,12 +30,10 @@ namespace Data.Helpers
             public readonly DateTime Date = DateTime.Now;
             public readonly string MethodName;
             public readonly string Message;
-            public readonly Application Application;
             public string FullMessage => $"{MethodName}. {Message}";
-            public MessageAddedEventArgs(string msg, string methodName, Application application)
+            public MessageAddedEventArgs(string msg, string methodName)
             {
                 Message = msg;
-                Application = application;
                 MethodName = methodName;
                 if (Message.StartsWith("!"))
                     Debug.Print($"LOGGER: {FullMessage}");

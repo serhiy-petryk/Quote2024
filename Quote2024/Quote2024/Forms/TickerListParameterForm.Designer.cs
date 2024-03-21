@@ -47,12 +47,15 @@ namespace Quote2024.Forms
             this.btnUpdateList = new System.Windows.Forms.Button();
             this.lblTickerList = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.numPreviousDays)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMinTradeValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxTradeValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMinTradeCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMinClose)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxClose)).BeginInit();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -272,7 +275,7 @@ namespace Quote2024.Forms
             this.txtTickerList.Multiline = true;
             this.txtTickerList.Name = "txtTickerList";
             this.txtTickerList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtTickerList.Size = new System.Drawing.Size(328, 363);
+            this.txtTickerList.Size = new System.Drawing.Size(328, 350);
             this.txtTickerList.TabIndex = 16;
             this.txtTickerList.TextChanged += new System.EventHandler(this.txtTickerList_TextChanged);
             // 
@@ -304,13 +307,30 @@ namespace Quote2024.Forms
             this.label3.TabIndex = 19;
             this.label3.Text = "Maximum trade values (Close*Volume) in mln:";
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 394);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(661, 22);
+            this.statusStrip1.TabIndex = 20;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(118, 17);
+            this.lblStatus.Text = "toolStripStatusLabel1";
+            // 
             // TickerListParameterForm
             // 
             this.AcceptButton = this.btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(661, 403);
+            this.ClientSize = new System.Drawing.Size(661, 416);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblTickerList);
             this.Controls.Add(this.btnUpdateList);
@@ -340,6 +360,8 @@ namespace Quote2024.Forms
             ((System.ComponentModel.ISupportInitialize)(this.numMinTradeCount)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMinClose)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxClose)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -365,5 +387,7 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnUpdateList;
         private System.Windows.Forms.Label lblTickerList;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatus;
     }
 }

@@ -37,11 +37,7 @@ namespace Quote2024.Forms
             StartImageAnimation();
 
             // Logger.MessageAdded += (sender, args) => StatusLabel.Text = args.FullMessage;
-            Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() =>
-            {
-                if (args.Application == Logger.Application.Main)
-                    StatusLabel.Text = args.FullMessage;
-            }));
+            Data.Helpers.Logger.MessageAdded += (sender, args) => this.BeginInvoke((Action)(() => StatusLabel.Text = args.FullMessage));
 
             browser = new ChromiumWebBrowser("www.eoddata.com");
             browser.FrameLoadEnd += Browser_FrameLoadEnd;

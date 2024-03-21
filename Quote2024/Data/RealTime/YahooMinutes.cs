@@ -24,12 +24,12 @@ namespace Data.RealTime
         private const int MinTradeCount = 10000;
         private const float MinClose = 5.0f;
 
-        public static List<string> GetTickerList(int tradingDays, float minTradeValue, float maxTradeValue, int minTradeCount, float minClose, float maxClose )
+        public static List<string> GetTickerList(Action<string> fnShowStatus, int tradingDays, float minTradeValue, float maxTradeValue, int minTradeCount, float minClose, float maxClose )
         {
-            Logger.AddMessage($"Get ticker list", Logger.Application.RealTime);
+            Logger.AddMessage($"Get ticker list", fnShowStatus);
 
             var dates = Actions.Yahoo.YahooIndicesLoader.GetTradingDays(
-                TimeHelper.GetCurrentEstDateTime().Date.AddDays(-1), tradingDays * 2 + 10);
+                TimeHelper.GetCurrentEstDateTime().Date.AddHours(-2).AddDays(-1), tradingDays * 2 + 10);
             var sqls = new string[tradingDays];
             var cnt = 0;
             var data = new List<PolygonDailyLoader.cItem>();
@@ -72,9 +72,9 @@ namespace Data.RealTime
             return tickers;
         }
 
-        public static async Task<(Dictionary<string, byte[]>, Dictionary<string, Exception>)> CheckTickers(string[] tickers)
+        public static async Task<(Dictionary<string, byte[]>, Dictionary<string, Exception>)> CheckTickers(Action<string> fnShowStatus, string[] tickers)
         {
-            Logger.AddMessage($"Check Yahoo minute data", Logger.Application.RealTime);
+            Logger.AddMessage($"Check Yahoo minute data", fnShowStatus);
             var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-30)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
@@ -111,10 +111,56 @@ namespace Data.RealTime
             Debug.Print($"SW: {sw.ElapsedMilliseconds}. From: {from}. To: {to}");
 
             Logger.AddMessage(
-                $"Yahoo minute data checked. {invalidTickers.Count} invalid tickers, {validTickers.Count} valid tickers",
-                Logger.Application.RealTime);
+                $"Yahoo minute data checked. {invalidTickers.Count} invalid tickers, {validTickers.Count} valid tickers", fnShowStatus);
 
             return (validTickers, invalidTickers);
+        }
+
+        public static async Task<Dictionary<string, byte[]>> Run(string[] symbols, string dataFolder, Action<string, Exception> onError)
+        {
+            const int minutes = 30;
+            Logger.AddMessage($"Download Yahoo minute data from {DateTime.UtcNow.AddMinutes(-minutes):HH:mm:ss} to {DateTime.UtcNow:HH:mm:ss} UTC");
+
+            var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
+            var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+
+            var urlsAndFileNames =
+                symbols.Select(s => (string.Format(UrlTemplate, s, from, to), string.Format(FileTemplate, s)));
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var tasks = new ConcurrentDictionary<string, Task<byte[]>>();
+            foreach (var symbol in symbols)
+            {
+                var task = Download.DownloadToBytesAsync(string.Format(UrlTemplate, symbol, from, to));
+                tasks[symbol] = task;
+            }
+
+            // await Task.WhenAll(tasks.Values);
+            var results = new Dictionary<string, byte[]>();
+            foreach (var kvp in tasks)
+            {
+                try
+                {
+                    // release control to the caller until the task is done, which will be near immediate for each task following the first
+                    results.Add(kvp.Key, await kvp.Value);
+                }
+                catch (Exception e)
+                {
+                    var text = string.Format(@"{""chart"":{""error"":""{0}""}}", e.Message.Replace(@"""", @"\"""));
+                    results.Add(kvp.Key, System.Text.Encoding.UTF8.GetBytes(text));
+                    onError?.Invoke(kvp.Key, e);
+                }
+            }
+
+            sw.Stop();
+            Debug.Print($"SW: {sw.ElapsedMilliseconds}. From: {from}. To: {to}");
+
+            if (dataFolder != null)
+                SaveResult(results, dataFolder);
+
+            return results;
         }
 
 
@@ -255,53 +301,6 @@ namespace Data.RealTime
             var aa1 = CsUtils.MemoryUsedInBytes / 1024 / 1024;
             tasks.Clear();
             var aa2 = CsUtils.MemoryUsedInBytes / 1024 / 1024;
-        }
-
-        public static async Task<Dictionary<string, byte[]>> Run(string[] symbols, string dataFolder, Action<string, Exception> onError)
-        {
-            const int minutes = 30;
-            Logger.AddMessage($"Download Yahoo minute data from {DateTime.UtcNow.AddMinutes(-minutes):HH:mm:ss} to {DateTime.UtcNow:HH:mm:ss} UTC");
-
-            var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
-            var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
-
-            var urlsAndFileNames =
-                symbols.Select(s => (string.Format(UrlTemplate, s, from, to), string.Format(FileTemplate, s)));
-
-            var sw = new Stopwatch();
-            sw.Start();
-
-            var tasks = new ConcurrentDictionary<string, Task<byte[]>>();
-            foreach (var symbol in symbols)
-            {
-                var task = Download.DownloadToBytesAsync(string.Format(UrlTemplate, symbol, from, to));
-                tasks[symbol] = task;
-            }
-
-            // await Task.WhenAll(tasks.Values);
-            var results = new Dictionary<string, byte[]>();
-            foreach (var kvp in tasks)
-            {
-                try
-                {
-                    // release control to the caller until the task is done, which will be near immediate for each task following the first
-                    results.Add(kvp.Key, await kvp.Value);
-                }
-                catch (Exception e)
-                {
-                    var text = string.Format(@"{""chart"":{""error"":""{0}""}}", e.Message.Replace(@"""", @"\"""));
-                    results.Add(kvp.Key, System.Text.Encoding.UTF8.GetBytes(text));
-                    onError?.Invoke(kvp.Key, e);
-                }
-            }
-
-            sw.Stop();
-            Debug.Print($"SW: {sw.ElapsedMilliseconds}. From: {from}. To: {to}");
-
-            if (dataFolder != null)
-                SaveResult(results, dataFolder);
-
-            return results;
         }
 
         public static void SaveResult(Dictionary<string, byte[]> results)
