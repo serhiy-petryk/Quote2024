@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,8 +13,14 @@ namespace Quote2024.Forms
     {
         private readonly System.Timers.Timer _timer = new System.Timers.Timer();
         
-        private Dictionary<string, byte[]> _validSymbols;
-        private Dictionary<string, Exception> _invalidSymbols;
+        private Dictionary<string, byte[]> _validTickers;
+        private Dictionary<string, Exception> _invalidTickers;
+
+        private string[] Tickers => txtTickerList.Text.Split('\n').Where(a => !string.IsNullOrWhiteSpace(a))
+            .Select(a => a.Trim()).ToArray();
+
+        private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
+        private string _dataFolder;
 
         private int _tickCount;
         private int TickCount
@@ -22,23 +29,38 @@ namespace Quote2024.Forms
             set
             {
                 _tickCount = value;
-                this.BeginInvoke((Action)(() => lblTickCount.Text = _tickCount.ToString()));
+                this.BeginInvoke((Action)(UpdateTickLabel));
             }
         }
 
-
-        private string[] Tickers => txtTickerList.Text.Split('\n').Where(a => !string.IsNullOrWhiteSpace(a))
-            .Select(a => a.Trim()).ToArray();
-
         private int _errorCount;
-        private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
-        private string _dataFolder;
+        private int ErrorCount
+        {
+            get => _errorCount;
+            set
+            {
+                _errorCount = value;
+                this.BeginInvoke((Action)(UpdateTickLabel));
+            }
+        }
+
+        private void UpdateTickLabel()
+        {
+            lblTickCount.ForeColor = ErrorCount == 0 ? Color.Black : Color.DarkRed;
+            var text = $@"Ticks: {TickCount:N0}";
+            if (ErrorCount != 0)
+                text += $@". Errors: {ErrorCount:N0}";
+            if (_invalidTickers != null && _invalidTickers.Count != 0)
+                text += $@". Invalid tickers: {_invalidTickers.Count:N0}";
+
+            lblTickCount.Text = text;
+        }
 
         public RealTimeForm()
         {
             InitializeComponent();
 
-            _timer.Interval = 2000;
+            _timer.Interval = 61000;
             _timer.Elapsed += _timer_Elapsed;
             lblTickCount.Text = lblStatus.Text = "";
             RefreshUI();
@@ -47,11 +69,13 @@ namespace Quote2024.Forms
         private async void btnStart_Click(object sender, EventArgs e)
         {
             TickCount = 0;
-            _errorCount = 0;
+            ErrorCount = 0;
 
             Debug.Print($"RealTime start: {DateTime.Now.TimeOfDay}");
 
             var tickers = await Data.RealTime.YahooMinutes.CheckTickers(ShowStatus, Tickers);
+            _validTickers = tickers.Item1;
+            _invalidTickers = tickers.Item2;
 
             if (tickers.Item2.Count > 0)
             {
@@ -88,10 +112,16 @@ namespace Quote2024.Forms
             btnStop.Enabled = _timer.Enabled;
         }
 
-        private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private async void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             // Debug.Print($"Tick: {DateTime.Now.TimeOfDay}");
             TickCount++;
+            await Data.RealTime.YahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
+        }
+
+        private void OnError(string arg1, Exception arg2)
+        {
+            ErrorCount++;
         }
 
         protected override void OnClosed(EventArgs e)

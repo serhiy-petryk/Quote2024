@@ -44,9 +44,9 @@ namespace Quote2024.Forms
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblStatus});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 356);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 394);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(545, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(750, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -58,7 +58,7 @@ namespace Quote2024.Forms
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(423, 244);
+            this.btnStart.Location = new System.Drawing.Point(202, 12);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 33);
             this.btnStart.TabIndex = 1;
@@ -68,9 +68,9 @@ namespace Quote2024.Forms
             // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(423, 283);
+            this.btnStop.Location = new System.Drawing.Point(283, 12);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(75, 30);
+            this.btnStop.Size = new System.Drawing.Size(75, 33);
             this.btnStop.TabIndex = 2;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
@@ -79,7 +79,7 @@ namespace Quote2024.Forms
             // lblTickCount
             // 
             this.lblTickCount.AutoSize = true;
-            this.lblTickCount.Location = new System.Drawing.Point(198, 15);
+            this.lblTickCount.Location = new System.Drawing.Point(364, 20);
             this.lblTickCount.Name = "lblTickCount";
             this.lblTickCount.Size = new System.Drawing.Size(38, 15);
             this.lblTickCount.TabIndex = 3;
@@ -87,9 +87,9 @@ namespace Quote2024.Forms
             // 
             // btnUpdateTickerList
             // 
-            this.btnUpdateTickerList.Location = new System.Drawing.Point(3, 7);
+            this.btnUpdateTickerList.Location = new System.Drawing.Point(86, 12);
             this.btnUpdateTickerList.Name = "btnUpdateTickerList";
-            this.btnUpdateTickerList.Size = new System.Drawing.Size(110, 35);
+            this.btnUpdateTickerList.Size = new System.Drawing.Size(110, 33);
             this.btnUpdateTickerList.TabIndex = 6;
             this.btnUpdateTickerList.Text = "Update ticker list";
             this.btnUpdateTickerList.UseVisualStyleBackColor = true;
@@ -99,18 +99,18 @@ namespace Quote2024.Forms
             // 
             this.txtTickerList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.txtTickerList.Location = new System.Drawing.Point(3, 63);
+            this.txtTickerList.Location = new System.Drawing.Point(3, 27);
             this.txtTickerList.Multiline = true;
             this.txtTickerList.Name = "txtTickerList";
             this.txtTickerList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtTickerList.Size = new System.Drawing.Size(76, 290);
+            this.txtTickerList.Size = new System.Drawing.Size(76, 364);
             this.txtTickerList.TabIndex = 7;
             this.txtTickerList.TextChanged += new System.EventHandler(this.txtTickerList_TextChanged);
             // 
             // lblTickerList
             // 
             this.lblTickerList.AutoSize = true;
-            this.lblTickerList.Location = new System.Drawing.Point(3, 45);
+            this.lblTickerList.Location = new System.Drawing.Point(3, 9);
             this.lblTickerList.Name = "lblTickerList";
             this.lblTickerList.Size = new System.Drawing.Size(47, 15);
             this.lblTickerList.TabIndex = 8;
@@ -120,7 +120,7 @@ namespace Quote2024.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(545, 378);
+            this.ClientSize = new System.Drawing.Size(750, 416);
             this.Controls.Add(this.lblTickerList);
             this.Controls.Add(this.txtTickerList);
             this.Controls.Add(this.btnUpdateTickerList);
