@@ -19,16 +19,16 @@ namespace Data.Actions.Yahoo
         private const string UrlTemplateForTradingDaysOnly = "https://query2.finance.yahoo.com/v8/finance/chart/{2}?period1={0}&period2={1}&interval=1d&events=history&includePrePost=false";
         private static readonly string[] Symbols = new[] { "^DJI", "^GSPC" };
 
-        public static DateTime[] GetTradingDays(DateTime toDate, int days)
+        public static DateTime[] GetTradingDays(Action<string> fnShowStatus, DateTime toDate, int days)
         {
-            Logger.AddMessage($"Started");
+            Logger.AddMessage($"Started", fnShowStatus);
 
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddDays(-days + 1)) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddHours(23)) / 1000;
             var dates = new List<DateTime>();
             DownloadData(Symbols[0], fromUnixSeconds, toUnixSeconds, dates);
 
-            Logger.AddMessage($"!Finished");
+            Logger.AddMessage($"!Finished", fnShowStatus);
 
             return dates.Select(a => a.Date).OrderByDescending(a => a).ToArray();
         }

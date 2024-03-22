@@ -24,7 +24,7 @@ namespace Data.RealTime
         {
             Logger.AddMessage($"Get ticker list", fnShowStatus);
 
-            var dates = Actions.Yahoo.YahooIndicesLoader.GetTradingDays(
+            var dates = Actions.Yahoo.YahooIndicesLoader.GetTradingDays(fnShowStatus,
                 TimeHelper.GetCurrentEstDateTime().Date.AddDays(-1), tradingDays * 2 + 10);
             var sqls = new string[tradingDays];
             var cnt = 0;
