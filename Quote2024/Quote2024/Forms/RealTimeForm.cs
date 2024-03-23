@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Data;
 using Data.Helpers;
 
 namespace Quote2024.Forms
@@ -114,9 +115,17 @@ namespace Quote2024.Forms
 
         private async void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            // Debug.Print($"Tick: {DateTime.Now.TimeOfDay}");
             TickCount++;
-            await Data.RealTime.YahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
+            var nyTime = TimeHelper.GetCurrentEstDateTime();
+            if (nyTime.AddMinutes(-15).TimeOfDay > Settings.MarketEndCommon)
+            {
+                btnStop_Click(sender, EventArgs.Empty);
+                return;
+            }
+            else if (nyTime.AddMinutes(30).TimeOfDay > Settings.MarketStart)
+            {
+                await Data.RealTime.YahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
+            }
         }
 
         private void OnError(string arg1, Exception arg2)

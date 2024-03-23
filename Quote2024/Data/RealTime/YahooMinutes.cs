@@ -74,9 +74,6 @@ namespace Data.RealTime
             var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-30)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
-            var urlsAndFileNames =
-                tickers.Select(s => (string.Format(UrlTemplate, s, from, to), string.Format(FileTemplate, s)));
-
             var sw = new Stopwatch();
             sw.Start();
 
@@ -120,9 +117,6 @@ namespace Data.RealTime
             var utcNow = DateTime.UtcNow;
             var from = new DateTimeOffset(utcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(utcNow).ToUnixTimeSeconds();
-
-            var urlsAndFileNames =
-                symbols.Select(s => (string.Format(UrlTemplate, s, from, to), string.Format(FileTemplate, s)));
 
             var sw = new Stopwatch();
             sw.Start();
