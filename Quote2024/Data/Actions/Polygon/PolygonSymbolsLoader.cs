@@ -90,7 +90,7 @@ namespace Data.Actions.Polygon
         {
             Logger.AddMessage($"Parsing and saving to database: {Path.GetFileName(zipFileName)}");
 
-            var items = new List<cItem>();
+            var items = new Dictionary<string, cItem>();
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
@@ -103,10 +103,12 @@ namespace Data.Actions.Polygon
                         item.pTimeStamp = entry.LastWriteTime.DateTime;
                     }
 
-                    items.AddRange(oo.results.Where(a => string.Equals(a.market, "stocks")));
+                    foreach(var item in oo.results.Where(a => string.Equals(a.market, "stocks")))
+                        if (!items.ContainsKey(item.pSymbol))
+                            items.Add(item.pSymbol, item);
                 }
 
-            DbHelper.ClearAndSaveToDbTable(items, "dbQ2024..Bfr_SymbolsPolygon", "pSymbol", "pDate", "pExchange",
+            DbHelper.ClearAndSaveToDbTable(items.Values, "dbQ2024..Bfr_SymbolsPolygon", "pSymbol", "pDate", "pExchange",
                 "pName", "type", "cik", "composite_figi", "share_class_figi", "last_updated_utc", "pTimeStamp");
 
             DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsPolygon");
