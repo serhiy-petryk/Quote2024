@@ -15,6 +15,8 @@ namespace Data.Helpers
             {
                 entryStream.CopyTo(memstream);
                 var bytes = memstream.ToArray();
+                if (bytes.Length>2 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) // contains BOM
+                    return SpanJson.JsonSerializer.Generic.Utf8.Deserialize<T>(bytes.Skip(3).ToArray());
                 return SpanJson.JsonSerializer.Generic.Utf8.Deserialize<T>(bytes);
             }
         }
