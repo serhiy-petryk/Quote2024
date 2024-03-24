@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Data.Actions.Yahoo;
+using Data.Helpers;
 
 namespace Data.Models
 {
@@ -87,14 +88,6 @@ namespace Data.Models
             return _allCorrections.ContainsKey(symbol) ? _allCorrections[symbol] : null;
         }
 
-        private static DateTime TimeStampToDateTime(long timeStamp, IEnumerable<cTradingPeriod> periods)
-        {
-            var aa = periods.Where(p => p.start <= timeStamp && p.end >= timeStamp).ToArray();
-            if (aa.Length == 1)
-                return (new DateTime(1970, 1, 1)).AddSeconds(timeStamp).AddSeconds(aa[0].gmtoffset);
-            throw new Exception("Check TimeStampToDateTime procedure in Quote2022.Models.MinuteYahoo");
-        }
-
         private string _metaSymbol => chart.result[0].meta.symbol;
         private Dictionary<DateTime, QuoteCorrection> _corrections;
         public List<Quote> GetQuotes(string symbol)
@@ -111,15 +104,6 @@ namespace Data.Models
                 return quotes;
             }
 
-            var periods = new List<MinuteYahoo.cTradingPeriod>();
-            var a1 = chart.result[0].meta.tradingPeriods;
-            var len1 = a1.GetLength(1);
-            for (var k1 = 0; k1 < a1.Length; k1++)
-            for (var k2 = 0; k2 < len1; k2++)
-                periods.Add(a1[k1, k2]);
-            
-            periods = periods.OrderBy(a => a.start).ToList();
-
             for (var k = 0; k < chart.result[0].timestamp.Length; k++)
             {
                 if (chart.result[0].indicators.quote[0].open[k].HasValue &&
@@ -128,7 +112,8 @@ namespace Data.Models
                     chart.result[0].indicators.quote[0].close[k].HasValue &&
                     chart.result[0].indicators.quote[0].volume[k].HasValue)
                 {
-                    var q = GetQuote(TimeStampToDateTime(chart.result[0].timestamp[k], periods), chart.result[0].indicators.quote[0], k);
+                    var nyTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(chart.result[0].timestamp[k] * 1000);
+                    var q = GetQuote(nyTime, chart.result[0].indicators.quote[0], k);
                     if (q != null)
                         quotes.Add(q);
                 }

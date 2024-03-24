@@ -1,13 +1,30 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using Newtonsoft.Json;
+using Data.Helpers;
 
-namespace Tests.RealTime
+namespace Data.Tests
 {
-    public static class RealTimeYahooMinute
+    public static class RealTimeYahooMinuteTests
     {
         private const string Folder = @"E:\Quote\WebData\RealTime\YahooMinute\2024-03-21";
+
+        public static void TestTradingPeriod()
+        {
+            var zipFileNames = Directory.GetFiles(Actions.Yahoo.YahooCommon.MinuteYahooDataFolder, "*.zip");
+            var errroLog = new Dictionary<string, string>();
+            foreach (var zipFileName in zipFileNames)
+            {
+                Logger.AddMessage($"File: {Path.GetFileName(zipFileName)}");
+                foreach (var x in Actions.Yahoo.YahooCommon.GetMinuteDataFromZipFile(zipFileName, errroLog).Take(1))
+                {
+                    var aa = x.Item2;
+                }
+            }
+            Logger.AddMessage($"!!!Finished");
+        }
+
         public static void Start()
         {
             var zipFiles = Directory.GetFiles(Folder, "*.zip").OrderBy(a=>a).ToArray();
@@ -18,7 +35,7 @@ namespace Tests.RealTime
                         using (var sr = new StreamReader(entry.Open()))
                         {
                             var json = sr.ReadToEnd();
-                            var oo1 = JsonConvert.DeserializeObject<Models.MinuteYahoo2>(json);
+                            // var oo1 = JsonConvert.DeserializeObject<Models.MinuteYahoo>(json);
                             var oo2 = SpanJson.JsonSerializer.Generic.Utf16.Deserialize<Models.MinuteYahoo2>(json);
                             //   Console.WriteLine(sr.ReadToEnd());
                         }

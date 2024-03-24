@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tests.Models
+﻿namespace Tests.Models
 {
-    public class MinuteYahoo
+    public class MinuteYahoo2
     {
         public cChart chart { get; set; }
 

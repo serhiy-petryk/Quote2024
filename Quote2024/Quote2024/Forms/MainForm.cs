@@ -181,7 +181,7 @@ namespace Quote2024.Forms
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
 
-            // await Task.Factory.StartNew(Data.Tests.RealTimeYahooMinute.Start);
+            await Task.Factory.StartNew(Data.Tests.RealTimeYahooMinuteTests.TestTradingPeriod);
             // await Task.Factory.StartNew((() => Data.RealTime.YahooMinutes.GetTickerList(1)));
             // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.InitTimer);
 
