@@ -1,0 +1,19 @@
+﻿=====
+To Do
+=====
+1. The last full minute in https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&includePrePost=true&events=history
+is always null.
+Try https://query1.finance.yahoo.com/v8/finance/chart/{symbol} (see https://cryptocointracker.com/yahoo-finance/yahoo-finance-api)
+or remove 'includePrePost', 'events' attributes in url
+or period1/2 повинно бути кратним 1 хвилині
+
+============
+Data sources
+============
+1. Polygon 1 min (delayed 15 min) - very good for check: https://api.polygon.io/v2/aggs/ticker/TSLA/range/1/minute/2024-03-25/2024-03-25?adjusted=false&sort=desc&limit=1000&apiKey=seHN3TRBzS_w_c060V5pWLsc3l4ZEu3z
+2. Yahoo chart 1 minute: https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&includePrePost=true&events=history
+	+ real time
+	+ дані співпадають з polygon
+	- the last full minute is 'null' (exception: TSLA in RTYahooMinutes_20240325191200.zip - дані з точністю до 1 сек)
+3. Nasdaq time sales
+	- ~ 20-70% of market volume
