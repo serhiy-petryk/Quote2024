@@ -109,8 +109,13 @@ namespace Quote2024.Forms
 
         private void RefreshUI()
         {
-            btnStart.Enabled = !_timer.Enabled;
-            btnStop.Enabled = _timer.Enabled;
+            if (statusStrip1.InvokeRequired)
+                Invoke(new MethodInvoker(RefreshUI));
+            else
+            {
+                btnStart.Enabled = !_timer.Enabled;
+                btnStop.Enabled = _timer.Enabled;
+            }
         }
 
         private async void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
