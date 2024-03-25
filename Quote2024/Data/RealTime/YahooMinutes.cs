@@ -139,7 +139,7 @@ namespace Data.RealTime
                 }
                 catch (Exception e)
                 {
-                    var text = @"{""chart"":{""error"":""{0}""}}".Replace(@"{0}", e.Message.Replace(@"""", @"\"""));
+                    var text = "{\"chart\":{\"error\":{\"code\":\"C#\",\"description\":\"{0}\"}}}".Replace(@"{0}", e.Message.Replace(@"""", @"\"""));
                     results.Add(kvp.Key, System.Text.Encoding.UTF8.GetBytes(text));
                     onError?.Invoke(kvp.Key, e);
                 }

@@ -208,7 +208,6 @@ namespace Data.Models
             public string symbol { get; set; }
             public string exchangeName { get; set; }
             public string instrumentType { get; set; }
-            public cTradingPeriod[,] tradingPeriods { get; set; }
         }
 
         public class cIndicators
@@ -223,14 +222,6 @@ namespace Data.Models
           public double?[] low { get; set; }
           public double?[] close { get; set; }
           public long?[] volume { get; set; }
-        }
-
-        public class cTradingPeriod
-        {
-          public string timezone { get; set; }
-          public long start { get; set; }
-          public long end { get; set; }
-          public long gmtoffset { get; set; }
         }
         #endregion
     }
