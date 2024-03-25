@@ -217,10 +217,10 @@ namespace Data.Models
 
         public class cQuote
         {
-          public double?[] open { get; set; }
-          public double?[] high { get; set; }
-          public double?[] low { get; set; }
-          public double?[] close { get; set; }
+          public float?[] open { get; set; }
+          public float?[] high { get; set; }
+          public float?[] low { get; set; }
+          public float?[] close { get; set; }
           public long?[] volume { get; set; }
         }
         #endregion
