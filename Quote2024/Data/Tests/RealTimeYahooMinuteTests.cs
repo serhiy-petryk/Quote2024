@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -117,6 +118,77 @@ namespace Data.Tests
                 }
             }
 
+        }
+
+        public static void ErrorList()
+        {
+            var exchanges = new Dictionary<string, int>();
+            var zipFiles = Directory.GetFiles(MainFolder, "*.zip", SearchOption.AllDirectories).OrderBy(a => a)
+                .ToArray();
+            foreach (var zipFileName in zipFiles)
+            {
+                if (zipFileName.Contains("DayPolygon")) continue;
+
+                var ss = Path.GetFileNameWithoutExtension(zipFileName).Split('_');
+                var utcFileDateTime =
+                    DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture).ToUniversalTime();
+                var msecs = new DateTimeOffset(utcFileDateTime, TimeSpan.Zero).ToUnixTimeMilliseconds();
+                var nyFileDateTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(msecs);
+
+                Logger.AddMessage($"File: {Path.GetFileName(zipFileName)}");
+                using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                    foreach (var entry in zip.Entries)
+                    {
+                        string content;
+                        using (var entryStream = entry.Open())
+                        using (var memstream = new MemoryStream())
+                        {
+                            entryStream.CopyTo(memstream);
+                            var bytes = memstream.ToArray();
+                            var o = Helpers.ZipUtils.DeserializeZipEntry<Models.MinuteYahoo>(entry);
+                            if (o.chart.error != null)
+                            {
+                                Debug.Print($"File: {Path.GetFileName(zipFileName)}\tEntry: {entry.Name}\tError: {o.chart.error.code}\t{o.chart.error.description}");
+                            }
+                        }
+                    }
+            }
+        }
+
+        public static void RegularMarketTime()
+        {
+            var exchanges = new Dictionary<string, int>();
+            var zipFiles = Directory.GetFiles(MainFolder, "*.zip", SearchOption.AllDirectories).OrderBy(a => a)
+                .ToArray();
+            foreach (var zipFileName in zipFiles)
+            {
+                if (zipFileName.Contains("DayPolygon")) continue;
+
+                var ss = Path.GetFileNameWithoutExtension(zipFileName).Split('_');
+                var utcFileDateTime =
+                    DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture).ToUniversalTime();
+                var msecs = new DateTimeOffset(utcFileDateTime, TimeSpan.Zero).ToUnixTimeMilliseconds();
+                var nyFileDateTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(msecs);
+
+                Logger.AddMessage($"File: {Path.GetFileName(zipFileName)}");
+                using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                    foreach (var entry in zip.Entries)
+                    {
+                        string content;
+                        using (var entryStream = entry.Open())
+                        using (var memstream = new MemoryStream())
+                        {
+                            entryStream.CopyTo(memstream);
+                            var bytes = memstream.ToArray();
+                            var o = Helpers.ZipUtils.DeserializeZipEntry<Models.MinuteYahoo>(entry);
+                            if (o.chart.result != null)
+                            {
+                                var a1 = o.chart.result[0].meta.NyRegularMarketTime;
+                                Debug.Print($"regularMarketTime: {a1:yyyy-MM-dd HH:mm:ss}\tFileDateTime: {nyFileDateTime:yyyy-MM-dd HH:mm:ss}");
+                            }
+                        }
+                    }
+            }
         }
 
         public static void Start()

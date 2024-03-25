@@ -208,6 +208,8 @@ namespace Data.Models
             public string symbol { get; set; }
             public string exchangeName { get; set; }
             public string instrumentType { get; set; }
+            public long regularMarketTime { get; set; } // Last transaction DateTime
+            public DateTime NyRegularMarketTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(regularMarketTime * 1000);
         }
 
         public class cIndicators
