@@ -6,6 +6,8 @@ is always null.
 Try https://query1.finance.yahoo.com/v8/finance/chart/{symbol} (see https://cryptocointracker.com/yahoo-finance/yahoo-finance-api)
 or remove 'includePrePost', 'events' attributes in url
 or period1/2 повинно бути кратним 1 хвилині
+2. Nasdaq time sales: https://api.nasdaq.com/api/quote/AA/realtime-trades?&limit=200000&fromTime=15:00
+	Спробувати маніпулювати fromTime/toTime/offset
 
 ============
 Data sources
@@ -15,5 +17,11 @@ Data sources
 	+ real time
 	+ дані співпадають з polygon
 	- the last full minute is 'null' (exception: TSLA in RTYahooMinutes_20240325191200.zip - дані з точністю до 1 сек)
-3. Nasdaq time sales
+3. Nasdaq time sales: https://api.nasdaq.com/api/quote/AA/realtime-trades?&limit=200000&fromTime=15:00
 	- ~ 20-70% of market volume
+4. https://www.chartmill.com/ - image, not posibility to scratch data
+5. Nasdaq chart: only close price
+6. Nasdaq pre-market: https://api.nasdaq.com/api/quote/TSLA/extended-trading?markettype=pre&assetclass=stocks&time=0
+	attributes like offset/rows/count/limit don't work for this url
+7. Nasdaq post-market: https://api.nasdaq.com/api/quote/TSLA/extended-trading?markettype=post&assetclass=stocks&time=0
+	(6:00-6:29): https://api.nasdaq.com/api/quote/TSLA/extended-trading?markettype=post&assetclass=stocks&time=5
