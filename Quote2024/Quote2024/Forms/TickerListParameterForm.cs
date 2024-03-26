@@ -23,7 +23,7 @@ namespace Quote2024.Forms
             txtTickerList.Text = "";
             await Task.Factory.StartNew((() =>
             {
-                var tickers = Data.RealTime.YahooMinutes.GetTickerList(ShowStatus,Convert.ToInt32(numPreviousDays.Value),
+                var tickers = Data.RealTime.RealTimeYahooMinutes.GetTickerList(ShowStatus,Convert.ToInt32(numPreviousDays.Value),
                     Convert.ToSingle(numMinTradeValue.Value), Convert.ToSingle(numMaxTradeValue.Value),
                     Convert.ToInt32(numMinTradeCount.Value), Convert.ToSingle(numMinClose.Value),
                     Convert.ToSingle(numMaxClose.Value));

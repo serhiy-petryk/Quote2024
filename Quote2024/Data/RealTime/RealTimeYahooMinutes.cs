@@ -12,7 +12,7 @@ using Data.Helpers;
 
 namespace Data.RealTime
 {
-    public class YahooMinutes
+    public class RealTimeYahooMinutes
     {
         // private const string UrlTemplate = @"https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&events=history";
         private const string UrlTemplate = @"https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&includePrePost=true&events=history";
