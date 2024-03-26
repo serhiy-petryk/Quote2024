@@ -14,6 +14,7 @@ namespace Data.RealTime
 {
     public class RealTimeYahooMinutes
     {
+        // Url from finance.yahoo.com: https://query2.finance.yahoo.com/v8/finance/chart/AA?period1=1710964800&period2=1711483200&interval=1m&includePrePost=true&events=div%7Csplit%7Cearn&useYfid=true&lang=en-US&region=US
         // private const string UrlTemplate = @"https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&events=history";
         private const string UrlTemplate = @"https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&includePrePost=true&events=history";
         private const string FileTemplate = @"{0}.json";

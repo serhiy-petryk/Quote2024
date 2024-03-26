@@ -4,10 +4,10 @@ To Do
 1. The last full minute in https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1m&includePrePost=true&events=history
 is always null.
 Try https://query1.finance.yahoo.com/v8/finance/chart/{symbol} (see https://cryptocointracker.com/yahoo-finance/yahoo-finance-api)
-or remove 'includePrePost', 'events' attributes in url
-or period1/2 повинно бути кратним 1 хвилині
+or remove 'includePrePost', 'events' attributes in url (не працює)
+or period1/2 повинно бути кратним 1 хвилині (не працює)
 2. Nasdaq time sales: https://api.nasdaq.com/api/quote/AA/realtime-trades?&limit=200000&fromTime=15:00
-	Спробувати маніпулювати fromTime/toTime/offset
+	Спробувати маніпулювати fromTime/toTime/offset (працює тільки offset, якщо є fromTime кратне 30 хвилинам)
 
 ============
 Data sources
@@ -18,6 +18,9 @@ Data sources
 	+ дані співпадають з polygon
 	- the last full minute is 'null' (exception: TSLA in RTYahooMinutes_20240325191200.zip - дані з точністю до 1 сек)
 3. Nasdaq time sales: https://api.nasdaq.com/api/quote/AA/realtime-trades?&limit=200000&fromTime=15:00
+	-+ fromTime повинно бути кратним 30 хвилин
+	+ працює offset, якщо fromTime кратне 30 хвилин.
+	- дані можна отримати тільки у поточний торговий день (у наступний день дані недоступні)
 	- ~ 20-70% of market volume
 4. https://www.chartmill.com/ - image, not posibility to scratch data
 5. Nasdaq chart: only close price
