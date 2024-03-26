@@ -76,7 +76,8 @@ namespace Data.RealTime
 
             // Rounded to 1 minute
             from = from / 60 * 60;
-            to = to / 60 * 60;
+            // to = to / 60 * 60;
+            to = (to + 59) / 60 * 60; // + current minute
 
             var sw = new Stopwatch();
             sw.Start();
@@ -124,7 +125,8 @@ namespace Data.RealTime
 
             // Rounded to 1 minute
             from = from / 60 * 60;
-            to = to / 60 * 60;
+            // to = to / 60 * 60;
+            to = (to + 59) / 60 * 60; // + current minute
 
             var sw = new Stopwatch();
             sw.Start();
