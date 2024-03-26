@@ -74,6 +74,10 @@ namespace Data.RealTime
             var from = new DateTimeOffset(DateTime.UtcNow.AddMinutes(-30)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
+            // Rounded to 1 minute
+            from = from / 60 * 60;
+            to = to / 60 * 60;
+
             var sw = new Stopwatch();
             sw.Start();
 
@@ -117,6 +121,10 @@ namespace Data.RealTime
             var utcNow = DateTime.UtcNow;
             var from = new DateTimeOffset(utcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(utcNow).ToUnixTimeSeconds();
+
+            // Rounded to 1 minute
+            from = from / 60 * 60;
+            to = to / 60 * 60;
 
             var sw = new Stopwatch();
             sw.Start();
