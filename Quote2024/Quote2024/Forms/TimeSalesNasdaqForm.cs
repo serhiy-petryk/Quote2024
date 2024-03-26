@@ -6,22 +6,21 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Data;
-using Data.Actions.Yahoo;
 using Data.Helpers;
 
 namespace Quote2024.Forms
 {
-    public partial class RealTimeForm : Form
+    public partial class TimeSalesNasdaqForm : Form
     {
         private readonly System.Timers.Timer _timer = new System.Timers.Timer();
-        
+
         private Dictionary<string, byte[]> _validTickers;
         private Dictionary<string, Exception> _invalidTickers;
 
         private string[] Tickers => txtTickerList.Text.Split('\n').Where(a => !string.IsNullOrWhiteSpace(a))
             .Select(a => a.Trim()).ToArray();
 
-        private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
+        private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\NasdaqTimeSales";
         private string _dataFolder;
 
         private int _tickCount;
@@ -58,7 +57,7 @@ namespace Quote2024.Forms
             lblTickCount.Text = text;
         }
 
-        public RealTimeForm()
+        public TimeSalesNasdaqForm()
         {
             InitializeComponent();
 
@@ -153,7 +152,7 @@ namespace Quote2024.Forms
         {
             if (_frmTickerListParameter == null)
             {
-                _frmTickerListParameter = new TickerListParameterForm(Tickers, YahooCommon.GetYahooTickerFromPolygonTicker);
+                _frmTickerListParameter = new TickerListParameterForm(Tickers, s => s);
                 _frmTickerListParameter.StartPosition = FormStartPosition.CenterScreen;
             }
 
@@ -163,7 +162,7 @@ namespace Quote2024.Forms
         }
 
         private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers ({Tickers.Length} items):";
-        
+
         private void ShowStatus(string message) => lblStatus.Text = message;
     }
 }

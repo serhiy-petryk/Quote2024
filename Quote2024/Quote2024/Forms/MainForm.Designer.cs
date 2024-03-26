@@ -34,6 +34,8 @@ namespace Quote2024.Forms
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnOpenTimeSalesNasdaq = new System.Windows.Forms.Button();
+            this.btnOpenRealTime = new System.Windows.Forms.Button();
             this.btnOpenWebSocket = new System.Windows.Forms.Button();
             this.btnMinuteYahooSaveLogToDb = new System.Windows.Forms.Button();
             this.btnMinuteYahooErrorCheck = new System.Windows.Forms.Button();
@@ -49,7 +51,7 @@ namespace Quote2024.Forms
             this.btnTest = new System.Windows.Forms.Button();
             this.lblEoddataLogged = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnOpenRealTime = new System.Windows.Forms.Button();
+            this.btnOpenTestForm = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
@@ -87,6 +89,8 @@ namespace Quote2024.Forms
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnOpenTestForm);
+            this.tpLoader.Controls.Add(this.btnOpenTimeSalesNasdaq);
             this.tpLoader.Controls.Add(this.btnOpenRealTime);
             this.tpLoader.Controls.Add(this.btnOpenWebSocket);
             this.tpLoader.Controls.Add(this.btnMinuteYahooSaveLogToDb);
@@ -104,12 +108,34 @@ namespace Quote2024.Forms
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
             // 
+            // btnOpenTimeSalesNasdaq
+            // 
+            this.btnOpenTimeSalesNasdaq.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenTimeSalesNasdaq.Location = new System.Drawing.Point(591, 230);
+            this.btnOpenTimeSalesNasdaq.Name = "btnOpenTimeSalesNasdaq";
+            this.btnOpenTimeSalesNasdaq.Size = new System.Drawing.Size(196, 33);
+            this.btnOpenTimeSalesNasdaq.TabIndex = 74;
+            this.btnOpenTimeSalesNasdaq.Text = "Open TimeSales Nasdaq form";
+            this.btnOpenTimeSalesNasdaq.UseVisualStyleBackColor = true;
+            this.btnOpenTimeSalesNasdaq.Click += new System.EventHandler(this.btnOpenTimeSalesNasdaq_Click);
+            // 
+            // btnOpenRealTime
+            // 
+            this.btnOpenRealTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenRealTime.Location = new System.Drawing.Point(591, 191);
+            this.btnOpenRealTime.Name = "btnOpenRealTime";
+            this.btnOpenRealTime.Size = new System.Drawing.Size(198, 33);
+            this.btnOpenRealTime.TabIndex = 73;
+            this.btnOpenRealTime.Text = "Open RealTime form";
+            this.btnOpenRealTime.UseVisualStyleBackColor = true;
+            this.btnOpenRealTime.Click += new System.EventHandler(this.btnOpenRealTime_Click);
+            // 
             // btnOpenWebSocket
             // 
             this.btnOpenWebSocket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenWebSocket.Location = new System.Drawing.Point(618, 196);
+            this.btnOpenWebSocket.Location = new System.Drawing.Point(591, 152);
             this.btnOpenWebSocket.Name = "btnOpenWebSocket";
-            this.btnOpenWebSocket.Size = new System.Drawing.Size(170, 33);
+            this.btnOpenWebSocket.Size = new System.Drawing.Size(199, 33);
             this.btnOpenWebSocket.TabIndex = 72;
             this.btnOpenWebSocket.Text = "Open WebSocketClient form";
             this.btnOpenWebSocket.UseVisualStyleBackColor = true;
@@ -276,16 +302,16 @@ namespace Quote2024.Forms
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // btnOpenRealTime
+            // btnOpenTestForm
             // 
-            this.btnOpenRealTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenRealTime.Location = new System.Drawing.Point(617, 235);
-            this.btnOpenRealTime.Name = "btnOpenRealTime";
-            this.btnOpenRealTime.Size = new System.Drawing.Size(170, 33);
-            this.btnOpenRealTime.TabIndex = 73;
-            this.btnOpenRealTime.Text = "Open RealTime form";
-            this.btnOpenRealTime.UseVisualStyleBackColor = true;
-            this.btnOpenRealTime.Click += new System.EventHandler(this.btnOpenRealTime_Click);
+            this.btnOpenTestForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenTestForm.Location = new System.Drawing.Point(591, 269);
+            this.btnOpenTestForm.Name = "btnOpenTestForm";
+            this.btnOpenTestForm.Size = new System.Drawing.Size(196, 33);
+            this.btnOpenTestForm.TabIndex = 75;
+            this.btnOpenTestForm.Text = "Open Test form";
+            this.btnOpenTestForm.UseVisualStyleBackColor = true;
+            this.btnOpenTestForm.Click += new System.EventHandler(this.btnOpenTestForm_Click);
             // 
             // MainForm
             // 
@@ -329,5 +355,7 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnMinuteYahooErrorCheck;
         private System.Windows.Forms.Button btnOpenWebSocket;
         private System.Windows.Forms.Button btnOpenRealTime;
+        private System.Windows.Forms.Button btnOpenTimeSalesNasdaq;
+        private System.Windows.Forms.Button btnOpenTestForm;
     }
 }

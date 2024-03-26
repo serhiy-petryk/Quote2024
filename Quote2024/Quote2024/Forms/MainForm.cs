@@ -181,7 +181,7 @@ namespace Quote2024.Forms
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
 
-            await Task.Factory.StartNew(Data.Tests.RealTimeYahooMinuteTests.RegularMarketTime);
+            // await Task.Factory.StartNew(Data.Tests.RealTimeYahooMinuteTests.RegularMarketTime);
             // await Task.Factory.StartNew((() => Data.RealTime.YahooMinutes.GetTickerList(1)));
             // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.InitTimer);
 
@@ -252,6 +252,18 @@ namespace Quote2024.Forms
         private void btnOpenRealTime_Click(object sender, EventArgs e)
         {
             var form = new RealTimeForm();
+            form.Show();
+        }
+
+        private void btnOpenTimeSalesNasdaq_Click(object sender, EventArgs e)
+        {
+            var form = new TimeSalesNasdaqForm();
+            form.Show();
+        }
+
+        private void btnOpenTestForm_Click(object sender, EventArgs e)
+        {
+            var form = new TestForm();
             form.Show();
         }
     }

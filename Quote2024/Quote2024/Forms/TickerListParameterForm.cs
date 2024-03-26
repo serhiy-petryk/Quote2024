@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Data.RealTime;
 
 namespace Quote2024.Forms
 {
     public partial class TickerListParameterForm : Form
     {
         public string[] Tickers => txtTickerList.Text.Split('\t').ToArray();
+        private Func<string, string> _fnConvertTicker;
 
-        public TickerListParameterForm(string[] tickers)
+        public TickerListParameterForm(string[] tickers, Func<string, string> fnConvertTicker)
         {
             InitializeComponent();
+
+            _fnConvertTicker = fnConvertTicker;
             lblStatus.Text = "";
             txtTickerList.Text = string.Join('\t', tickers);
         }
@@ -23,7 +27,7 @@ namespace Quote2024.Forms
             txtTickerList.Text = "";
             await Task.Factory.StartNew((() =>
             {
-                var tickers = Data.RealTime.RealTimeYahooMinutes.GetTickerList(ShowStatus,Convert.ToInt32(numPreviousDays.Value),
+                var tickers = RealTimeCommon.GetTickerList(ShowStatus, Convert.ToInt32(numPreviousDays.Value),
                     Convert.ToSingle(numMinTradeValue.Value), Convert.ToSingle(numMaxTradeValue.Value),
                     Convert.ToInt32(numMinTradeCount.Value), Convert.ToSingle(numMinClose.Value),
                     Convert.ToSingle(numMaxClose.Value));

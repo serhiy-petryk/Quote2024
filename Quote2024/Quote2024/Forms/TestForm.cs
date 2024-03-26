@@ -4,17 +4,19 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Data;
 using Data.Actions.Yahoo;
 using Data.Helpers;
+using Data.RealTime;
 
 namespace Quote2024.Forms
 {
-    public partial class RealTimeForm : Form
+    public partial class TestForm : Form
     {
         private readonly System.Timers.Timer _timer = new System.Timers.Timer();
-        
+
         private Dictionary<string, byte[]> _validTickers;
         private Dictionary<string, Exception> _invalidTickers;
 
@@ -58,7 +60,7 @@ namespace Quote2024.Forms
             lblTickCount.Text = text;
         }
 
-        public RealTimeForm()
+        public TestForm()
         {
             InitializeComponent();
 
@@ -163,7 +165,31 @@ namespace Quote2024.Forms
         }
 
         private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers ({Tickers.Length} items):";
-        
+
+        private async void btnUpdateList_Click(object sender, EventArgs e)
+        {
+            btnUpdateList.Enabled = false;
+            txtTickerList.Text = "";
+            await Task.Factory.StartNew((() =>
+            {
+                var tickers = RealTimeCommon.GetTickerList(ShowStatus, Convert.ToInt32(numPreviousDays.Value),
+                    Convert.ToSingle(numMinTradeValue.Value), Convert.ToSingle(numMaxTradeValue.Value),
+                    Convert.ToInt32(numMinTradeCount.Value), Convert.ToSingle(numMinClose.Value),
+                    Convert.ToSingle(numMaxClose.Value));
+
+                this.BeginInvoke((Action)(() =>
+                {
+                    var tickerList = new List<string>();
+                    if (cbIncludeIndices.Checked)
+                        tickerList.AddRange(new[] { "^DJI", "^GSPC" });
+                    tickerList.AddRange(tickers.OrderBy(a => a));
+                    txtTickerList.Text = string.Join('\t', tickerList);
+                    btnUpdateList.Enabled = true;
+                }));
+            }));
+        }
+
         private void ShowStatus(string message) => lblStatus.Text = message;
+
     }
 }
