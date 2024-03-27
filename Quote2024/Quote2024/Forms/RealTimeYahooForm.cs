@@ -133,7 +133,7 @@ namespace Quote2024.Forms
             }
             else if (nyTime.AddMinutes(15).TimeOfDay > Settings.MarketStart)
             {
-                await Data.RealTime.RealTimeYahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
+                await RealTimeYahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
             }
         }
 
