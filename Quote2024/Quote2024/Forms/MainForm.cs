@@ -249,12 +249,6 @@ namespace Quote2024.Forms
             form.Show();
         }
 
-        private void btnOpenRealTime_Click(object sender, EventArgs e)
-        {
-            var form = new RealTimeForm();
-            form.Show();
-        }
-
         private void btnOpenTimeSalesNasdaq_Click(object sender, EventArgs e)
         {
             var form = new TimeSalesNasdaqForm();
@@ -264,6 +258,12 @@ namespace Quote2024.Forms
         private void btnOpenTestForm_Click(object sender, EventArgs e)
         {
             var form = new TestForm();
+            form.Show();
+        }
+
+        private void btnOpenRealTimeYahoo_Click(object sender, EventArgs e)
+        {
+            var form = new RealTimeYahooForm();
             form.Show();
         }
     }

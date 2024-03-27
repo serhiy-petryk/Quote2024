@@ -15,4 +15,10 @@
     <ProjectReference Include="..\WebSocketClientApp\WebSocketClientApp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Forms\RealTimeYahooForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>
