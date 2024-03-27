@@ -28,3 +28,12 @@ Data sources
 	attributes like offset/rows/count/limit don't work for this url
 7. Nasdaq post-market: https://api.nasdaq.com/api/quote/TSLA/extended-trading?markettype=post&assetclass=stocks&time=0
 	(6:00-6:29): https://api.nasdaq.com/api/quote/TSLA/extended-trading?markettype=post&assetclass=stocks&time=5
+
+==========
+Conclusion
+==========
+1. Nasdaq TimeSales has захист. Вдалося завантажити дані для 875 тікерів мінімально за 31 секунди (групи по 30 тікерів із затримкою 10 мілісекунд).
+Якщо групи по 40 символів, то вже є помилки. Тобто є можливість вантажити не більше ~30 тікерів за 1 секунду. 
+Блокування знімається після ~10 хвилин.
+
+

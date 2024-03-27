@@ -1,67 +1,86 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Data.Actions.Polygon;
 using Data.Helpers;
 
 namespace Data.RealTime
 {
     public class TimeSalesNasdaq
     {
-        private const string DayPolygonDataFolder = @"E:\Quote\WebData\RealTime\YahooMinute\DayPolygon";
+        private const string UrlTemplate = @"https://api.nasdaq.com/api/quote/{0}/realtime-trades?&limit=200000&fromTime={1}";
+        private const string FileTemplate = @"{0}.json";
 
-        public static List<string> GetTickerList(Action<string> fnShowStatus, int tradingDays, float minTradeValue,
-            float maxTradeValue, int minTradeCount, float minClose, float maxClose)
+        public static async Task<(Dictionary<string, byte[]>, Dictionary<string, Exception>)> CheckTickers(Action<string> fnShowStatus, string[] tickers)
         {
-            Logger.AddMessage($"Get ticker list", fnShowStatus);
+            Logger.AddMessage($"Check Nasdaq timesales data", fnShowStatus);
+            var from = TimeHelper.GetCurrentEstDateTime().TimeOfDay;
+            from = new TimeSpan(0, Convert.ToInt32(from.TotalMinutes) / 30 * 30, 0);
+            // var fromKey = from.ToString(@"hh\:mm");
+            var fromKey = "15:30";
 
-            var dates = Actions.Yahoo.YahooIndicesLoader.GetTradingDays(fnShowStatus,
-                TimeHelper.GetCurrentEstDateTime().Date.AddDays(-1), tradingDays * 2 + 10);
-            var sqls = new string[tradingDays];
-            var cnt = 0;
-            var data = new List<PolygonDailyLoader.cItem>();
-            for (var k = 0; k < tradingDays; k++)
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var tickers2 = tickers.Select((x, i) => new { Index = i, Value = x })
+                .GroupBy(x => x.Index / 24)
+                .Select(x => x.Select(v => v.Value).ToList())
+                .ToArray();
+
+            var validTickers = new Dictionary<string, byte[]>();
+            var invalidTickers = new Dictionary<string, Exception>();
+            for (var k = 0; k < tickers2.Length; k++)
             {
-                var date = dates[k];
-                var zipFileName = Path.Combine(DayPolygonDataFolder, $"DayPolygon_{date:yyyyMMdd}.zip");
-                if (!File.Exists(zipFileName))
+                var tasks = new ConcurrentDictionary<string, Task<byte[]>>();
+                foreach (var ticker in tickers2[k])
                 {
-                    var url =
-                        $@"https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/{date:yyyy-MM-dd}?adjusted=false&apiKey={PolygonCommon.GetApiKey2003()}";
-                    var o = Download.DownloadToBytes(url, true);
-                    if (o.Item2 != null)
-                        throw new Exception(
-                            $"PolygonDailyLoader: Error while download from {url}. Error message: {o.Item2.Message}");
-
-                    var jsonFileName = $"DayPolygon_{date:yyyyMMdd}.json";
-                    ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { new VirtualFileEntry(jsonFileName, o.Item1) });
+                    var task = Download.DownloadToBytesAsync(string.Format(UrlTemplate, ticker, fromKey), true, true);
+                    tasks[ticker] = task;
                 }
 
-                using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var kvp in tasks)
                 {
-                    var content = zip.Entries[0].GetContentOfZipEntry().Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
-                    var oo = ZipUtils.DeserializeString<PolygonDailyLoader.cRoot>(content);
-
-                    if (oo.status != "OK" || oo.count != oo.queryCount || oo.count != oo.resultsCount || oo.adjusted || oo.resultsCount == 0)
-                        throw new Exception($"Bad file: {zipFileName}");
-
-                    var minTradeValue2 = (Settings.IsInMarketTime(date) ? minTradeValue / 2.0f : minTradeValue) * 1000000f;
-                    var maxTradeValue2 = (Settings.IsInMarketTime(date) ? maxTradeValue / 2.0f : maxTradeValue) * 1000000f;
-                    var minTradeCount2 = Settings.IsInMarketTime(date) ? minTradeCount / 2.0 : minTradeCount;
-
-                    data.AddRange(oo.results.Where(a => a.c >= minClose && a.c <= maxClose && a.n >= minTradeCount && a.c * a.v >= minTradeValue2 && a.c * a.v <= maxTradeValue2));
+                    try
+                    {
+                        // release control to the caller until the task is done, which will be near immediate for each task following the first
+                        validTickers.Add(kvp.Key, await kvp.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        invalidTickers.Add(kvp.Key, ex);
+                        Debug.Print($"{DateTime.Now.TimeOfDay}. Ticker: {kvp.Key}. Error: {ex.Message}");
+                    }
                 }
+
+                if (k == tickers2.Length - 1)
+                    break;
+                Thread.Sleep(20);
             }
 
-            var tickers = data.GroupBy(a => a.TT).Where(a => a.Count() == tradingDays).Select(a => a.Key).ToList();
+            sw.Stop();
+            Debug.Print($"TimeSalesNasdaq.CheckTickers. {sw.ElapsedMilliseconds:N0} milliseconds. From: {fromKey}");
 
-            return tickers;
+            Logger.AddMessage(
+                $"Nasdaq timesales data checked. {invalidTickers.Count} invalid tickers, {validTickers.Count} valid tickers", fnShowStatus);
+
+            return (validTickers, invalidTickers);
         }
 
+        public static async Task<Dictionary<string, byte[]>> Run(Action<string> fnShowStatus, string[] symbols, string dataFolder, Action<string, Exception> onError)
+        {
+            fnShowStatus("!!! Function not ready!!!");
+            return new Dictionary<string, byte[]>();
+        }
+
+        public static void SaveResult(Dictionary<string, byte[]> results, string dataFolder)
+        {
+            var virtualFileEntries = results.Select(kvp => new VirtualFileEntry($"{kvp.Key}.json", kvp.Value));
+            ZipUtils.ZipVirtualFileEntries(Path.Combine(dataFolder, $@"TSNasdaq_{DateTime.Now:yyyyMMddHHmmss}.zip"), virtualFileEntries);
+        }
 
     }
 }

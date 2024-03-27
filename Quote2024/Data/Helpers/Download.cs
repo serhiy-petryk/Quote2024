@@ -7,10 +7,11 @@ namespace Data.Helpers
 {
     public static class Download
     {
-        public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false)
+        public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy=false)
         {
             using (var wc = new WebClientEx())
             {
+                if (noProxy) wc.Proxy = null;
                 wc.Encoding = System.Text.Encoding.UTF8;
                 // wc.Cookies = cookies;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;

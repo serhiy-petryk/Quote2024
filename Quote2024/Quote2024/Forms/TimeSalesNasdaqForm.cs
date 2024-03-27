@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Data;
-using Data.Actions.Yahoo;
 using Data.Helpers;
 using Data.RealTime;
 
@@ -23,7 +22,7 @@ namespace Quote2024.Forms
         private string[] Tickers => txtTickerList.Text.Split(new []{"\t", " ", "\n"}, StringSplitOptions.RemoveEmptyEntries).Where(a => !string.IsNullOrWhiteSpace(a))
             .Select(a => a.Trim()).ToArray();
 
-        private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
+        private readonly string _baseFolder = @"D:\Quote\WebData\Minute\NasdaqTimeSales";
         private string _dataFolder;
 
         private int _tickCount;
@@ -78,7 +77,8 @@ namespace Quote2024.Forms
 
             Debug.Print($"Nasdaq TimeSales started: {DateTime.Now.TimeOfDay}");
 
-            var tickers = await Data.RealTime.RealTimeYahooMinutes.CheckTickers(ShowStatus, Tickers);
+            var tickers = await Data.RealTime.TimeSalesNasdaq.CheckTickers(ShowStatus, Tickers);
+
             _validTickers = tickers.Item1;
             _invalidTickers = tickers.Item2;
 
@@ -99,9 +99,9 @@ namespace Quote2024.Forms
             if (!Directory.Exists(_dataFolder))
                 Directory.CreateDirectory(_dataFolder);
 
-            RealTimeYahooMinutes.SaveResult(tickers.Item1, _dataFolder);
+            TimeSalesNasdaq.SaveResult(tickers.Item1, _dataFolder);
 
-            _timer.Start();
+            //_timer.Start();
             RefreshUI();
         }
 
@@ -133,7 +133,7 @@ namespace Quote2024.Forms
             }
             else if (nyTime.AddMinutes(15).TimeOfDay > Settings.MarketStart)
             {
-                await Data.RealTime.RealTimeYahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
+                await TimeSalesNasdaq.Run(ShowStatus, Tickers, _dataFolder, OnError);
             }
         }
 

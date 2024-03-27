@@ -3,11 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using Data.Actions.Polygon;
-using Data.Actions.Yahoo;
 using Data.Helpers;
 
 namespace Data.RealTime
