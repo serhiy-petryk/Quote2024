@@ -19,6 +19,9 @@
     <Compile Update="Forms\RealTimeYahooForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\TimeSalesNasdaqForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>
