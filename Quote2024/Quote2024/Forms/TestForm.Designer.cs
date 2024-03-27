@@ -360,6 +360,7 @@ namespace Quote2024.Forms
             this.txtTickerList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtTickerList.Size = new System.Drawing.Size(367, 332);
             this.txtTickerList.TabIndex = 1;
+            this.txtTickerList.TabStop = false;
             this.txtTickerList.TextChanged += new System.EventHandler(this.txtTickerList_TextChanged);
             // 
             // lblTickerList
@@ -375,7 +376,7 @@ namespace Quote2024.Forms
             // 
             this.lblTickCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTickCount.AutoSize = true;
-            this.lblTickCount.Location = new System.Drawing.Point(5, 9);
+            this.lblTickCount.Location = new System.Drawing.Point(3, 9);
             this.lblTickCount.Name = "lblTickCount";
             this.lblTickCount.Size = new System.Drawing.Size(75, 15);
             this.lblTickCount.TabIndex = 2;
@@ -384,9 +385,9 @@ namespace Quote2024.Forms
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStop.Location = new System.Drawing.Point(5, 84);
+            this.btnStop.Location = new System.Drawing.Point(3, 84);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(75, 37);
+            this.btnStop.Size = new System.Drawing.Size(75, 42);
             this.btnStop.TabIndex = 1;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
@@ -395,7 +396,7 @@ namespace Quote2024.Forms
             // btnStart
             // 
             this.btnStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStart.Location = new System.Drawing.Point(4, 34);
+            this.btnStart.Location = new System.Drawing.Point(2, 34);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 42);
             this.btnStart.TabIndex = 0;

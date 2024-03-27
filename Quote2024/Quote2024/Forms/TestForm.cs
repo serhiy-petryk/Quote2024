@@ -74,8 +74,9 @@ namespace Quote2024.Forms
         {
             TickCount = 0;
             ErrorCount = 0;
+            btnStart.Enabled = false;
 
-            Debug.Print($"RealTime start: {DateTime.Now.TimeOfDay}");
+            Debug.Print($"Yahoo RealTime started: {DateTime.Now.TimeOfDay}");
 
             var tickers = await Data.RealTime.RealTimeYahooMinutes.CheckTickers(ShowStatus, Tickers);
             _validTickers = tickers.Item1;
@@ -98,7 +99,7 @@ namespace Quote2024.Forms
             if (!Directory.Exists(_dataFolder))
                 Directory.CreateDirectory(_dataFolder);
 
-            Data.RealTime.RealTimeYahooMinutes.SaveResult(tickers.Item1, _dataFolder);
+            RealTimeYahooMinutes.SaveResult(tickers.Item1, _dataFolder);
 
             _timer.Start();
             RefreshUI();
@@ -130,7 +131,7 @@ namespace Quote2024.Forms
                 btnStop_Click(sender, EventArgs.Empty);
                 return;
             }
-            else if (nyTime.AddMinutes(30).TimeOfDay > Settings.MarketStart)
+            else if (nyTime.AddMinutes(15).TimeOfDay > Settings.MarketStart)
             {
                 await Data.RealTime.RealTimeYahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
             }
@@ -147,21 +148,6 @@ namespace Quote2024.Forms
 
             _timer.Elapsed -= _timer_Elapsed;
             _timer.Dispose();
-            _frmTickerListParameter?.Dispose();
-        }
-
-        private TickerListParameterForm _frmTickerListParameter;
-        private async void btnUpdateTickerList_Click(object sender, EventArgs e)
-        {
-            if (_frmTickerListParameter == null)
-            {
-                _frmTickerListParameter = new TickerListParameterForm(Tickers, YahooCommon.GetYahooTickerFromPolygonTicker);
-                _frmTickerListParameter.StartPosition = FormStartPosition.CenterScreen;
-            }
-
-            _frmTickerListParameter.ShowDialog();
-            if (_frmTickerListParameter.DialogResult == DialogResult.OK)
-                txtTickerList.Text = string.Join('\n', _frmTickerListParameter.Tickers);
         }
 
         private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers (divided by space or tab): {Tickers.Length} items";
