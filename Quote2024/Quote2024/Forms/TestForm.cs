@@ -20,7 +20,7 @@ namespace Quote2024.Forms
         private Dictionary<string, byte[]> _validTickers;
         private Dictionary<string, Exception> _invalidTickers;
 
-        private string[] Tickers => txtTickerList.Text.Split('\n').Where(a => !string.IsNullOrWhiteSpace(a))
+        private string[] Tickers => txtTickerList.Text.Split(new []{"\t", " ", "\n"}, StringSplitOptions.RemoveEmptyEntries).Where(a => !string.IsNullOrWhiteSpace(a))
             .Select(a => a.Trim()).ToArray();
 
         private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
@@ -164,7 +164,7 @@ namespace Quote2024.Forms
                 txtTickerList.Text = string.Join('\n', _frmTickerListParameter.Tickers);
         }
 
-        private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers ({Tickers.Length} items):";
+        private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers (divided by space or tab): {Tickers.Length} items";
 
         private async void btnUpdateList_Click(object sender, EventArgs e)
         {
@@ -182,7 +182,7 @@ namespace Quote2024.Forms
                     var tickerList = new List<string>();
                     if (cbIncludeIndices.Checked)
                         tickerList.AddRange(new[] { "^DJI", "^GSPC" });
-                    tickerList.AddRange(tickers.OrderBy(a => a));
+                    tickerList.AddRange(tickers.Select(YahooCommon.GetYahooTickerFromPolygonTicker).OrderBy(a => a));
                     txtTickerList.Text = string.Join('\t', tickerList);
                     btnUpdateList.Enabled = true;
                 }));

@@ -82,8 +82,8 @@ namespace Quote2024.Forms
             // lblStatus
             // 
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(118, 17);
-            this.lblStatus.Text = "toolStripStatusLabel1";
+            this.lblStatus.Size = new System.Drawing.Size(52, 17);
+            this.lblStatus.Text = "lblStatus";
             // 
             // splitContainer1
             // 
@@ -108,6 +108,7 @@ namespace Quote2024.Forms
             this.splitContainer1.Panel1.Controls.Add(this.label4);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
             this.splitContainer1.Panel1.Controls.Add(this.label1);
+            this.splitContainer1.Panel1.Cursor = System.Windows.Forms.Cursors.Default;
             // 
             // splitContainer1.Panel2
             // 
@@ -334,12 +335,14 @@ namespace Quote2024.Forms
             // 
             this.splitContainer2.Panel1.Controls.Add(this.txtTickerList);
             this.splitContainer2.Panel1.Controls.Add(this.lblTickerList);
+            this.splitContainer2.Panel1.Cursor = System.Windows.Forms.Cursors.Default;
             // 
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.lblTickCount);
             this.splitContainer2.Panel2.Controls.Add(this.btnStop);
             this.splitContainer2.Panel2.Controls.Add(this.btnStart);
+            this.splitContainer2.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
             this.splitContainer2.Size = new System.Drawing.Size(480, 353);
             this.splitContainer2.SplitterDistance = 373;
             this.splitContainer2.SplitterWidth = 5;
@@ -347,6 +350,7 @@ namespace Quote2024.Forms
             // 
             // txtTickerList
             // 
+            this.txtTickerList.AcceptsTab = true;
             this.txtTickerList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -356,45 +360,48 @@ namespace Quote2024.Forms
             this.txtTickerList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtTickerList.Size = new System.Drawing.Size(367, 332);
             this.txtTickerList.TabIndex = 1;
+            this.txtTickerList.TextChanged += new System.EventHandler(this.txtTickerList_TextChanged);
             // 
             // lblTickerList
             // 
             this.lblTickerList.AutoSize = true;
             this.lblTickerList.Location = new System.Drawing.Point(3, 0);
             this.lblTickerList.Name = "lblTickerList";
-            this.lblTickerList.Size = new System.Drawing.Size(57, 15);
+            this.lblTickerList.Size = new System.Drawing.Size(180, 15);
             this.lblTickerList.TabIndex = 0;
-            this.lblTickerList.Text = "Ticker list";
+            this.lblTickerList.Text = "Tickers (divided by space or tab):";
             // 
             // lblTickCount
             // 
             this.lblTickCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTickCount.AutoSize = true;
-            this.lblTickCount.Location = new System.Drawing.Point(11, 9);
+            this.lblTickCount.Location = new System.Drawing.Point(5, 9);
             this.lblTickCount.Name = "lblTickCount";
-            this.lblTickCount.Size = new System.Drawing.Size(38, 15);
+            this.lblTickCount.Size = new System.Drawing.Size(75, 15);
             this.lblTickCount.TabIndex = 2;
-            this.lblTickCount.Text = "label8";
+            this.lblTickCount.Text = "lblTickCount";
             // 
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStop.Location = new System.Drawing.Point(11, 84);
+            this.btnStop.Location = new System.Drawing.Point(5, 84);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 37);
             this.btnStop.TabIndex = 1;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // btnStart
             // 
             this.btnStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStart.Location = new System.Drawing.Point(10, 34);
+            this.btnStart.Location = new System.Drawing.Point(4, 34);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 42);
             this.btnStart.TabIndex = 0;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // TestForm
             // 
