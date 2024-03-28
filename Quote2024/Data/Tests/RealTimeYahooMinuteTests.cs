@@ -12,6 +12,7 @@ namespace Data.Tests
     public static class RealTimeYahooMinuteTests
     {
         private const string Folder = @"E:\Quote\WebData\RealTime\YahooMinute\2024-03-21";
+        private const string Folder2 = @"E:\Quote\WebData\RealTime\YahooMinute\2024-03-26";
         private const string MainFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
 
         public static void TestTradingPeriod()
@@ -189,6 +190,82 @@ namespace Data.Tests
                         }
                     }
             }
+        }
+
+        public static void DefineDelay()
+        {
+            var lastSecondsLog = new Dictionary<int, int>();
+
+            var zipFiles = Directory.GetFiles(Folder2, "*.zip", SearchOption.AllDirectories).OrderBy(a => a)
+                .ToArray();
+            foreach (var zipFileName in zipFiles)
+            {
+                if (zipFileName.Contains("DayPolygon")) continue;
+
+                var ss = Path.GetFileNameWithoutExtension(zipFileName).Split('_');
+                var utcFileDateTime =
+                    DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture).ToUniversalTime();
+                var msecs = new DateTimeOffset(utcFileDateTime, TimeSpan.Zero).ToUnixTimeMilliseconds();
+                var nyFileDateTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(msecs);
+
+                if (nyFileDateTime.TimeOfDay > new TimeSpan(16, 2, 0))
+                    continue;
+
+                Logger.AddMessage($"File: {Path.GetFileName(zipFileName)}");
+                using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                    foreach (var entry in zip.Entries)
+                    {
+                        var o = Helpers.ZipUtils.DeserializeZipEntry<Models.MinuteYahoo>(entry);
+                        if (o.chart.result?[0].timestamp != null)
+                        {
+                            var times = o.chart.result[0].timestamp;
+                            var times2 = times.Select(a => TimeHelper.GetEstDateTimeFromUnixMilliseconds(a * 1000)).ToArray();
+                            var lastSeconds = Convert.ToInt32(times[times.Length - 1] - times[times.Length - 2]);
+                            if (!lastSecondsLog.ContainsKey(lastSeconds))
+                                lastSecondsLog.Add(lastSeconds,0);
+                            lastSecondsLog[lastSeconds]++;
+
+                            var a1 = o.chart.result[0].indicators.quote[0];
+                            if (lastSeconds > 60)
+                            {
+                                Debug.Print($"Big last seconds: {entry.Name}. File: {Path.GetFileName(zipFileName)}. Volume: {a1.volume[times.Length-1]}. Time: {times2[times2.Length-1].TimeOfDay}. Last seconds:{lastSeconds}");
+                                if (entry.Name == "APP.json")
+                                {
+
+                                }
+                            }
+                            if (lastSeconds == 60)
+                            {
+                                if (a1.volume[times.Length - 1] == null || a1.volume[times.Length - 1]==0)
+                                {
+
+                                }
+
+                            }
+                            else
+                            {
+                                if (a1.volume[times.Length - 1] != 0)
+                                {
+
+                                }
+                            }
+
+                            if (a1.volume[times.Length - 2] == null && a1.volume[times.Length - 1] != 0 && lastSeconds!=60)
+                            {
+
+                            }
+                            else if (a1.volume[times.Length - 2] != null && a1.volume[times.Length - 1] == 0)
+                            {
+
+                            }
+                            // Debug.Print($"regularMarketTime: {a1:yyyy-MM-dd HH:mm:ss}\tFileDateTime: {nyFileDateTime:yyyy-MM-dd HH:mm:ss}");
+                        }
+                    }
+            }
+
+            var aa1 = lastSecondsLog.OrderBy(a => a.Key).ToDictionary(a => a.Key, a => a.Value);
+            foreach(var kvp in aa1)
+                Debug.Print($"{kvp.Key}\t{kvp.Value}");
         }
 
         public static void Start()

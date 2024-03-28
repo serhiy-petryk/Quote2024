@@ -25,7 +25,7 @@ namespace Data.RealTime
             // Rounded to 1 minute
             from = from / 60 * 60;
             // to = to / 60 * 60;
-            to = (to + 59) / 60 * 60; // + current minute
+            to = (to + 119) / 60 * 60; // + current minute
 
             var sw = new Stopwatch();
             sw.Start();
@@ -70,11 +70,12 @@ namespace Data.RealTime
             var utcNow = DateTime.UtcNow;
             var from = new DateTimeOffset(utcNow.AddMinutes(-minutes)).ToUnixTimeSeconds();
             var to = new DateTimeOffset(utcNow).ToUnixTimeSeconds();
+            var methodStarted = DateTime.Now;
 
             // Rounded to 1 minute
             from = from / 60 * 60;
             // to = to / 60 * 60;
-            to = (to + 59) / 60 * 60; // + current minute
+            to = (to + 119) / 60 * 60; // + current minute
 
             var sw = new Stopwatch();
             sw.Start();
@@ -109,15 +110,17 @@ namespace Data.RealTime
                 fnShowStatus);
 
             if (dataFolder != null)
-                SaveResult(results, dataFolder);
+                SaveResult(results, dataFolder, methodStarted);
 
             return results;
         }
 
-        public static void SaveResult(Dictionary<string, byte[]> results, string dataFolder)
+        public static void SaveResult(Dictionary<string, byte[]> results, string dataFolder, DateTime methodStarted)
         {
+            var filename = Path.Combine(dataFolder, $@"RT2YahooMinutes_{DateTime.Now:yyyyMMddHHmmss}.zip");
             var virtualFileEntries = results.Select(kvp => new VirtualFileEntry($"{kvp.Key}.json", kvp.Value));
-            ZipUtils.ZipVirtualFileEntries(Path.Combine(dataFolder, $@"RTYahooMinutes_{DateTime.Now:yyyyMMddHHmmss}.zip"), virtualFileEntries);
+            ZipUtils.ZipVirtualFileEntries(filename, virtualFileEntries);
+            File.SetCreationTime(filename, methodStarted);
         }
     }
 }

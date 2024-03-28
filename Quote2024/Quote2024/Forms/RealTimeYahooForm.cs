@@ -78,6 +78,7 @@ namespace Quote2024.Forms
 
             Debug.Print($"Yahoo RealTime started: {DateTime.Now.TimeOfDay}");
 
+            var methodStarted = DateTime.Now;
             var tickers = await Data.RealTime.RealTimeYahooMinutes.CheckTickers(ShowStatus, Tickers);
             _validTickers = tickers.Item1;
             _invalidTickers = tickers.Item2;
@@ -99,7 +100,7 @@ namespace Quote2024.Forms
             if (!Directory.Exists(_dataFolder))
                 Directory.CreateDirectory(_dataFolder);
 
-            RealTimeYahooMinutes.SaveResult(tickers.Item1, _dataFolder);
+            RealTimeYahooMinutes.SaveResult(tickers.Item1, _dataFolder, methodStarted);
 
             _timer.Start();
             RefreshUI();
