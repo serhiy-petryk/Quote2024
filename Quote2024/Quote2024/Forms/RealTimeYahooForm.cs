@@ -132,7 +132,7 @@ namespace Quote2024.Forms
                 btnStop_Click(sender, EventArgs.Empty);
                 return;
             }
-            else if (nyTime.AddMinutes(15).TimeOfDay > Settings.MarketStart)
+            else if (nyTime.AddMinutes(5).TimeOfDay > Settings.MarketStart)
             {
                 await RealTimeYahooMinutes.Run(ShowStatus, Tickers, _dataFolder, OnError);
             }
