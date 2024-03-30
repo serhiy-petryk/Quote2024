@@ -113,7 +113,7 @@ namespace Data.RealTime
             var invalidCount = 0;
             var totalCount = tickers.Length * fromKeys.Length;
             var groupedTickers = tickers.Select((x, i) => new { Index = i, Value = x })
-                .GroupBy(x => x.Index / 185)
+                .GroupBy(x => x.Index / 180)
                 .Select(x => x.Select(v => v.Value).ToList())
                 .ToArray(); 
             foreach (var fromKey in fromKeys)
