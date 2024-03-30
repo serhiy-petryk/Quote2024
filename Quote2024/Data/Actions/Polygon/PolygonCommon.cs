@@ -11,7 +11,7 @@ namespace Data.Actions.Polygon
         public const string DataFolderMinute = @"E:\Quote\WebData\Minute\Polygon2003\Data\";
         public const string DataFolderSymbols = @"E:\Quote\WebData\Symbols\Polygon2003\Data\";
 
-        public static string GetApiKey() => CsUtils.GetApiKeys("polygon.io")[1];
+        public static string GetApiKey() => CsUtils.GetApiKeys("polygon.io")[0];
         public static string GetApiKey2003() => CsUtils.GetApiKeys("polygon.io.2003")[0];
 
         public static string GetMyTicker(string polygonTicker)
