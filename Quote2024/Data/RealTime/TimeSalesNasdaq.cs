@@ -96,7 +96,7 @@ namespace Data.RealTime
         {
             Logger.AddMessage($"Download all Nasdaq timesales data", fnShowStatus);
 
-            var downloadInterval = TimeSpan.FromMilliseconds(10000);
+            var downloadInterval = TimeSpan.FromMilliseconds(8500);
             var fromKeys = new string[]
             {
                 "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -142,8 +142,6 @@ namespace Data.RealTime
                                 // release control to the caller until the task is done, which will be near immediate for each task following the first
                                 validTickers.Add(kvp.Key, await kvp.Value);
                                 validCount++;
-                                if (validCount % 10 == 0)
-                                    Logger.AddMessage($"Downloaded {validCount:N0} from {totalCount:N0}. From key: {fromKey}", fnShowStatus);
                             }
                             catch (Exception ex)
                             {
@@ -162,6 +160,8 @@ namespace Data.RealTime
 
                         var dt2 = DateTime.Now.TimeOfDay;
                         Debug.Print($"TSAllNasdaq ended. Time: {dt2}. K={k}");
+                        Logger.AddMessage($"Downloaded {validCount:N0} from {totalCount:N0}. From key: {fromKey}", fnShowStatus);
+
                         var a1 = downloadInterval - (dt2 - dt1);
                         if (a1>TimeSpan.Zero)
                             await Task.Delay(Convert.ToInt32(a1.TotalMilliseconds));
@@ -172,7 +172,6 @@ namespace Data.RealTime
 
                     var virtualFileEntries = validTickers.Select(kvp => new VirtualFileEntry($"{kvp.Key}.json", kvp.Value));
                     ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries);
-
                 }
             }
 
