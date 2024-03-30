@@ -175,7 +175,7 @@ namespace Data.RealTime
                 }
             }
 
-            Logger.AddMessage($"All Nasdaq timesales data finished. {invalidCount} invalid items, {validCount} valid items", fnShowStatus);
+            Logger.AddMessage($"All Nasdaq timesales data finished. {invalidCount:N0} invalid items, {validCount:N0} valid items", fnShowStatus);
         }
 
     }
