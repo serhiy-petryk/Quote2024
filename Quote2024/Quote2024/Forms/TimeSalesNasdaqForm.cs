@@ -173,5 +173,11 @@ namespace Quote2024.Forms
 
         private void ShowStatus(string message) => lblStatus.Text = message;
 
+        private async void btnDownloadForAllDay_Click(object sender, EventArgs e)
+        {
+            btnDownloadForAllDay.Enabled = false;
+            await Data.RealTime.TimeSalesNasdaq.DownloadAllData(ShowStatus, Tickers);
+            btnDownloadForAllDay.Enabled = true;
+        }
     }
 }

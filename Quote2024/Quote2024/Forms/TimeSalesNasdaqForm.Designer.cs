@@ -51,6 +51,7 @@ namespace Quote2024.Forms
             this.lblTickCount = new System.Windows.Forms.Label();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
+            this.btnDownloadForAllDay = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -325,6 +326,7 @@ namespace Quote2024.Forms
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.btnDownloadForAllDay);
             this.splitContainer2.Panel2.Controls.Add(this.lblTickCount);
             this.splitContainer2.Panel2.Controls.Add(this.btnStop);
             this.splitContainer2.Panel2.Controls.Add(this.btnStart);
@@ -362,7 +364,7 @@ namespace Quote2024.Forms
             // 
             this.lblTickCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTickCount.AutoSize = true;
-            this.lblTickCount.Location = new System.Drawing.Point(2, 9);
+            this.lblTickCount.Location = new System.Drawing.Point(1, 9);
             this.lblTickCount.Name = "lblTickCount";
             this.lblTickCount.Size = new System.Drawing.Size(75, 15);
             this.lblTickCount.TabIndex = 2;
@@ -371,7 +373,7 @@ namespace Quote2024.Forms
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStop.Location = new System.Drawing.Point(15, 84);
+            this.btnStop.Location = new System.Drawing.Point(14, 84);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 42);
             this.btnStop.TabIndex = 1;
@@ -382,13 +384,23 @@ namespace Quote2024.Forms
             // btnStart
             // 
             this.btnStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStart.Location = new System.Drawing.Point(15, 34);
+            this.btnStart.Location = new System.Drawing.Point(14, 34);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 42);
             this.btnStart.TabIndex = 0;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            // 
+            // btnDownloadForAllDay
+            // 
+            this.btnDownloadForAllDay.Location = new System.Drawing.Point(14, 197);
+            this.btnDownloadForAllDay.Name = "btnDownloadForAllDay";
+            this.btnDownloadForAllDay.Size = new System.Drawing.Size(75, 67);
+            this.btnDownloadForAllDay.TabIndex = 3;
+            this.btnDownloadForAllDay.Text = "Download data for all day";
+            this.btnDownloadForAllDay.UseVisualStyleBackColor = true;
+            this.btnDownloadForAllDay.Click += new System.EventHandler(this.btnDownloadForAllDay_Click);
             // 
             // TimeSalesNasdaqForm
             // 
@@ -447,5 +459,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Label lblTickCount;
+        private System.Windows.Forms.Button btnDownloadForAllDay;
     }
 }

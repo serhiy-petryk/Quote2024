@@ -17,7 +17,7 @@ namespace Quote2024
             HttpWebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultCredentials;
             //      HttpWebRequest.DefaultWebProxy.als = CredentialCache.DefaultCredentials;
             FtpWebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultCredentials;
-            System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
+            System.Net.ServicePointManager.DefaultConnectionLimit = 20000;
 
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
