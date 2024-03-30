@@ -44,6 +44,11 @@ namespace Data.Actions.MorningStar
                 morningStarTicker = morningStarTicker.Replace('p', '^');
                 testSymbol = morningStarTicker;
             }
+            else if (morningStarTicker.EndsWith('w'))
+            {
+                morningStarTicker = morningStarTicker.Substring(0, morningStarTicker.Length-1) + ".WI";
+                testSymbol = morningStarTicker.Substring(0, morningStarTicker.Length - 3);
+            }
             else if (morningStarTicker.EndsWith(" U"))
             {
                 morningStarTicker = morningStarTicker.Replace(" U", ".U");
