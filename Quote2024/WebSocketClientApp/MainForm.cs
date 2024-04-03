@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.WebSockets;
 using System.Windows.Forms;
@@ -41,6 +42,12 @@ namespace WebSocketClientApp
                 //if (info.Type != DisconnectionType.Exit && info.Type!= DisconnectionType.ByUser)
                   //  _client.Reconnect();
                 SaveLog("Disconnection happened, type: " + info.Type);
+                if (info.Type == DisconnectionType.NoMessageReceived && _lastSendMessage != null)
+                {
+                    Debug.Print("Resend message");
+                    SendMessage(_lastSendMessage);
+                    SaveLog("Send last message after disconnection happened");
+                }
             });
 
             _client.MessageReceived.Subscribe(msg =>
@@ -60,7 +67,7 @@ namespace WebSocketClientApp
         private void SaveLog(string text)
         {
             if (cbLogMessages.Checked)
-                BeginInvoke((Action)(() => listBox1.Items.Add(text)));
+                BeginInvoke((Action)(() => listBox1.Items.Insert(0, text)));
         }
 
         private void ConnectButton_Click(object sender, EventArgs e)
