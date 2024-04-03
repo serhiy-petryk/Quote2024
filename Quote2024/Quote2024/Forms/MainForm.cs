@@ -282,7 +282,7 @@ namespace Quote2024.Forms
 
         private void btnYahooWebSocketForm_Click(object sender, EventArgs e)
         {
-            var form = new WebSocketYahoo();
+            var form = new WebSocketYahooForm();
             form.Show();
         }
     }

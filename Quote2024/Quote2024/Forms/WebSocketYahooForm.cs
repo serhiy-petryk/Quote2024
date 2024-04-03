@@ -14,7 +14,7 @@ using Data.RealTime.Stooq;
 
 namespace Quote2024.Forms
 {
-    public partial class WebSocketYahoo: Form
+    public partial class WebSocketYahooForm: Form
     {
         private readonly System.Timers.Timer _timer = new System.Timers.Timer();
 
@@ -61,7 +61,7 @@ namespace Quote2024.Forms
             lblTickCount.Text = text;
         }
 
-        public WebSocketYahoo()
+        public WebSocketYahooForm()
         {
             InitializeComponent();
 
