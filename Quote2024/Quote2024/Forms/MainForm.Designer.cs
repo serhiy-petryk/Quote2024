@@ -34,7 +34,7 @@ namespace Quote2024.Forms
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
-            this.btnStooqMinuteForm = new System.Windows.Forms.Button();
+            this.btnYahooWebSocketForm = new System.Windows.Forms.Button();
             this.btnFinageTradesForm = new System.Windows.Forms.Button();
             this.btnFinageMinuteForm = new System.Windows.Forms.Button();
             this.btnOpenTestForm = new System.Windows.Forms.Button();
@@ -92,7 +92,7 @@ namespace Quote2024.Forms
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
-            this.tpLoader.Controls.Add(this.btnStooqMinuteForm);
+            this.tpLoader.Controls.Add(this.btnYahooWebSocketForm);
             this.tpLoader.Controls.Add(this.btnFinageTradesForm);
             this.tpLoader.Controls.Add(this.btnFinageMinuteForm);
             this.tpLoader.Controls.Add(this.btnOpenTestForm);
@@ -114,16 +114,16 @@ namespace Quote2024.Forms
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
             // 
-            // btnStooqMinuteForm
+            // btnYahooWebSocketForm
             // 
-            this.btnStooqMinuteForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStooqMinuteForm.Location = new System.Drawing.Point(398, 101);
-            this.btnStooqMinuteForm.Name = "btnStooqMinuteForm";
-            this.btnStooqMinuteForm.Size = new System.Drawing.Size(159, 33);
-            this.btnStooqMinuteForm.TabIndex = 78;
-            this.btnStooqMinuteForm.Text = "Open Stooq Minute form";
-            this.btnStooqMinuteForm.UseVisualStyleBackColor = true;
-            this.btnStooqMinuteForm.Click += new System.EventHandler(this.btnStooqMinuteForm_Click);
+            this.btnYahooWebSocketForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnYahooWebSocketForm.Location = new System.Drawing.Point(398, 98);
+            this.btnYahooWebSocketForm.Name = "btnYahooWebSocketForm";
+            this.btnYahooWebSocketForm.Size = new System.Drawing.Size(186, 36);
+            this.btnYahooWebSocketForm.TabIndex = 78;
+            this.btnYahooWebSocketForm.Text = "Open Yahoo WebSocket form";
+            this.btnYahooWebSocketForm.UseVisualStyleBackColor = true;
+            this.btnYahooWebSocketForm.Click += new System.EventHandler(this.btnYahooWebSocketForm_Click);
             // 
             // btnFinageTradesForm
             // 
@@ -398,6 +398,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnOpenTestForm;
         private System.Windows.Forms.Button btnFinageMinuteForm;
         private System.Windows.Forms.Button btnFinageTradesForm;
-        private System.Windows.Forms.Button btnStooqMinuteForm;
+        private System.Windows.Forms.Button btnYahooWebSocketForm;
     }
 }

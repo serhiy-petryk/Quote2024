@@ -1,7 +1,7 @@
 ﻿
 namespace Quote2024.Forms
 {
-    partial class MinuteStooqForm
+    partial class WebSocketYahoo
     {
         /// <summary>
         /// Required designer variable.

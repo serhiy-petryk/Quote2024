@@ -280,9 +280,9 @@ namespace Quote2024.Forms
             form.Show();
         }
 
-        private void btnStooqMinuteForm_Click(object sender, EventArgs e)
+        private void btnYahooWebSocketForm_Click(object sender, EventArgs e)
         {
-            var form = new MinuteStooqForm();
+            var form = new WebSocketYahoo();
             form.Show();
         }
     }

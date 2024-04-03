@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Forms\MinuteStooqForm.cs">
+    <Compile Update="Forms\WebSocketYahoo.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\MinuteFinageForm.cs">
