@@ -16,7 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\MinuteStooqForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\MinuteFinageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\RealTimeYahooForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\TradesFinageForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\TimeSalesNasdaqForm.cs">

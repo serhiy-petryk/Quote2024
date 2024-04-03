@@ -26,7 +26,7 @@ namespace Data.Models
 
         public static void RunFileTest()
         {
-            var lines = File.ReadAllLines(@"E:\Temp\WebSocket_20240306213522.txt");
+            var lines = File.ReadAllLines(@"E:\Temp\WebSocketYahoo_20240306213522.txt");
             foreach (var line in lines)
             {
                 var dt = DateTime.ParseExact(line.Substring(0, 12), "HH:mm:ss.fff", CultureInfo.InvariantCulture);

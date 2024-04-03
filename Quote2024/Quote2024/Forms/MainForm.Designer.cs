@@ -34,6 +34,9 @@ namespace Quote2024.Forms
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnStooqMinuteForm = new System.Windows.Forms.Button();
+            this.btnFinageTradesForm = new System.Windows.Forms.Button();
+            this.btnFinageMinuteForm = new System.Windows.Forms.Button();
             this.btnOpenTestForm = new System.Windows.Forms.Button();
             this.btnOpenTimeSalesNasdaq = new System.Windows.Forms.Button();
             this.btnOpenRealTimeYahoo = new System.Windows.Forms.Button();
@@ -89,6 +92,9 @@ namespace Quote2024.Forms
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnStooqMinuteForm);
+            this.tpLoader.Controls.Add(this.btnFinageTradesForm);
+            this.tpLoader.Controls.Add(this.btnFinageMinuteForm);
             this.tpLoader.Controls.Add(this.btnOpenTestForm);
             this.tpLoader.Controls.Add(this.btnOpenTimeSalesNasdaq);
             this.tpLoader.Controls.Add(this.btnOpenRealTimeYahoo);
@@ -108,6 +114,39 @@ namespace Quote2024.Forms
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
             // 
+            // btnStooqMinuteForm
+            // 
+            this.btnStooqMinuteForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnStooqMinuteForm.Location = new System.Drawing.Point(398, 101);
+            this.btnStooqMinuteForm.Name = "btnStooqMinuteForm";
+            this.btnStooqMinuteForm.Size = new System.Drawing.Size(159, 33);
+            this.btnStooqMinuteForm.TabIndex = 78;
+            this.btnStooqMinuteForm.Text = "Open Stooq Minute form";
+            this.btnStooqMinuteForm.UseVisualStyleBackColor = true;
+            this.btnStooqMinuteForm.Click += new System.EventHandler(this.btnStooqMinuteForm_Click);
+            // 
+            // btnFinageTradesForm
+            // 
+            this.btnFinageTradesForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFinageTradesForm.Location = new System.Drawing.Point(591, 262);
+            this.btnFinageTradesForm.Name = "btnFinageTradesForm";
+            this.btnFinageTradesForm.Size = new System.Drawing.Size(196, 33);
+            this.btnFinageTradesForm.TabIndex = 77;
+            this.btnFinageTradesForm.Text = "Open Finage Trades form";
+            this.btnFinageTradesForm.UseVisualStyleBackColor = true;
+            this.btnFinageTradesForm.Click += new System.EventHandler(this.btnFinageTradesForm_Click);
+            // 
+            // btnFinageMinuteForm
+            // 
+            this.btnFinageMinuteForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFinageMinuteForm.Location = new System.Drawing.Point(591, 223);
+            this.btnFinageMinuteForm.Name = "btnFinageMinuteForm";
+            this.btnFinageMinuteForm.Size = new System.Drawing.Size(196, 33);
+            this.btnFinageMinuteForm.TabIndex = 76;
+            this.btnFinageMinuteForm.Text = "Open Finage Minute form";
+            this.btnFinageMinuteForm.UseVisualStyleBackColor = true;
+            this.btnFinageMinuteForm.Click += new System.EventHandler(this.btnFinageMinuteForm_Click);
+            // 
             // btnOpenTestForm
             // 
             this.btnOpenTestForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -122,7 +161,7 @@ namespace Quote2024.Forms
             // btnOpenTimeSalesNasdaq
             // 
             this.btnOpenTimeSalesNasdaq.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenTimeSalesNasdaq.Location = new System.Drawing.Point(589, 240);
+            this.btnOpenTimeSalesNasdaq.Location = new System.Drawing.Point(591, 184);
             this.btnOpenTimeSalesNasdaq.Name = "btnOpenTimeSalesNasdaq";
             this.btnOpenTimeSalesNasdaq.Size = new System.Drawing.Size(196, 33);
             this.btnOpenTimeSalesNasdaq.TabIndex = 74;
@@ -133,7 +172,7 @@ namespace Quote2024.Forms
             // btnOpenRealTimeYahoo
             // 
             this.btnOpenRealTimeYahoo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenRealTimeYahoo.Location = new System.Drawing.Point(589, 201);
+            this.btnOpenRealTimeYahoo.Location = new System.Drawing.Point(591, 145);
             this.btnOpenRealTimeYahoo.Name = "btnOpenRealTimeYahoo";
             this.btnOpenRealTimeYahoo.Size = new System.Drawing.Size(198, 33);
             this.btnOpenRealTimeYahoo.TabIndex = 73;
@@ -144,9 +183,9 @@ namespace Quote2024.Forms
             // btnOpenWebSocket
             // 
             this.btnOpenWebSocket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenWebSocket.Location = new System.Drawing.Point(591, 152);
+            this.btnOpenWebSocket.Location = new System.Drawing.Point(398, 279);
             this.btnOpenWebSocket.Name = "btnOpenWebSocket";
-            this.btnOpenWebSocket.Size = new System.Drawing.Size(199, 33);
+            this.btnOpenWebSocket.Size = new System.Drawing.Size(171, 33);
             this.btnOpenWebSocket.TabIndex = 72;
             this.btnOpenWebSocket.Text = "Open WebSocketClient form";
             this.btnOpenWebSocket.UseVisualStyleBackColor = true;
@@ -357,5 +396,8 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnOpenRealTimeYahoo;
         private System.Windows.Forms.Button btnOpenTimeSalesNasdaq;
         private System.Windows.Forms.Button btnOpenTestForm;
+        private System.Windows.Forms.Button btnFinageMinuteForm;
+        private System.Windows.Forms.Button btnFinageTradesForm;
+        private System.Windows.Forms.Button btnStooqMinuteForm;
     }
 }

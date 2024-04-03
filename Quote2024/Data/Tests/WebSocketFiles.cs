@@ -50,32 +50,75 @@ namespace Data.Tests
         {
             // Result for Yahoo: 1% of item have >2 min delay, 10% of item have >22 seconds delay; average delay: 7-12 seconds (96-98 symbols)
             var diffValues = new Dictionary<double, int>();
-            var files = Directory.GetFiles(folder, "*Yahoo*.txt");
+            var files = Directory.GetFiles(folder, "WebSocketYahoo_20240403161314.txt");
+            var marketHoursTypes = new Dictionary<PricingData.MarketHoursType, int>();
+            var optionTypes = new Dictionary<PricingData.OptionType, int>();
+            var cnt = 0;
+            var allData = new List<PricingData>();
+            var dataByMinutes = new Dictionary<string, Dictionary<DateTime, (float, float, long, int)>>();
             foreach (var file in files)
             {
                 var lines = File.ReadAllLines(file);
-                // File creation time can be late for part of second (need to add 'AddSeconds(-10)' method)
-                var fileDate = File.GetCreationTime(file).AddSeconds(-10).Date;
-                var fileTime = File.GetCreationTime(file).AddSeconds(-10).TimeOfDay;
+                var ss = Path.GetFileNameWithoutExtension(file).Split('_');
+                var fileDateTime = DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                var fileDate = fileDateTime.Date;
+                var fileTime = fileDate.TimeOfDay;
+
+                var a1 = new DateTimeOffset(fileDateTime.ToUniversalTime(), TimeSpan.Zero).ToUnixTimeMilliseconds();
+                var estFileDateTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(a1);
+                var estTimeOffset = fileDateTime - estFileDateTime;
+
                 var delayTotal = 0.0;
                 var itemCount = 0;
                 var symbols = new Dictionary<string, int>();
                 foreach (var line in lines)
                 {
-                    itemCount++;
+                    cnt++;
                     var data = PricingData.GetPricingData(line.Substring(13));
-                    var etcDataDate = TimeHelper.GetEstDateTimeFromUnixMilliseconds(data.time/2);
+                    if (!marketHoursTypes.ContainsKey(data.marketHours))
+                        marketHoursTypes.Add(data.marketHours, 0);
+                    marketHoursTypes[data.marketHours]++;
 
-                    var timeSpan = TimeSpan.ParseExact(line.Substring(0, 12), @"hh\:mm\:ss\.FFF", CultureInfo.InvariantCulture);
-                    var recordDate = fileDate.Add(timeSpan);
-                    if (timeSpan < fileTime)
-                        recordDate = recordDate.AddDays(1);
-                    var etcRecordDate = TimeZoneInfo.ConvertTimeFromUtc(recordDate.ToUniversalTime(), TimeHelper.EstTimeZone);
+                    if (data.marketHours != PricingData.MarketHoursType.REGULAR_MARKET) continue;
 
+                    itemCount++;
+                    allData.Add(data);
+
+                    if (!dataByMinutes.ContainsKey(data.id))
+                        dataByMinutes.Add(data.id, new Dictionary<DateTime, (float, float, long, int)>());
+                    var minuteData = dataByMinutes[data.id];
+                    var dataUnixMinuteMilliseconds = (data.time/120000) * 60000; // rounded to 1 minute
+                    var dataMinuteKey = TimeHelper.GetEstDateTimeFromUnixMilliseconds(dataUnixMinuteMilliseconds);
+                    if (!minuteData.ContainsKey(dataMinuteKey))
+                    {
+                        minuteData.Add(dataMinuteKey, (data.price, data.price, data.lastSize,1));
+                    }
+                    else
+                    {
+                        var minPrice = Math.Min(minuteData[dataMinuteKey].Item1, data.price);
+                        var maxPrice = Math.Max(minuteData[dataMinuteKey].Item2, data.price);
+                        var volume = minuteData[dataMinuteKey].Item3 + data.lastSize;
+                        var count = minuteData[dataMinuteKey].Item4 + 1;
+                        minuteData[dataMinuteKey] = (minPrice, maxPrice, volume, count);
+                    }
+
+                    if (!optionTypes.ContainsKey(data.optionsType))
+                        optionTypes.Add(data.optionsType, 0);
+                    optionTypes[data.optionsType]++;
+
+                    var etcDataDate = TimeHelper.GetEstDateTimeFromUnixMilliseconds(data.time / 2);
+                    var recordTime = TimeSpan.ParseExact(line.Substring(0, 12), @"hh\:mm\:ss\.FFF", CultureInfo.InvariantCulture);
+                    var recordDate = ((recordTime < fileTime ? fileDate.AddDays(1) : fileDate) + recordTime);
+                    var etcRecordDate = recordDate.Subtract(estTimeOffset);
+
+                    if (etcRecordDate < etcDataDate)
+                    {
+                        throw new Exception("Please, check");
+                    }
                     var difference = etcRecordDate - etcDataDate;
                     delayTotal += difference.TotalSeconds;
                     var diffValue = Math.Round(difference.TotalSeconds, 0);
-                    if (diffValue >1000)
+                    if (diffValue > 30)
                     {
 
                     }
@@ -86,10 +129,10 @@ namespace Data.Tests
                     if (!symbols.ContainsKey(data.id))
                         symbols.Add(data.id, 0);
                 }
-                Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{delayTotal/itemCount}\t{symbols.Count}");
+                Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{delayTotal / itemCount}\t{symbols.Count}");
             }
 
-            foreach (var key in diffValues.Keys.OrderBy(a=>a))
+            foreach (var key in diffValues.Keys.OrderBy(a => a))
                 Debug.Print($"{key}\t{diffValues[key]}");
         }
 
