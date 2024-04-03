@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.WebSockets;
@@ -10,7 +11,9 @@ namespace WebSocketClientApp
     public partial class MainForm : Form
     {
         private Websocket.Client.WebsocketClient _client;
-        private static string _lastSendMessage;
+        private string _lastSendMessage;
+        private List<string> _fileLogBuffer;
+        private object _fileLocker = new object();
 
         public MainForm()
         {
@@ -23,6 +26,7 @@ namespace WebSocketClientApp
         private void InitClient(string host)
         {
             _client?.Dispose();
+            _fileLogBuffer = new List<string>();
 
             _client = new WebsocketClient(new Uri(host));
 
@@ -54,7 +58,18 @@ namespace WebSocketClientApp
             {
                 var messText = $"{DateTime.Now:HH:mm:ss.fff},{msg}";
                 if (cbSaveLogToFile.Checked && !string.IsNullOrWhiteSpace(txtLogFileName.Text))
-                    File.AppendAllText(txtLogFileName.Text, messText + Environment.NewLine);
+                {
+                    lock (_fileLocker)
+                    {
+                        _fileLogBuffer.Add(messText);
+                        if (_fileLogBuffer.Count > 5000)
+                        {
+                            var buffer = _fileLogBuffer;
+                            _fileLogBuffer = new List<string>();
+                            File.AppendAllLinesAsync(txtLogFileName.Text, buffer);
+                        }
+                    }
+                }
                 if (cbLogMessages.Checked)
                     SaveLog(messText);
             });
@@ -77,10 +92,7 @@ namespace WebSocketClientApp
         }
 
         private void DisconnectButton_Click(object sender, EventArgs e)  {
-            _client?.Stop(WebSocketCloseStatus.Empty, String.Empty);
-            _client.Dispose();
-            _client = null;
-
+            StopSocket();
             UpdateUI();
         }
 
@@ -98,7 +110,7 @@ namespace WebSocketClientApp
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            _client?.Dispose();
+            StopSocket();
         }
 
         private void ClearLogButton_Click(object sender, EventArgs e) => listBox1.Items.Clear();
@@ -108,6 +120,15 @@ namespace WebSocketClientApp
             ConnectButton.Enabled = _client == null;
             DisconnectButton.Enabled = _client != null;
             SendButton.Enabled = _client != null;
+        }
+
+        private void StopSocket()
+        {
+            _client?.Stop(WebSocketCloseStatus.Empty, String.Empty);
+            _client.Dispose();
+            _client = null;
+            File.AppendAllLines(txtLogFileName.Text, _fileLogBuffer);
+            _fileLogBuffer = null;
         }
 
         private void button1_Click(object sender, EventArgs e)

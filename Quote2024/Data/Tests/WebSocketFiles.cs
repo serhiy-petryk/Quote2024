@@ -48,21 +48,22 @@ namespace Data.Tests
 
         public static void YahooDelayRun()
         {
-            // Result for Yahoo: 1% of item have >2 min delay, 10% of item have >22 seconds delay; average delay: 7-12 seconds (96-98 symbols)
-            var diffValues = new Dictionary<double, int>();
-            var files = Directory.GetFiles(folder, "WebSocketYahoo_20240403161314.txt");
-            var marketHoursTypes = new Dictionary<PricingData.MarketHoursType, int>();
-            var optionTypes = new Dictionary<PricingData.OptionType, int>();
+            // Result for Yahoo: 0.6% of item have > 10 seconds delay; average delay: 2 seconds (9 biggest (by TradeValue) symbols)
+            var files = Directory.GetFiles(folder, "WebSocketYahoo_*.txt");
             var cnt = 0;
-            var allData = new List<PricingData>();
-            var dataByMinutes = new Dictionary<string, Dictionary<DateTime, (float, float, long, int)>>();
             foreach (var file in files)
             {
+                var diffValues = new Dictionary<double, int>();
+                var marketHoursTypes = new Dictionary<PricingData.MarketHoursType, int>();
+                var optionTypes = new Dictionary<PricingData.OptionType, int>();
+                // var allData = new List<PricingData>();
+                var dataByMinutes = new Dictionary<string, Dictionary<DateTime, (float, float, long, int)>>();
+
                 var lines = File.ReadAllLines(file);
                 var ss = Path.GetFileNameWithoutExtension(file).Split('_');
                 var fileDateTime = DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
                 var fileDate = fileDateTime.Date;
-                var fileTime = fileDate.TimeOfDay;
+                var fileTime = fileDateTime.TimeOfDay;
 
                 var a1 = new DateTimeOffset(fileDateTime.ToUniversalTime(), TimeSpan.Zero).ToUnixTimeMilliseconds();
                 var estFileDateTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(a1);
@@ -82,7 +83,7 @@ namespace Data.Tests
                     if (data.marketHours != PricingData.MarketHoursType.REGULAR_MARKET) continue;
 
                     itemCount++;
-                    allData.Add(data);
+                    // allData.Add(data);
 
                     if (!dataByMinutes.ContainsKey(data.id))
                         dataByMinutes.Add(data.id, new Dictionary<DateTime, (float, float, long, int)>());
@@ -111,17 +112,17 @@ namespace Data.Tests
                     var recordDate = ((recordTime < fileTime ? fileDate.AddDays(1) : fileDate) + recordTime);
                     var etcRecordDate = recordDate.Subtract(estTimeOffset);
 
+                    if (etcRecordDate < etcDataDate.AddMilliseconds(-1000))
+                    {
+                        // throw new Exception("Please, check");
+                    }
                     if (etcRecordDate < etcDataDate)
                     {
-                        throw new Exception("Please, check");
+                        Debug.Print($"Bad record date\t{Path.GetFileName(file)}. Ticker: {data.id}. Time: {etcRecordDate.TimeOfDay}. Difference: \t{(etcDataDate-etcRecordDate).TotalMilliseconds}");
                     }
                     var difference = etcRecordDate - etcDataDate;
                     delayTotal += difference.TotalSeconds;
                     var diffValue = Math.Round(difference.TotalSeconds, 0);
-                    if (diffValue > 30)
-                    {
-
-                    }
                     if (!diffValues.ContainsKey(diffValue))
                         diffValues.Add(diffValue, 0);
                     diffValues[diffValue]++;
@@ -130,10 +131,9 @@ namespace Data.Tests
                         symbols.Add(data.id, 0);
                 }
                 Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{delayTotal / itemCount}\t{symbols.Count}");
+                foreach (var key in diffValues.Keys.OrderBy(a => a))
+                    Debug.Print($"Delay:\t{key}\t{diffValues[key]}");
             }
-
-            foreach (var key in diffValues.Keys.OrderBy(a => a))
-                Debug.Print($"{key}\t{diffValues[key]}");
         }
 
         public static void YahooTimeRangesRun()
