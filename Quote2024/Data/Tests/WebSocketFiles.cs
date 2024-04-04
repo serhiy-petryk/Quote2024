@@ -46,6 +46,58 @@ namespace Data.Tests
                 Debug.Print($"{ev.Key}\t{ev.Value}");
         }
 
+        public static void YahooCheckSequence()
+        {
+            // Result is ~ 0.05% bad rows. Average time difference is ~ 2.0-3.5 secs
+            var files = Directory.GetFiles(folder, "WebSocketYahoo_*.txt");
+            var cnt = 0;
+            foreach (var file in files)
+            {
+                var lines = File.ReadAllLines(file);
+                var ss = Path.GetFileNameWithoutExtension(file).Split('_');
+                var fileDateTime = DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                var fileDate = fileDateTime.Date;
+                var fileTime = fileDateTime.TimeOfDay;
+
+                var a1 = new DateTimeOffset(fileDateTime.ToUniversalTime(), TimeSpan.Zero).ToUnixTimeMilliseconds();
+                var estFileDateTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(a1);
+                var estTimeOffset = fileDateTime - estFileDateTime;
+
+                var sequences = new Dictionary<string, long>();
+                var allCount = 0;
+                var badCount = 0;
+                var totalDifference = 0.0;
+                foreach (var line in lines)
+                {
+                    cnt++;
+                    var data = PricingData.GetPricingData(line.Substring(13));
+                    if (data.marketHours != PricingData.MarketHoursType.REGULAR_MARKET) continue;
+
+                    allCount++;
+                    if (!sequences.ContainsKey(data.id))
+                        sequences.Add(data.id, data.time);
+                    else
+                    {
+                        if (data.time < sequences[data.id])
+                        {
+                            // var a2 = sequences[data.id] - data.time;
+                            var date1 = TimeHelper.GetEstDateTimeFromUnixMilliseconds(data.time / 2);
+                            var date2 = TimeHelper.GetEstDateTimeFromUnixMilliseconds(sequences[data.id] / 2);
+                            badCount++;
+                            totalDifference += (date2 - date1).TotalMilliseconds;
+                        }
+                        else
+                            sequences[data.id] = data.time;
+                    }
+                }
+
+                if (badCount == 0)
+                    Debug.Print($"{Path.GetFileName(file)}\t{allCount}\t{badCount}");
+                else
+                    Debug.Print($"{Path.GetFileName(file)}\t{allCount}\t{badCount}\t{Convert.ToInt32(totalDifference / badCount)}");
+            }
+        }
+
         public static void YahooDelayRun()
         {
             // Result for Yahoo: 0.6% of item have > 10 seconds delay; average delay: 2 seconds (9 biggest (by TradeValue) symbols)
