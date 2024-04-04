@@ -24,7 +24,6 @@ namespace Data.Helpers
         public YahooSocket(string logFileName, IList<string> tickers, Action<string> onDisconnect)
         {
             _logFileName = logFileName;
-            // _tickers = tickers.ToArray();
             if (tickers != null && tickers.Count > 0)
             {
                 _clientMessage = "{\"subscribe\":[\"" + string.Join("\",\"", tickers) + "\"]}";
