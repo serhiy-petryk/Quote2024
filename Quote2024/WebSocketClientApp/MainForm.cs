@@ -10,10 +10,10 @@ namespace WebSocketClientApp
 {
     public partial class MainForm : Form
     {
-        private Websocket.Client.WebsocketClient _client;
+        private WebsocketClient _client;
         private string _lastSendMessage;
         private List<string> _fileLogBuffer;
-        private object _fileLocker = new object();
+        private readonly object _fileLocker = new object();
 
         public MainForm()
         {
@@ -30,7 +30,7 @@ namespace WebSocketClientApp
 
             _client = new WebsocketClient(new Uri(host));
 
-            _client.ReconnectTimeout = TimeSpan.FromSeconds(10);
+            _client.ReconnectTimeout = TimeSpan.FromSeconds(3);
             _client.ReconnectionHappened.Subscribe(info =>
             {
                 if (info.Type == ReconnectionType.Initial)
@@ -38,14 +38,14 @@ namespace WebSocketClientApp
                 else if (info.Type == ReconnectionType.Lost || info.Type== ReconnectionType.NoMessageReceived)
                     SendMessage(_lastSendMessage);
 
-                SaveLog("Reconnection happened, type: " + info.Type);
+                SaveLog($"{DateTime.Now.TimeOfDay} Reconnection happened, type {info.Type}");
             });
 
             _client.DisconnectionHappened.Subscribe(info =>
             {
                 //if (info.Type != DisconnectionType.Exit && info.Type!= DisconnectionType.ByUser)
-                  //  _client.Reconnect();
-                SaveLog("Disconnection happened, type: " + info.Type);
+                //  _client.Reconnect();
+                SaveLog($"{DateTime.Now.TimeOfDay} Disconnection happened, type {info.Type}");
                 if (info.Type == DisconnectionType.NoMessageReceived && _lastSendMessage != null)
                 {
                     Debug.Print("Resend message");
@@ -125,9 +125,10 @@ namespace WebSocketClientApp
         private void StopSocket()
         {
             _client?.Stop(WebSocketCloseStatus.Empty, String.Empty);
-            _client.Dispose();
+            _client?.Dispose();
             _client = null;
-            File.AppendAllLines(txtLogFileName.Text, _fileLogBuffer);
+            if (_fileLogBuffer != null && _fileLogBuffer.Count > 0)
+                File.AppendAllLines(txtLogFileName.Text, _fileLogBuffer);
             _fileLogBuffer = null;
         }
 
