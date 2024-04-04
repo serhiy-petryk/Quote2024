@@ -49,6 +49,7 @@ namespace Quote2024.Forms
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.txtTickerList = new System.Windows.Forms.TextBox();
             this.lblTickerList = new System.Windows.Forms.Label();
+            this.btnFlush = new System.Windows.Forms.Button();
             this.lblTickCount = new System.Windows.Forms.Label();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
@@ -339,6 +340,7 @@ namespace Quote2024.Forms
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.btnFlush);
             this.splitContainer2.Panel2.Controls.Add(this.lblTickCount);
             this.splitContainer2.Panel2.Controls.Add(this.btnStop);
             this.splitContainer2.Panel2.Controls.Add(this.btnStart);
@@ -372,11 +374,21 @@ namespace Quote2024.Forms
             this.lblTickerList.TabIndex = 0;
             this.lblTickerList.Text = "Tickers (divided by space or tab):";
             // 
+            // btnFlush
+            // 
+            this.btnFlush.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFlush.Location = new System.Drawing.Point(12, 155);
+            this.btnFlush.Name = "btnFlush";
+            this.btnFlush.Size = new System.Drawing.Size(75, 42);
+            this.btnFlush.TabIndex = 3;
+            this.btnFlush.Text = "Flush";
+            this.btnFlush.UseVisualStyleBackColor = true;
+            this.btnFlush.Click += new System.EventHandler(this.btnFlush_Click);
+            // 
             // lblTickCount
             // 
-            this.lblTickCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTickCount.AutoSize = true;
-            this.lblTickCount.Location = new System.Drawing.Point(-2, 9);
+            this.lblTickCount.Location = new System.Drawing.Point(-4, 9);
             this.lblTickCount.Name = "lblTickCount";
             this.lblTickCount.Size = new System.Drawing.Size(75, 15);
             this.lblTickCount.TabIndex = 2;
@@ -385,7 +397,7 @@ namespace Quote2024.Forms
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStop.Location = new System.Drawing.Point(12, 82);
+            this.btnStop.Location = new System.Drawing.Point(9, 82);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 42);
             this.btnStop.TabIndex = 1;
@@ -396,7 +408,7 @@ namespace Quote2024.Forms
             // btnStart
             // 
             this.btnStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStart.Location = new System.Drawing.Point(12, 34);
+            this.btnStart.Location = new System.Drawing.Point(9, 34);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 42);
             this.btnStart.TabIndex = 0;
@@ -404,15 +416,15 @@ namespace Quote2024.Forms
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
-            // MinuteStooqForm
+            // WebSocketYahooForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(709, 375);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
-            this.Name = "MinuteStooqForm";
-            this.Text = "MinuteStooq Form";
+            this.Name = "WebSocketYahooForm";
+            this.Text = "YahooStreamer Form";
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -462,5 +474,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Label lblTickCount;
+        private System.Windows.Forms.Button btnFlush;
     }
 }

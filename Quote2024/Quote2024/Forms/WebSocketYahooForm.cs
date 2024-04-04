@@ -10,53 +10,34 @@ using Data;
 using Data.Actions.Yahoo;
 using Data.Helpers;
 using Data.RealTime;
-using Data.RealTime.Stooq;
 
 namespace Quote2024.Forms
 {
     public partial class WebSocketYahooForm: Form
     {
-        private readonly System.Timers.Timer _timer = new System.Timers.Timer();
-
-        private Dictionary<string, byte[]> _validTickers;
-        private Dictionary<string, Exception> _invalidTickers;
-
-        private string[] Tickers => txtTickerList.Text.Split(new []{"\t", " ", "\n"}, StringSplitOptions.RemoveEmptyEntries).Where(a => !string.IsNullOrWhiteSpace(a))
+        private string[] Tickers => txtTickerList.Text.Split(new[] { "\t", " ", "\n" }, StringSplitOptions.RemoveEmptyEntries).Where(a => !string.IsNullOrWhiteSpace(a))
             .Select(a => a.Trim()).ToArray();
 
-        private readonly string _baseFolder = @"E:\Quote\WebData\RealTime\StooqMinute\Data";
-        private string _dataFolder;
+        private readonly string _dataFolder = Path.Combine(@"E:\Quote\WebData\RealTime\YahooSocket\Data",
+            TimeHelper.GetCurrentEstDateTime().ToString("yyyy-MM-dd"));
 
-        private int _tickCount;
-        private int TickCount
+        private YahooSocket[] _sockets;
+
+        private int _disconnectionCount;
+        private int DisconnectionCount
         {
-            get => _tickCount;
+            get => _disconnectionCount;
             set
             {
-                _tickCount = value;
-                this.BeginInvoke((Action)(UpdateTickLabel));
-            }
-        }
-
-        private int _errorCount;
-        private int ErrorCount
-        {
-            get => _errorCount;
-            set
-            {
-                _errorCount = value;
+                _disconnectionCount = value;
                 this.BeginInvoke((Action)(UpdateTickLabel));
             }
         }
 
         private void UpdateTickLabel()
         {
-            lblTickCount.ForeColor = ErrorCount == 0 ? Color.Black : Color.DarkRed;
-            var text = $@"Ticks: {TickCount:N0}";
-            if (ErrorCount != 0)
-                text += $@". Errors: {ErrorCount:N0}";
-            if (_invalidTickers != null && _invalidTickers.Count != 0)
-                text += $@". Invalid tickers: {_invalidTickers.Count:N0}";
+            lblTickCount.ForeColor = DisconnectionCount == 0 ? Color.Black : Color.DarkRed;
+            var text = $@"Disconnections: {DisconnectionCount:N0}";
 
             lblTickCount.Text = text;
         }
@@ -65,51 +46,70 @@ namespace Quote2024.Forms
         {
             InitializeComponent();
 
-            _timer.Interval = 61000;
-            _timer.Elapsed += _timer_Elapsed;
             lblTickCount.Text = lblStatus.Text = "";
             RefreshUI();
+            btnUpdateList_Click(null, null);
+        }
+
+        private Dictionary<string, List<string>> GetSplittedTickers()
+        {
+            var indexTickers = new List<string>();
+            var tickers = new List<string>();
+            var splittedTickers = new Dictionary<string, List<string>>() { {Path.Combine(_dataFolder, "YWS_0_{0}.txt"), indexTickers} };
+            foreach (var ticker in Tickers)
+            {
+                if (ticker.StartsWith('^'))
+                {
+                    indexTickers.Add(ticker);
+                    continue;
+                }
+                tickers.Add(ticker);
+                if (tickers.Count >= splittedTickers.Count)
+                {
+                    splittedTickers.Add(Path.Combine(_dataFolder, $"YSocket_{splittedTickers.Count}_{{0}}.txt"), tickers);
+                    tickers = new List<string>();
+                }
+            }
+            if (tickers.Count > 0)
+                splittedTickers.Add(Path.Combine(_dataFolder, $"YSocket_{splittedTickers.Count}_{{0}}.txt"), tickers);
+
+            return splittedTickers;
         }
 
         private async void btnStart_Click(object sender, EventArgs e)
         {
-            TickCount = 0;
-            ErrorCount = 0;
+            DisconnectionCount = 0;
             btnStart.Enabled = false;
 
-            Debug.Print($"StooqMinute RealTime started: {DateTime.Now.TimeOfDay}");
+            Logger.AddMessage($"Initializing YahooSockets: {DateTime.Now.TimeOfDay:hh\\:mm\\:ss}", ShowStatus);
 
-            var methodStarted = DateTime.Now;
-            var tickers = await Data.RealTime.Stooq.MinuteStooqRealTime.CheckTickers(ShowStatus, Tickers.Take(1));
-            _validTickers = tickers.Item1;
-            _invalidTickers = tickers.Item2;
+            var dateTimeKey = DateTime.Now.ToString("yyyyMMddHHmmss");
+            _sockets = GetSplittedTickers()
+                .Select(a => new YahooSocket(string.Format(a.Key, dateTimeKey), a.Value, OnDisconnect)).ToArray();
 
-            if (tickers.Item2.Count > 0)
-            {
-                if (MessageBox.Show($@"There are some invalid tickers: {string.Join(", ", tickers.Item2.Keys)}. Continue?",
-                        null, MessageBoxButtons.OKCancel) == DialogResult.Cancel)
-                    return;
-            }
-
-            if (tickers.Item1.Count == 0)
-            {
-                MessageBox.Show(@"No valid tickers", null, MessageBoxButtons.OK);
-                return;
-            }
-
-            _dataFolder = Path.Combine(_baseFolder, TimeHelper.GetCurrentEstDateTime().ToString("yyyy-MM-dd"));
             if (!Directory.Exists(_dataFolder))
                 Directory.CreateDirectory(_dataFolder);
 
-            MinuteStooqRealTime.SaveResult(tickers.Item1, _dataFolder, methodStarted);
+            foreach (var socket in _sockets.Skip(2).Take(1))
+            {
+                socket.Start();
+                await Task.Delay(50);
+            }
 
-            // _timer.Start();
+            Logger.AddMessage($"YahooSockets were initialized: {DateTime.Now.TimeOfDay:hh\\:mm\\:ss}", ShowStatus);
             RefreshUI();
+        }
+
+        private void OnDisconnect(string message)
+        {
+
+            Logger.AddMessage($"Last disconnection: {message}", ShowStatus);
+            DisconnectionCount++;
         }
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            _timer.Stop();
+            Stop();
             RefreshUI();
         }
 
@@ -119,37 +119,27 @@ namespace Quote2024.Forms
                 Invoke(new MethodInvoker(RefreshUI));
             else
             {
-                btnStart.Enabled = !_timer.Enabled;
-                btnStop.Enabled = _timer.Enabled;
+                btnStart.Enabled = _sockets == null;
+                btnStop.Enabled = _sockets != null;
+                btnFlush.Enabled = btnStop.Enabled;
             }
         }
 
-        private async void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void Stop()
         {
-            TickCount++;
-            var nyTime = TimeHelper.GetCurrentEstDateTime();
-            if (nyTime.AddMinutes(-15).TimeOfDay > Settings.MarketEndCommon)
+            if (_sockets != null)
             {
-                btnStop_Click(sender, EventArgs.Empty);
-                return;
+                foreach (var socket in _sockets)
+                    socket.Dispose();
+                _sockets = null;
             }
-            else if (nyTime.AddMinutes(5).TimeOfDay > Settings.MarketStart)
-            {
-                await MinuteFinageRealTime.Run(ShowStatus, Tickers, _dataFolder, OnError);
-            }
-        }
-
-        private void OnError(string arg1, Exception arg2)
-        {
-            ErrorCount++;
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e);
+            Stop();
 
-            _timer.Elapsed -= _timer_Elapsed;
-            _timer.Dispose();
+            base.OnClosed(e);
         }
 
         private void txtTickerList_TextChanged(object sender, EventArgs e) => lblTickerList.Text = $@"Tickers (divided by space or tab): {Tickers.Length} items";
@@ -157,6 +147,7 @@ namespace Quote2024.Forms
         private async void btnUpdateList_Click(object sender, EventArgs e)
         {
             btnUpdateList.Enabled = false;
+            btnStart.Enabled = false;
             txtTickerList.Text = "";
             await Task.Factory.StartNew((() =>
             {
@@ -169,15 +160,24 @@ namespace Quote2024.Forms
                 {
                     var tickerList = new List<string>();
                     if (cbIncludeIndices.Checked)
-                        tickerList.AddRange(new[] { "^DJI", "^SPX" });
-                    tickerList.AddRange(tickers.Select(YahooCommon.GetYahooTickerFromPolygonTicker).OrderBy(a => a));
+                        tickerList.AddRange(new[] { "^DJI", "^GSPC" });
+                    tickerList.AddRange(tickers.Select(YahooCommon.GetYahooTickerFromPolygonTicker));
                     txtTickerList.Text = string.Join('\t', tickerList);
                     btnUpdateList.Enabled = true;
+                    RefreshUI();
                 }));
             }));
         }
 
         private void ShowStatus(string message) => lblStatus.Text = message;
 
+        private void btnFlush_Click(object sender, EventArgs e)
+        {
+            if (_sockets != null)
+            {
+                foreach(var socket in _sockets)
+                    socket.Flush();
+            }
+        }
     }
 }

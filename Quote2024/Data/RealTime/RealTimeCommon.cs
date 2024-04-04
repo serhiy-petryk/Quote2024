@@ -55,7 +55,10 @@ namespace Data.RealTime
                 }
             }
 
-            var tickers = data.GroupBy(a => a.TT).Where(a => a.Count() == tradingDays).Select(a => a.Key).ToList();
+            // Order by TradeCount DESC -> for YahooStreamer
+
+            var tickers = data.GroupBy(a => a.TT).Where(a => a.Count() == tradingDays)
+                .OrderByDescending(a => a.ToArray().Average(a1 => a1.TradeCount)).Select(a => a.Key).ToList();
 
             return tickers;
         }
