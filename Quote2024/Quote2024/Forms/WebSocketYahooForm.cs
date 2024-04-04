@@ -90,7 +90,7 @@ namespace Quote2024.Forms
             if (!Directory.Exists(_dataFolder))
                 Directory.CreateDirectory(_dataFolder);
 
-            foreach (var socket in _sockets.Skip(2).Take(1))
+            foreach (var socket in _sockets)
             {
                 socket.Start();
                 await Task.Delay(50);
