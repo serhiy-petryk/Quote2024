@@ -92,8 +92,8 @@ namespace Quote2024.Forms
             Logger.AddMessage($"Initializing YahooSockets: {DateTime.Now.TimeOfDay:hh\\:mm\\:ss}", ShowStatus);
 
             var dateTimeKey = DateTime.Now.ToString("yyyyMMddHHmmss");
-            _sockets = GetSplittedTickersByOneTicker()
-                .Select(a => new YahooSocket(string.Format(a.Key, dateTimeKey), a.Value, OnDisconnect)).ToArray();
+            _sockets = GetSplittedTickersByOneTicker().Select(a =>
+                new YahooSocket(a.Key, string.Format(a.Key, dateTimeKey), a.Value, OnDisconnect)).ToArray();
 
             if (!Directory.Exists(_dataFolder))
                 Directory.CreateDirectory(_dataFolder);

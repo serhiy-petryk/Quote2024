@@ -12,7 +12,7 @@ namespace Data.Tests
     public class WebSocketFiles
     {
         private const string folderOld = @"E:\Quote\WebData\RealTime\WebSockets";
-        private const string folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-04";
+        private const string folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-05";
         public static void DecodePolygonRun()
         {
             // Result for Yahoo: min - 7 minutes 8 seconds
@@ -102,12 +102,13 @@ namespace Data.Tests
         public static void YahooDelayRun()
         {
             // Result for Yahoo: 0.6% of item have > 10 seconds delay; average delay: 2 seconds (9 biggest (by TradeValue) symbols)
-            var files = Directory.GetFiles(folder, "YSocket_*.txt")
-                .OrderBy(a => int.Parse(Path.GetFileNameWithoutExtension(a).Split('_')[1])).ToArray();
+            //var files = Directory.GetFiles(folder, "YSocket_*.txt")
+              //  .OrderBy(a => int.Parse(Path.GetFileNameWithoutExtension(a).Split('_')[1])).ToArray();
+            var files = Directory.GetFiles(folder, "YSocket_*.txt").OrderBy(a => a).ToArray();
             var cnt = 0;
             foreach (var file in files)
             {
-                var diffValues = new Dictionary<double, int>();
+                var diffValues = new Dictionary<int, int>();
                 var marketHoursTypes = new Dictionary<PricingData.MarketHoursType, int>();
                 var optionTypes = new Dictionary<PricingData.OptionType, int>();
                 // var allData = new List<PricingData>();
@@ -128,7 +129,7 @@ namespace Data.Tests
                 var symbols = new Dictionary<string, int>();
                 var badRecordDayCount = 0;
                 var maxBadRecordMilliseconds = 0;
-                foreach (var line in lines)
+                foreach (var line in lines.Where(a=>a.EndsWith("=")))
                 {
                     cnt++;
                     var data = PricingData.GetPricingData(line.Substring(13));
@@ -185,7 +186,7 @@ namespace Data.Tests
                     }
                     var difference = etcRecordDate - etcDataDate;
                     delayTotal += difference.TotalSeconds;
-                    var diffValue = Math.Round(difference.TotalSeconds, 0);
+                    var diffValue = Convert.ToInt32(Math.Round(difference.TotalSeconds, 0));
                     if (!diffValues.ContainsKey(diffValue))
                         diffValues.Add(diffValue, 0);
                     diffValues[diffValue]++;
@@ -193,9 +194,12 @@ namespace Data.Tests
                     if (!symbols.ContainsKey(data.id))
                         symbols.Add(data.id, 0);
                 }
-                Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{delayTotal / itemCount}\t{symbols.Count}\t{badRecordDayCount}\t{maxBadRecordMilliseconds}");
-                foreach (var key in diffValues.Keys.OrderBy(a => a))
-                    Debug.Print($"Delay:\t{key}\t{diffValues[key]}");
+
+                var minDelay = diffValues.Keys.Min();
+                var maxDelay = diffValues.Keys.Max();
+                Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{Math.Round(delayTotal / itemCount, 1)}\t{symbols.Count}\t{badRecordDayCount}\t{maxBadRecordMilliseconds}\t{minDelay}\t{maxDelay}");
+                // foreach (var key in diffValues.Keys.OrderBy(a => a))
+                //  Debug.Print($"Delay:\t{key}\t{diffValues[key]}");
             }
         }
 

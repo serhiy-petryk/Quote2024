@@ -21,8 +21,13 @@ namespace Data.Helpers
 
         private List<string> _fileLogBuffer;
 
-        public YahooSocket(string logFileName, IList<string> tickers, Action<string> onDisconnect)
+        public readonly string Id;
+        public int MessageCount;
+        public List<string> Log;
+
+        public YahooSocket(string id, string logFileName, IList<string> tickers, Action<string> onDisconnect)
         {
+            Id = id;
             _logFileName = logFileName;
             if (tickers != null && tickers.Count > 0)
             {
@@ -42,6 +47,8 @@ namespace Data.Helpers
 
             _client = new WebsocketClient(new Uri(Host));
 
+            MessageCount = 0;
+            Log = new List<string>();
             _client.ReconnectTimeout = TimeSpan.FromSeconds(300);
             _client.ReconnectionHappened.Subscribe(info =>
             {
@@ -61,21 +68,18 @@ namespace Data.Helpers
 
             _client.MessageReceived.Subscribe(msg =>
             {
+                MessageCount++;
                 var messText = $"{DateTime.Now:HH:mm:ss.fff},{msg}";
-                List<string> buffer = null;
                 lock (_fileLocker)
                 {
                     _fileLogBuffer.Add(messText);
-                    if (_fileLogBuffer.Count > _flushCount)
+                    if (_fileLogBuffer.Count >= _flushCount)
                     {
-                        buffer = _fileLogBuffer;
+                        var buffer = _fileLogBuffer;
                         _fileLogBuffer = new List<string>();
+                        File.AppendAllLinesAsync(_logFileName, buffer);
                     }
                 }
-
-                if (buffer != null)
-                    File.AppendAllLinesAsync(_logFileName, buffer);
-
                 // SaveLog(messText);
             });
 
@@ -84,22 +88,21 @@ namespace Data.Helpers
 
         public void Flush()
         {
-            List<string> buffer = null;
             lock (_fileLocker)
             {
                 if (_fileLogBuffer!= null && _fileLogBuffer.Count > 0)
                 {
-                    buffer = _fileLogBuffer;
+                    var buffer = _fileLogBuffer;
                     _fileLogBuffer = new List<string>();
+                    File.AppendAllLinesAsync(_logFileName, buffer);
                 }
             }
-            if (buffer != null)
-                File.AppendAllLinesAsync(_logFileName, buffer);
         }
 
         private void SaveLog(string message)
         {
-            Debug.Print($"YSocketLog: {Path.GetFileNameWithoutExtension(_logFileName)}\t{message}");
+            Log.Add(message);
+            // Debug.Print($"YSocketLog: {Path.GetFileNameWithoutExtension(_logFileName)}\t{message}");
         }
 
         public void Dispose()
