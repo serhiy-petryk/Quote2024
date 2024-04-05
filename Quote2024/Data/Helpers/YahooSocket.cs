@@ -42,7 +42,7 @@ namespace Data.Helpers
 
             _client = new WebsocketClient(new Uri(Host));
 
-            _client.ReconnectTimeout = TimeSpan.FromSeconds(30);
+            _client.ReconnectTimeout = TimeSpan.FromSeconds(300);
             _client.ReconnectionHappened.Subscribe(info =>
             {
                 if (info.Type == ReconnectionType.Initial || info.Type == ReconnectionType.Lost || info.Type == ReconnectionType.NoMessageReceived)
@@ -55,22 +55,27 @@ namespace Data.Helpers
             {
                 var message = $"{DateTime.Now.TimeOfDay} Disconnection happened, type {info.Type}";
                 SaveLog(message);
-                this?._onDisconnect(Path.GetFileNameWithoutExtension(_logFileName) + " " + message);
+                if (_client != null)
+                    this?._onDisconnect(Path.GetFileNameWithoutExtension(_logFileName) + " " + message);
             });
 
             _client.MessageReceived.Subscribe(msg =>
             {
                 var messText = $"{DateTime.Now:HH:mm:ss.fff},{msg}";
+                List<string> buffer = null;
                 lock (_fileLocker)
                 {
                     _fileLogBuffer.Add(messText);
                     if (_fileLogBuffer.Count > _flushCount)
                     {
-                        var buffer = _fileLogBuffer;
+                        buffer = _fileLogBuffer;
                         _fileLogBuffer = new List<string>();
-                        File.AppendAllLinesAsync(_logFileName, buffer);
                     }
                 }
+
+                if (buffer != null)
+                    File.AppendAllLinesAsync(_logFileName, buffer);
+
                 // SaveLog(messText);
             });
 
@@ -79,15 +84,17 @@ namespace Data.Helpers
 
         public void Flush()
         {
+            List<string> buffer = null;
             lock (_fileLocker)
             {
                 if (_fileLogBuffer!= null && _fileLogBuffer.Count > 0)
                 {
-                    var buffer = _fileLogBuffer;
+                    buffer = _fileLogBuffer;
                     _fileLogBuffer = new List<string>();
-                    File.AppendAllLinesAsync(_logFileName, buffer);
                 }
             }
+            if (buffer != null)
+                File.AppendAllLinesAsync(_logFileName, buffer);
         }
 
         private void SaveLog(string message)
@@ -101,8 +108,7 @@ namespace Data.Helpers
             _client?.Dispose();
             _client = null;
 
-            if (_fileLogBuffer != null && _fileLogBuffer.Count > 0)
-                File.AppendAllLines(_logFileName, _fileLogBuffer);
+            Flush();
             _fileLogBuffer = null;
         }
     }

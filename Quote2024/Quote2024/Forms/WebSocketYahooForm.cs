@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Data;
 using Data.Actions.Yahoo;
 using Data.Helpers;
 using Data.RealTime;
@@ -51,11 +49,21 @@ namespace Quote2024.Forms
             btnUpdateList_Click(null, null);
         }
 
+        private Dictionary<string, List<string>> GetSplittedTickersByOneTicker()
+        {
+            // 1 socket - 1 ticker
+            var result = Tickers.OrderBy(a => a)
+                .ToDictionary(ticker => Path.Combine(_dataFolder, $"YSocket_{ticker}_{{0}}.txt"),
+                    ticker => new List<string> { ticker });
+            return result;
+        }
+
         private Dictionary<string, List<string>> GetSplittedTickers()
         {
+            // For investigation: 44 socket from 1 to 44 tickers in socket.
             var indexTickers = new List<string>();
             var tickers = new List<string>();
-            var splittedTickers = new Dictionary<string, List<string>>() { {Path.Combine(_dataFolder, "YWS_0_{0}.txt"), indexTickers} };
+            var splittedTickers = new Dictionary<string, List<string>>() { { Path.Combine(_dataFolder, "YSocket_0_{0}.txt"), indexTickers } };
             foreach (var ticker in Tickers)
             {
                 if (ticker.StartsWith('^'))
@@ -84,7 +92,7 @@ namespace Quote2024.Forms
             Logger.AddMessage($"Initializing YahooSockets: {DateTime.Now.TimeOfDay:hh\\:mm\\:ss}", ShowStatus);
 
             var dateTimeKey = DateTime.Now.ToString("yyyyMMddHHmmss");
-            _sockets = GetSplittedTickers()
+            _sockets = GetSplittedTickersByOneTicker()
                 .Select(a => new YahooSocket(string.Format(a.Key, dateTimeKey), a.Value, OnDisconnect)).ToArray();
 
             if (!Directory.Exists(_dataFolder))
@@ -138,7 +146,6 @@ namespace Quote2024.Forms
         protected override void OnClosed(EventArgs e)
         {
             Stop();
-
             base.OnClosed(e);
         }
 
@@ -169,7 +176,13 @@ namespace Quote2024.Forms
             }));
         }
 
-        private void ShowStatus(string message) => lblStatus.Text = message;
+        private void ShowStatus(string message)
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => ShowStatus(message)));
+            else
+                lblStatus.Text = message;
+        }
 
         private void btnFlush_Click(object sender, EventArgs e)
         {

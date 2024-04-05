@@ -11,7 +11,8 @@ namespace Data.Tests
 {
     public class WebSocketFiles
     {
-        private const string folder = @"E:\Quote\WebData\RealTime\WebSockets";
+        private const string folderOld = @"E:\Quote\WebData\RealTime\WebSockets";
+        private const string folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-04";
         public static void DecodePolygonRun()
         {
             // Result for Yahoo: min - 7 minutes 8 seconds
@@ -101,7 +102,8 @@ namespace Data.Tests
         public static void YahooDelayRun()
         {
             // Result for Yahoo: 0.6% of item have > 10 seconds delay; average delay: 2 seconds (9 biggest (by TradeValue) symbols)
-            var files = Directory.GetFiles(folder, "WebSocketYahoo_*.txt");
+            var files = Directory.GetFiles(folder, "YSocket_*.txt")
+                .OrderBy(a => int.Parse(Path.GetFileNameWithoutExtension(a).Split('_')[1])).ToArray();
             var cnt = 0;
             foreach (var file in files)
             {
@@ -124,6 +126,8 @@ namespace Data.Tests
                 var delayTotal = 0.0;
                 var itemCount = 0;
                 var symbols = new Dictionary<string, int>();
+                var badRecordDayCount = 0;
+                var maxBadRecordMilliseconds = 0;
                 foreach (var line in lines)
                 {
                     cnt++;
@@ -133,6 +137,15 @@ namespace Data.Tests
                     marketHoursTypes[data.marketHours]++;
 
                     if (data.marketHours != PricingData.MarketHoursType.REGULAR_MARKET) continue;
+
+                    var etcDataDate = TimeHelper.GetEstDateTimeFromUnixMilliseconds(data.time / 2);
+                    var recordTime = TimeSpan.ParseExact(line.Substring(0, 12), @"hh\:mm\:ss\.FFF", CultureInfo.InvariantCulture);
+                    var recordDate = ((recordTime < fileTime ? fileDate.AddDays(1) : fileDate) + recordTime);
+                    var etcRecordDate = recordDate.Subtract(estTimeOffset);
+
+                    if (data.marketHours == PricingData.MarketHoursType.REGULAR_MARKET &&
+                        etcRecordDate.TimeOfDay >= Settings.MarketEndCommon)
+                        continue;
 
                     itemCount++;
                     // allData.Add(data);
@@ -159,18 +172,16 @@ namespace Data.Tests
                         optionTypes.Add(data.optionsType, 0);
                     optionTypes[data.optionsType]++;
 
-                    var etcDataDate = TimeHelper.GetEstDateTimeFromUnixMilliseconds(data.time / 2);
-                    var recordTime = TimeSpan.ParseExact(line.Substring(0, 12), @"hh\:mm\:ss\.FFF", CultureInfo.InvariantCulture);
-                    var recordDate = ((recordTime < fileTime ? fileDate.AddDays(1) : fileDate) + recordTime);
-                    var etcRecordDate = recordDate.Subtract(estTimeOffset);
-
                     if (etcRecordDate < etcDataDate.AddMilliseconds(-1000))
                     {
-                        // throw new Exception("Please, check");
+                        Debug.Print($"Big bad record date\t{Path.GetFileName(file)}. Ticker: {data.id}. Time: {etcRecordDate.TimeOfDay}. Difference: \t{(etcDataDate - etcRecordDate).TotalMilliseconds}");
                     }
                     if (etcRecordDate < etcDataDate)
                     {
-                        Debug.Print($"Bad record date\t{Path.GetFileName(file)}. Ticker: {data.id}. Time: {etcRecordDate.TimeOfDay}. Difference: \t{(etcDataDate-etcRecordDate).TotalMilliseconds}");
+                        badRecordDayCount++;
+                        var badRecordDayDiff = Convert.ToInt32((etcDataDate - etcRecordDate).TotalMilliseconds);
+                        if (badRecordDayDiff > maxBadRecordMilliseconds) maxBadRecordMilliseconds = badRecordDayDiff;
+                        // Debug.Print($"Bad record date\t{Path.GetFileName(file)}. Ticker: {data.id}. Time: {etcRecordDate.TimeOfDay}. Difference: \t{(etcDataDate-etcRecordDate).TotalMilliseconds}");
                     }
                     var difference = etcRecordDate - etcDataDate;
                     delayTotal += difference.TotalSeconds;
@@ -182,7 +193,7 @@ namespace Data.Tests
                     if (!symbols.ContainsKey(data.id))
                         symbols.Add(data.id, 0);
                 }
-                Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{delayTotal / itemCount}\t{symbols.Count}");
+                Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{delayTotal / itemCount}\t{symbols.Count}\t{badRecordDayCount}\t{maxBadRecordMilliseconds}");
                 foreach (var key in diffValues.Keys.OrderBy(a => a))
                     Debug.Print($"Delay:\t{key}\t{diffValues[key]}");
             }
