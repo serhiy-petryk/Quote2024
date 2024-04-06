@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using ProtoBuf;
 
 namespace Data.Models
@@ -15,9 +16,26 @@ namespace Data.Models
             return Serializer.Deserialize<PricingData>((ReadOnlySpan<byte>)bb);
         }
 
+        public static void CorrectYahooStreamerFiles()
+        {
+            var folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-05";
+            var files = Directory.GetFiles(folder,"YSocket*.txt");
+            foreach (var file in files)
+            {
+                var lines = File.ReadAllLines(file);
+                try
+                {
+                    var bb = Convert.FromBase64String(lines[lines.Length - 1]);
+                }
+                catch (Exception ex)
+                {
+                    System.IO.File.WriteAllLines(file, lines.Take(lines.Length - 1).ToArray());
+                }
+            }
+        }
+
         public static void RunTest()
         {
-            // CgRBQVBMFXH9KEMYsN7m18JjKgNOTVMwCDgBRQoLKr9IlIq+M2WAo5C/2AEE
             var s = @"CgRBQVBMFXH9KEMYsN7m18JjKgNOTVMwCDgBRQoLKr9IlIq+M2WAo5C/2AEE";
             var bb = Convert.FromBase64String(s);
             string decodedString = System.Text.Encoding.UTF8.GetString(bb);

@@ -129,7 +129,7 @@ namespace Data.Tests
                 var symbols = new Dictionary<string, int>();
                 var badRecordDayCount = 0;
                 var maxBadRecordMilliseconds = 0;
-                foreach (var line in lines.Where(a=>a.EndsWith("=")))
+                foreach (var line in lines)
                 {
                     cnt++;
                     var data = PricingData.GetPricingData(line.Substring(13));
