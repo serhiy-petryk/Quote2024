@@ -49,7 +49,8 @@ namespace Data.Helpers
 
             MessageCount = 0;
             Log = new List<string>();
-            _client.ReconnectTimeout = TimeSpan.FromSeconds(300);
+            // _client.ReconnectTimeout = TimeSpan.FromSeconds(300);
+            _client.ReconnectTimeout = null;
             _client.ReconnectionHappened.Subscribe(info =>
             {
                 if (info.Type == ReconnectionType.Initial || info.Type == ReconnectionType.Lost || info.Type == ReconnectionType.NoMessageReceived)
