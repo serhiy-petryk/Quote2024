@@ -13,6 +13,44 @@ namespace Data.Tests
     {
         private const string folderOld = @"E:\Quote\WebData\RealTime\WebSockets";
         private const string folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-05";
+
+        public class DelayStat
+        {
+            public string Id;
+            public string Type;
+            public int MessageCount;
+            public long TotalDelayMsecs;
+            public int MinDelayMsecs;
+            public int MaxDelayMsecs;
+            public int BadRecordDayCount;
+            public int MaxBadRecordMsecs;
+
+            public DelayStat(string id, string type)
+            {
+                Id = id;
+                Type = type;
+            }
+
+            public void AddMessageData(DateTime etcDataDate, DateTime etcRecordDate)
+            {
+                MessageCount++;
+                var delayMsecs = Convert.ToInt32((etcRecordDate - etcDataDate).TotalMilliseconds);
+                TotalDelayMsecs += delayMsecs;
+                if (delayMsecs < MinDelayMsecs) MinDelayMsecs = delayMsecs;
+                if (delayMsecs > MaxDelayMsecs) MaxDelayMsecs = delayMsecs;
+                if (delayMsecs < 0)
+                {
+                    BadRecordDayCount++;
+                    if (-delayMsecs > MaxBadRecordMsecs) MaxBadRecordMsecs = -delayMsecs;
+                }
+            }
+
+            // public override string ToString() =>
+               // $"{Type}\t{Id}\t{MessageCount}\t{Math.Round(0.001 * TotalDelayMsecs / MessageCount, 1)}\t{BadRecordDayCount}\t{Math.Round(0.001 * MaxBadRecordMsecs, 1)}\t{Math.Round(0.001 * MinDelayMsecs, 1)}\t{Math.Round(0.001 * MaxDelayMsecs, 1)}";
+            public override string ToString() =>
+                $"{Type}\t{Id}\t{MessageCount}\t{Math.Round(0.001 * TotalDelayMsecs / MessageCount, 1)}\t{BadRecordDayCount}\t{Math.Round(0.001 * MinDelayMsecs, 2)}\t{Math.Round(0.001 * MaxDelayMsecs, 1)}";
+        }
+
         public static void DecodePolygonRun()
         {
             // Result for Yahoo: min - 7 minutes 8 seconds
@@ -106,14 +144,10 @@ namespace Data.Tests
               //  .OrderBy(a => int.Parse(Path.GetFileNameWithoutExtension(a).Split('_')[1])).ToArray();
             var files = Directory.GetFiles(folder, "YSocket_*.txt").OrderBy(a => a).ToArray();
             var cnt = 0;
+            var folderStat = new DelayStat(Path.GetFileName(folder), "Folder");
+            var tickerCount = 0;
             foreach (var file in files)
             {
-                var diffValues = new Dictionary<int, int>();
-                var marketHoursTypes = new Dictionary<PricingData.MarketHoursType, int>();
-                var optionTypes = new Dictionary<PricingData.OptionType, int>();
-                // var allData = new List<PricingData>();
-                var dataByMinutes = new Dictionary<string, Dictionary<DateTime, (float, float, long, int)>>();
-
                 var lines = File.ReadAllLines(file);
                 var ss = Path.GetFileNameWithoutExtension(file).Split('_');
                 var fileDateTime = DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
@@ -124,19 +158,12 @@ namespace Data.Tests
                 var estFileDateTime = TimeHelper.GetEstDateTimeFromUnixMilliseconds(a1);
                 var estTimeOffset = fileDateTime - estFileDateTime;
 
-                var delayTotal = 0.0;
-                var itemCount = 0;
-                var symbols = new Dictionary<string, int>();
-                var badRecordDayCount = 0;
-                var maxBadRecordMilliseconds = 0;
+                var fileStat = new DelayStat(Path.GetFileName(file), "File");
+                var tickerStats = new Dictionary<string, DelayStat>();
                 foreach (var line in lines)
                 {
                     cnt++;
                     var data = PricingData.GetPricingData(line.Substring(13));
-                    if (!marketHoursTypes.ContainsKey(data.marketHours))
-                        marketHoursTypes.Add(data.marketHours, 0);
-                    marketHoursTypes[data.marketHours]++;
-
                     if (data.marketHours != PricingData.MarketHoursType.REGULAR_MARKET) continue;
 
                     var etcDataDate = TimeHelper.GetEstDateTimeFromUnixMilliseconds(data.time / 2);
@@ -148,59 +175,26 @@ namespace Data.Tests
                         etcRecordDate.TimeOfDay >= Settings.MarketEndCommon)
                         continue;
 
-                    itemCount++;
-                    // allData.Add(data);
+                    if (etcRecordDate.TimeOfDay < new TimeSpan(11, 0, 0) ||
+                        etcRecordDate.TimeOfDay > new TimeSpan(15, 0, 0))
+                        continue;
 
-                    if (!dataByMinutes.ContainsKey(data.id))
-                        dataByMinutes.Add(data.id, new Dictionary<DateTime, (float, float, long, int)>());
-                    var minuteData = dataByMinutes[data.id];
-                    var dataUnixMinuteMilliseconds = (data.time/120000) * 60000; // rounded to 1 minute
-                    var dataMinuteKey = TimeHelper.GetEstDateTimeFromUnixMilliseconds(dataUnixMinuteMilliseconds);
-                    if (!minuteData.ContainsKey(dataMinuteKey))
-                    {
-                        minuteData.Add(dataMinuteKey, (data.price, data.price, data.lastSize,1));
-                    }
-                    else
-                    {
-                        var minPrice = Math.Min(minuteData[dataMinuteKey].Item1, data.price);
-                        var maxPrice = Math.Max(minuteData[dataMinuteKey].Item2, data.price);
-                        var volume = minuteData[dataMinuteKey].Item3 + data.lastSize;
-                        var count = minuteData[dataMinuteKey].Item4 + 1;
-                        minuteData[dataMinuteKey] = (minPrice, maxPrice, volume, count);
-                    }
-
-                    if (!optionTypes.ContainsKey(data.optionsType))
-                        optionTypes.Add(data.optionsType, 0);
-                    optionTypes[data.optionsType]++;
-
-                    if (etcRecordDate < etcDataDate.AddMilliseconds(-1000))
-                    {
-                        Debug.Print($"Big bad record date\t{Path.GetFileName(file)}. Ticker: {data.id}. Time: {etcRecordDate.TimeOfDay}. Difference: \t{(etcDataDate - etcRecordDate).TotalMilliseconds}");
-                    }
-                    if (etcRecordDate < etcDataDate)
-                    {
-                        badRecordDayCount++;
-                        var badRecordDayDiff = Convert.ToInt32((etcDataDate - etcRecordDate).TotalMilliseconds);
-                        if (badRecordDayDiff > maxBadRecordMilliseconds) maxBadRecordMilliseconds = badRecordDayDiff;
-                        // Debug.Print($"Bad record date\t{Path.GetFileName(file)}. Ticker: {data.id}. Time: {etcRecordDate.TimeOfDay}. Difference: \t{(etcDataDate-etcRecordDate).TotalMilliseconds}");
-                    }
-                    var difference = etcRecordDate - etcDataDate;
-                    delayTotal += difference.TotalSeconds;
-                    var diffValue = Convert.ToInt32(Math.Round(difference.TotalSeconds, 0));
-                    if (!diffValues.ContainsKey(diffValue))
-                        diffValues.Add(diffValue, 0);
-                    diffValues[diffValue]++;
-
-                    if (!symbols.ContainsKey(data.id))
-                        symbols.Add(data.id, 0);
+                    folderStat.AddMessageData(etcDataDate, etcRecordDate);
+                    fileStat.AddMessageData(etcDataDate, etcRecordDate);
+                    var ticker = data.id;
+                    if (!tickerStats.ContainsKey(ticker))
+                        tickerStats.Add(ticker, new DelayStat(ticker, "Ticker"));
+                    tickerStats[ticker].AddMessageData(etcDataDate, etcRecordDate);
                 }
 
-                var minDelay = diffValues.Keys.Min();
-                var maxDelay = diffValues.Keys.Max();
-                Debug.Print($"{Path.GetFileName(file)}\t{itemCount}\t{Math.Round(delayTotal / itemCount, 1)}\t{symbols.Count}\t{badRecordDayCount}\t{maxBadRecordMilliseconds}\t{minDelay}\t{maxDelay}");
-                // foreach (var key in diffValues.Keys.OrderBy(a => a))
-                //  Debug.Print($"Delay:\t{key}\t{diffValues[key]}");
+                tickerCount += tickerStats.Count;
+
+                Debug.Print(fileStat.ToString()+$"\t{tickerStats.Count}");
+                foreach(var item in tickerStats)
+                    Debug.Print(item.Value.ToString());
             }
+
+            Debug.Print(folderStat.ToString() + $"\t{tickerCount}");
         }
 
         public static void YahooTimeRangesRun()
