@@ -101,7 +101,7 @@ namespace Quote2024.Forms
             foreach (var socket in _sockets)
             {
                 socket.Start();
-                await Task.Delay(50);
+                await Task.Delay(300);
             }
 
             Logger.AddMessage($"YahooSockets were initialized: {DateTime.Now.TimeOfDay:hh\\:mm\\:ss}", ShowStatus);
@@ -110,6 +110,7 @@ namespace Quote2024.Forms
 
         private void OnDisconnect(string message)
         {
+            Debug.Print(message);
             Logger.AddMessage($"Last disconnection: {message}", ShowStatus);
             DisconnectionCount++;
         }
@@ -190,6 +191,39 @@ namespace Quote2024.Forms
                 foreach(var socket in _sockets)
                     socket.Flush();
             }
+        }
+
+        private void btnPrintSocketStatuses_Click(object sender, EventArgs e)
+        {
+            Debug.Print("=======  STATUS of SOCKETS =======");
+            if (_sockets == null)
+            {
+                Debug.Print("No sockets");
+                return;
+            }
+
+            var messageCountArray = _sockets.OrderByDescending(a => a.MessageCount).ThenBy(a => a.Id).ToArray();
+            var messageCount = 0;
+            foreach (var socket in messageCountArray)
+            {
+                Debug.Print($"Ticker: {socket.Id}.\tMessages:\t{socket.MessageCount}");
+                messageCount += socket.MessageCount;
+            }
+            Debug.Print($"TOTAL messages: {messageCount:N0}");
+            Debug.Print(Environment.NewLine);
+
+            var notRunning = _sockets.Where(a => a.SocketClient != null && !a.SocketClient.IsRunning).Select(a => a.Id).ToArray();
+            if (notRunning.Length > 0)
+                Debug.Print($"Not running {notRunning.Length} sockets: " + string.Join(", ", notRunning));
+            else
+                Debug.Print("All sockets are running");
+
+            var notStarted = _sockets.Where(a => a.SocketClient != null && !a.SocketClient.IsStarted).Select(a => a.Id).ToArray();
+            if (notStarted.Length > 0)
+                Debug.Print($"Not started {notRunning.Length} sockets: " + string.Join(", ", notRunning));
+            else
+                Debug.Print("All sockets are started");
+
         }
     }
 }

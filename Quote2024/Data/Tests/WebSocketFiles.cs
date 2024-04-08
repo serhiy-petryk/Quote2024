@@ -12,7 +12,7 @@ namespace Data.Tests
     public class WebSocketFiles
     {
         private const string folderOld = @"E:\Quote\WebData\RealTime\WebSockets";
-        private const string folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-05";
+        private const string folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-08";
 
         public class DelayStat
         {
@@ -139,9 +139,10 @@ namespace Data.Tests
 
         public static void YahooDelayRun()
         {
-            // Result for Yahoo: 0.6% of item have > 10 seconds delay; average delay: 2 seconds (9 biggest (by TradeValue) symbols)
+            // Result for Yahoo (9 biggest (by TradeValue) symbols): 0.6% of item have > 10 seconds delay; average delay: 2 seconds 
+            // Result for Yahoo (~1000 symbols: average delay is ~10-11 seconds; 25% of item have < 5 seconds delay; 50% - < 10 seconds delay, 75% - < 20 seconds delay; there are some tickers with > 100 seconds delays
             //var files = Directory.GetFiles(folder, "YSocket_*.txt")
-              //  .OrderBy(a => int.Parse(Path.GetFileNameWithoutExtension(a).Split('_')[1])).ToArray();
+            //  .OrderBy(a => int.Parse(Path.GetFileNameWithoutExtension(a).Split('_')[1])).ToArray();
             var files = Directory.GetFiles(folder, "YSocket_*.txt").OrderBy(a => a).ToArray();
             var cnt = 0;
             var folderStat = new DelayStat(Path.GetFileName(folder), "Folder");

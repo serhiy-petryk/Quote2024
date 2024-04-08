@@ -12,15 +12,14 @@ namespace Data.Helpers
         private const string Host = @"wss://streamer.finance.yahoo.com";
 
         private readonly string _logFileName;
-        private readonly string _clientMessage;
+        private readonly string _sendMessage;
         private readonly int _flushCount;
         private readonly object _fileLocker = new object();
         private readonly Action<string> _onDisconnect;
 
-        private WebsocketClient _client;
-
         private List<string> _fileLogBuffer;
 
+        public WebsocketClient SocketClient;
         public readonly string Id;
         public int MessageCount;
         public List<string> Log;
@@ -31,7 +30,7 @@ namespace Data.Helpers
             _logFileName = logFileName;
             if (tickers != null && tickers.Count > 0)
             {
-                _clientMessage = "{\"subscribe\":[\"" + string.Join("\",\"", tickers) + "\"]}";
+                _sendMessage = "{\"subscribe\":[\"" + string.Join("\",\"", tickers) + "\"]}";
                 _flushCount = Math.Min(5000, tickers.Count * 120);
             }
             _onDisconnect = onDisconnect;
@@ -39,35 +38,37 @@ namespace Data.Helpers
 
         public void Start()
         {
-            if (string.IsNullOrEmpty(_clientMessage)) return;
+            if (string.IsNullOrEmpty(_sendMessage)) return;
 
-            _client?.Dispose();
+            SocketClient?.Dispose();
             lock (_fileLocker)
+            {
                 _fileLogBuffer = new List<string>();
+            }
 
-            _client = new WebsocketClient(new Uri(Host));
+            SocketClient = new WebsocketClient(new Uri(Host));
 
             MessageCount = 0;
             Log = new List<string>();
             // _client.ReconnectTimeout = TimeSpan.FromSeconds(300);
-            _client.ReconnectTimeout = null;
-            _client.ReconnectionHappened.Subscribe(info =>
+            SocketClient.ReconnectTimeout = null;
+            SocketClient.ReconnectionHappened.Subscribe(info =>
             {
                 if (info.Type == ReconnectionType.Initial || info.Type == ReconnectionType.Lost || info.Type == ReconnectionType.NoMessageReceived)
-                    _client?.Send(_clientMessage);
+                    SocketClient?.Send(_sendMessage);
 
                 SaveLog($"{DateTime.Now.TimeOfDay} Reconnection happened, type {info.Type}");
             });
 
-            _client.DisconnectionHappened.Subscribe(info =>
+            SocketClient.DisconnectionHappened.Subscribe(info =>
             {
                 var message = $"{DateTime.Now.TimeOfDay} Disconnection happened, type {info.Type}";
                 SaveLog(message);
-                if (_client != null)
+                if (SocketClient != null)
                     this?._onDisconnect(Path.GetFileNameWithoutExtension(_logFileName) + " " + message);
             });
 
-            _client.MessageReceived.Subscribe(msg =>
+            SocketClient.MessageReceived.Subscribe(msg =>
             {
                 MessageCount++;
                 var messText = $"{DateTime.Now:HH:mm:ss.fff},{msg}";
@@ -84,7 +85,7 @@ namespace Data.Helpers
                 // SaveLog(messText);
             });
 
-            _client.Start();
+            SocketClient.Start();
         }
 
         public void Flush()
@@ -108,9 +109,9 @@ namespace Data.Helpers
 
         public void Dispose()
         {
-            _client?.Stop(WebSocketCloseStatus.Empty, String.Empty);
-            _client?.Dispose();
-            _client = null;
+            SocketClient?.Stop(WebSocketCloseStatus.Empty, String.Empty);
+            SocketClient?.Dispose();
+            SocketClient = null;
 
             Flush();
             _fileLogBuffer = null;

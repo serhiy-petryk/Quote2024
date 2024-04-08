@@ -53,6 +53,7 @@ namespace Quote2024.Forms
             this.lblTickCount = new System.Windows.Forms.Label();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
+            this.btnPrintSocketStatuses = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -340,6 +341,7 @@ namespace Quote2024.Forms
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.btnPrintSocketStatuses);
             this.splitContainer2.Panel2.Controls.Add(this.btnFlush);
             this.splitContainer2.Panel2.Controls.Add(this.lblTickCount);
             this.splitContainer2.Panel2.Controls.Add(this.btnStop);
@@ -377,7 +379,7 @@ namespace Quote2024.Forms
             // btnFlush
             // 
             this.btnFlush.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFlush.Location = new System.Drawing.Point(12, 155);
+            this.btnFlush.Location = new System.Drawing.Point(11, 155);
             this.btnFlush.Name = "btnFlush";
             this.btnFlush.Size = new System.Drawing.Size(75, 42);
             this.btnFlush.TabIndex = 3;
@@ -397,7 +399,7 @@ namespace Quote2024.Forms
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStop.Location = new System.Drawing.Point(9, 82);
+            this.btnStop.Location = new System.Drawing.Point(8, 82);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 42);
             this.btnStop.TabIndex = 1;
@@ -408,13 +410,24 @@ namespace Quote2024.Forms
             // btnStart
             // 
             this.btnStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStart.Location = new System.Drawing.Point(9, 34);
+            this.btnStart.Location = new System.Drawing.Point(8, 34);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 42);
             this.btnStart.TabIndex = 0;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            // 
+            // btnPrintSocketStatuses
+            // 
+            this.btnPrintSocketStatuses.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPrintSocketStatuses.Location = new System.Drawing.Point(11, 224);
+            this.btnPrintSocketStatuses.Name = "btnPrintSocketStatuses";
+            this.btnPrintSocketStatuses.Size = new System.Drawing.Size(79, 60);
+            this.btnPrintSocketStatuses.TabIndex = 4;
+            this.btnPrintSocketStatuses.Text = "Debug.Print status of sockets";
+            this.btnPrintSocketStatuses.UseVisualStyleBackColor = true;
+            this.btnPrintSocketStatuses.Click += new System.EventHandler(this.btnPrintSocketStatuses_Click);
             // 
             // WebSocketYahooForm
             // 
@@ -475,5 +488,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Label lblTickCount;
         private System.Windows.Forms.Button btnFlush;
+        private System.Windows.Forms.Button btnPrintSocketStatuses;
     }
 }
