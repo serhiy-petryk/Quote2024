@@ -34,17 +34,14 @@ namespace WebSocketClientApp
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.ConnectButton = new System.Windows.Forms.Button();
             this.DisconnectButton = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.WebServerUri = new System.Windows.Forms.TextBox();
             this.ClearLogButton = new System.Windows.Forms.Button();
             this.cbLogMessages = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtLogFileName = new System.Windows.Forms.TextBox();
             this.cbSaveLogToFile = new System.Windows.Forms.CheckBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.cbSocketList = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SendMessageText
@@ -86,7 +83,7 @@ namespace WebSocketClientApp
             // ConnectButton
             // 
             this.ConnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ConnectButton.Location = new System.Drawing.Point(695, 160);
+            this.ConnectButton.Location = new System.Drawing.Point(704, 91);
             this.ConnectButton.Name = "ConnectButton";
             this.ConnectButton.Size = new System.Drawing.Size(75, 50);
             this.ConnectButton.TabIndex = 3;
@@ -97,7 +94,7 @@ namespace WebSocketClientApp
             // DisconnectButton
             // 
             this.DisconnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DisconnectButton.Location = new System.Drawing.Point(695, 216);
+            this.DisconnectButton.Location = new System.Drawing.Point(704, 147);
             this.DisconnectButton.Name = "DisconnectButton";
             this.DisconnectButton.Size = new System.Drawing.Size(75, 46);
             this.DisconnectButton.TabIndex = 4;
@@ -105,49 +102,10 @@ namespace WebSocketClientApp
             this.DisconnectButton.UseVisualStyleBackColor = true;
             this.DisconnectButton.Click += new System.EventHandler(this.DisconnectButton_Click);
             // 
-            // textBox1
-            // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(652, 41);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(175, 23);
-            this.textBox1.TabIndex = 5;
-            this.textBox1.Text = "wss://delayed.polygon.io/stocks";
-            // 
-            // textBox2
-            // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(651, 12);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(175, 23);
-            this.textBox2.TabIndex = 6;
-            this.textBox2.Text = "wss://echo.websocket.org";
-            // 
-            // textBox3
-            // 
-            this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(652, 70);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.ReadOnly = true;
-            this.textBox3.Size = new System.Drawing.Size(176, 23);
-            this.textBox3.TabIndex = 7;
-            this.textBox3.Text = "wss://socket.polygon.io/stocks";
-            // 
-            // WebServerUri
-            // 
-            this.WebServerUri.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.WebServerUri.Location = new System.Drawing.Point(654, 131);
-            this.WebServerUri.Name = "WebServerUri";
-            this.WebServerUri.Size = new System.Drawing.Size(172, 23);
-            this.WebServerUri.TabIndex = 8;
-            this.WebServerUri.Text = "wss://echo.websocket.org";
-            // 
             // ClearLogButton
             // 
             this.ClearLogButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ClearLogButton.Location = new System.Drawing.Point(695, 327);
+            this.ClearLogButton.Location = new System.Drawing.Point(704, 264);
             this.ClearLogButton.Name = "ClearLogButton";
             this.ClearLogButton.Size = new System.Drawing.Size(75, 46);
             this.ClearLogButton.TabIndex = 9;
@@ -161,7 +119,7 @@ namespace WebSocketClientApp
             this.cbLogMessages.AutoSize = true;
             this.cbLogMessages.Checked = true;
             this.cbLogMessages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbLogMessages.Location = new System.Drawing.Point(679, 302);
+            this.cbLogMessages.Location = new System.Drawing.Point(688, 239);
             this.cbLogMessages.Name = "cbLogMessages";
             this.cbLogMessages.Size = new System.Drawing.Size(105, 19);
             this.cbLogMessages.TabIndex = 10;
@@ -183,14 +141,14 @@ namespace WebSocketClientApp
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtLogFileName.Location = new System.Drawing.Point(97, 9);
             this.txtLogFileName.Name = "txtLogFileName";
-            this.txtLogFileName.Size = new System.Drawing.Size(401, 23);
+            this.txtLogFileName.Size = new System.Drawing.Size(381, 23);
             this.txtLogFileName.TabIndex = 12;
             // 
             // cbSaveLogToFile
             // 
             this.cbSaveLogToFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbSaveLogToFile.AutoSize = true;
-            this.cbSaveLogToFile.Location = new System.Drawing.Point(504, 11);
+            this.cbSaveLogToFile.Location = new System.Drawing.Point(484, 11);
             this.cbSaveLogToFile.Name = "cbSaveLogToFile";
             this.cbSaveLogToFile.Size = new System.Drawing.Size(141, 19);
             this.cbSaveLogToFile.TabIndex = 13;
@@ -208,32 +166,41 @@ namespace WebSocketClientApp
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // textBox4
+            // cbSocketList
             // 
-            this.textBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox4.Location = new System.Drawing.Point(654, 99);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.ReadOnly = true;
-            this.textBox4.Size = new System.Drawing.Size(176, 23);
-            this.textBox4.TabIndex = 15;
-            this.textBox4.Text = "wss://streamer.finance.yahoo.com";
+            this.cbSocketList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbSocketList.Items.AddRange(new object[] {
+            "wss://echo.websocket.org",
+            "wss://delayed.polygon.io/stocks",
+            "wss://socket.polygon.io/stocks",
+            "wss://streamer.finance.yahoo.com"});
+            this.cbSocketList.Location = new System.Drawing.Point(631, 30);
+            this.cbSocketList.Name = "cbSocketList";
+            this.cbSocketList.Size = new System.Drawing.Size(200, 23);
+            this.cbSocketList.TabIndex = 16;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(631, 12);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(88, 15);
+            this.label2.TabIndex = 17;
+            this.label2.Text = "Web socket url:";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(838, 450);
-            this.Controls.Add(this.textBox4);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.cbSocketList);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.cbSaveLogToFile);
             this.Controls.Add(this.txtLogFileName);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cbLogMessages);
             this.Controls.Add(this.ClearLogButton);
-            this.Controls.Add(this.WebServerUri);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.DisconnectButton);
             this.Controls.Add(this.ConnectButton);
             this.Controls.Add(this.listBox1);
@@ -253,16 +220,13 @@ namespace WebSocketClientApp
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Button ConnectButton;
         private System.Windows.Forms.Button DisconnectButton;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox WebServerUri;
         private System.Windows.Forms.Button ClearLogButton;
         private System.Windows.Forms.CheckBox cbLogMessages;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtLogFileName;
         private System.Windows.Forms.CheckBox cbSaveLogToFile;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.ComboBox cbSocketList;
+        private System.Windows.Forms.Label label2;
     }
 }

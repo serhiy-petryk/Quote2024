@@ -20,6 +20,7 @@ namespace WebSocketClientApp
             InitializeComponent();
 
             txtLogFileName.Text = $@"E:\Temp\WebSocket_{DateTime.Now:yyyyMMddHHmmss}.txt";
+            cbSocketList.SelectedIndex = cbSocketList.Items.Count - 1;
             UpdateUI();
         }
 
@@ -87,8 +88,9 @@ namespace WebSocketClientApp
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(WebServerUri.Text))
-                InitClient(WebServerUri.Text);
+            var host = cbSocketList.Text;
+            if (!string.IsNullOrWhiteSpace(host) && host.StartsWith("ws"))
+                InitClient(host);
         }
 
         private void DisconnectButton_Click(object sender, EventArgs e)  {
