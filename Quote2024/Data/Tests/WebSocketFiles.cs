@@ -175,9 +175,9 @@ namespace Data.Tests
                         etcRecordDate.TimeOfDay >= Settings.MarketEndCommon)
                         continue;
 
-                    if (etcRecordDate.TimeOfDay < new TimeSpan(11, 0, 0) ||
+                    /*if (etcRecordDate.TimeOfDay < new TimeSpan(13, 0, 0) ||
                         etcRecordDate.TimeOfDay > new TimeSpan(15, 0, 0))
-                        continue;
+                        continue;*/
 
                     folderStat.AddMessageData(etcDataDate, etcRecordDate);
                     fileStat.AddMessageData(etcDataDate, etcRecordDate);
