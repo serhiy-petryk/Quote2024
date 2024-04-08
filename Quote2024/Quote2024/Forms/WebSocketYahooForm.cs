@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -49,12 +50,11 @@ namespace Quote2024.Forms
             btnUpdateList_Click(null, null);
         }
 
-        private Dictionary<string, List<string>> GetSplittedTickersByOneTicker()
+        private Dictionary<string, (string,List<string>)> GetSplittedTickersByOneTicker()
         {
             // 1 socket - 1 ticker
-            var result = Tickers.OrderBy(a => a)
-                .ToDictionary(ticker => Path.Combine(_dataFolder, $"YSocket_{ticker}_{{0}}.txt"),
-                    ticker => new List<string> { ticker });
+            var result = Tickers.OrderBy(a => a).ToDictionary(ticker => ticker,
+                ticker => (Path.Combine(_dataFolder, $"YSocket_{ticker}_{{0}}.txt"), new List<string> { ticker }));
             return result;
         }
 
@@ -93,7 +93,7 @@ namespace Quote2024.Forms
 
             var dateTimeKey = DateTime.Now.ToString("yyyyMMddHHmmss");
             _sockets = GetSplittedTickersByOneTicker().Select(a =>
-                new YahooSocket(a.Key, string.Format(a.Key, dateTimeKey), a.Value, OnDisconnect)).ToArray();
+                new YahooSocket(a.Key, string.Format(a.Value.Item1, dateTimeKey), a.Value.Item2, OnDisconnect)).ToArray();
 
             if (!Directory.Exists(_dataFolder))
                 Directory.CreateDirectory(_dataFolder);
@@ -110,7 +110,6 @@ namespace Quote2024.Forms
 
         private void OnDisconnect(string message)
         {
-
             Logger.AddMessage($"Last disconnection: {message}", ShowStatus);
             DisconnectionCount++;
         }
