@@ -24,26 +24,20 @@ namespace Data.Helpers
             var chunks = entries
                 .Select((s, i) => new { Value = s, Index = i })
                 .GroupBy(x => x.Index / size)
-                .Select(grp => grp.Select(x => x.Value).ToArray())
-                .ToArray();
+                .Select(grp => grp.ToDictionary(a => a.Value, a => (object)null)).ToArray();
 
-            var numbers = Enumerable.Range(0, chunks.GetLength(0)).ToArray();
-
+            var numbers = Enumerable.Range(0, chunks.Length).ToArray();
             Parallel.ForEach(numbers, number =>
+            {
+                using (var fs = File.Open(zipFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var archive = new ZipArchive(fs, ZipArchiveMode.Read, false))
                 {
-                    using (FileStream fs = File.Open(zipFileName, FileMode.Open, FileAccess.Read,
-                               FileShare.Read))
-                    {
-                        using (var archive = new ZipArchive(fs, ZipArchiveMode.Read, false))
-                        {
-                            var thisEntryNames = chunks[number];
-
-                            var thisEntries = archive.Entries.Where(a => thisEntryNames.Contains(a.FullName));
-                            foreach (var entry in thisEntries)
-                                action(entry);
-                        }
-                    }
-                });
+                    var thisEntryNames = chunks[number];
+                    var thisEntries = archive.Entries.Where(a => thisEntryNames.ContainsKey(a.FullName));
+                    foreach (var entry in thisEntries)
+                        action(entry);
+                }
+            });
         }
 
         public static IEnumerable<ZipArchiveEntry> GetEntriesByParallel(string zipFileName,
