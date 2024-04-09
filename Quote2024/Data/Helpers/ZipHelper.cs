@@ -40,40 +40,6 @@ namespace Data.Helpers
             });
         }
 
-        public static IEnumerable<ZipArchiveEntry> GetEntriesByParallel(string zipFileName,
-            Func<ZipArchiveEntry, bool> filter)
-        {
-            const int threads = 8;
-            string[] entries;
-            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
-                entries = zip.Entries.Where(a => a.Length > 0).Select(a => a.FullName).ToArray();
-
-            var size = entries.Length / threads;
-            var chunks = entries
-                .Select((s, i) => new { Value = s, Index = i })
-                .GroupBy(x => x.Index / size)
-                .Select(grp => grp.Select(x => x.Value).ToArray())
-                .ToArray();
-
-            var numbers = Enumerable.Range(0, chunks.GetLength(0)).ToArray();
-            var aa = numbers.AsParallel().Select<int, IEnumerable<ZipArchiveEntry>>(a =>
-            {
-                using (FileStream fs = File.Open(zipFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    using (var archive = new ZipArchive(fs, ZipArchiveMode.Read, true))
-                    {
-                        var thisEntryNames = chunks[a];
-                        // var thisEntries = archive.Entries.Where(a => thisEntryNames.Contains(a.FullName)).ToArray();
-                        // foreach (var entry in archive.Entries.Where(a => thisEntryNames.Contains(a.FullName)))
-                        return archive.Entries.Where(a1 => thisEntryNames.Contains(a1.FullName));
-                    }
-                }
-            });
-
-            foreach (var item in aa.SelectMany(a=>a))
-                yield return item;
-        }
-
         public static T DeserializeZipEntry<T>(ZipArchiveEntry entry)
         {
             using (var entryStream = entry.Open())
