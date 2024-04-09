@@ -41,3 +41,8 @@ Conclusion
 	замість 2-3 секунд (якщо Proxy!=null) затримка є 4-6 секунд (коли Proxy=null)).
 Перші два requests мають розмір на 5-7% більший ніж послідуючі requests (можливо з'являється багато null значень) - потрібно дослідити.
 
+3. YahooSocket: ~1 message/second for every ticker.
+Average delay (~1000 tickers) is ~10-11 seconds (no VPN or VPN with best performance, US VPN has additional delay ~0.3 second)
+25% of item has < 5 seconds delay; 50% - < 10 seconds delay, 75% - < 20 seconds delay; ~ 20 tickers have > 100 seconds delays
+
+

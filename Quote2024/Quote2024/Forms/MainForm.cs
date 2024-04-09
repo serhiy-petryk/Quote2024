@@ -171,7 +171,7 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            // await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
+            await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
 
             // await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
 
@@ -182,7 +182,7 @@ namespace Quote2024.Forms
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
 
             // await Task.Factory.StartNew(Data.Tests.RealTimeYahooMinuteTests.DefineDelay);
-            await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
+            // await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
             // await Task.Factory.StartNew((() => Data.RealTime.YahooMinutes.GetTickerList(1)));
             // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.InitTimer);
 

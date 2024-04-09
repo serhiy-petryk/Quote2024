@@ -11,8 +11,54 @@ namespace Data.Scanners
     {
         public static void Start()
         {
+            var lockObj = new object();
             var folder = @"E:\Quote\WebData\Minute\Polygon2003\Data";
-            var files = Directory.GetFiles(folder, "*.zip");
+            var files = Directory.GetFiles(folder, "MP2003_20230325.zip");
+            foreach (var zipFileName in files)
+            {
+                Logger.AddMessage($"File: {Path.GetFileName(zipFileName)}");
+
+                long itemCount = 0;
+                long nullItems = 0;
+                int entryCount = 0;
+                var sw = new Stopwatch();
+                sw.Start();
+                ZipUtils.ProcessZipByParallel(zipFileName, entry => entry.Length > 0, entry =>
+                {
+                    entryCount++;
+                    var oo = ZipUtils.DeserializeZipEntry<PolygonCommon.cMinuteRoot>(entry);
+                    if (oo.count == 0)
+                    {
+                        nullItems++;
+                        return;
+                    }
+
+                    lock (lockObj)
+                    {
+                        itemCount += oo.count;
+                    }
+
+                    foreach (var q in oo.results.Where(o => !o.IsValid))
+                    {
+                        Debug.Print(
+                            $"File: {Path.GetFileName(zipFileName)}. Entry: {entry.Name}. Quote: {q}");
+                    }
+
+                });
+                sw.Stop();
+                Debug.Print($"Time: {sw.ElapsedMilliseconds:N0} msecs.\tEntries: {entryCount:N0}.\tNull items: {nullItems:N0}.\tItems: {itemCount:N0}.");
+            }
+
+            Logger.AddMessage($"Finished!");
+        }
+
+        public static void StartNonParallel()
+        {
+            var folder = @"E:\Quote\WebData\Minute\Polygon2003\Data";
+            var files = Directory.GetFiles(folder, "MP2003_20230325.zip");
+            long itemCount = 0;
+            var sw = new Stopwatch();
+            sw.Start();
             foreach (var zipFileName in files)
             {
                 Logger.AddMessage($"File: {Path.GetFileName(zipFileName)}");
@@ -23,12 +69,15 @@ namespace Data.Scanners
                         var oo = ZipUtils.DeserializeZipEntry<PolygonCommon.cMinuteRoot>(entry);
                         if (oo.count == 0) continue;
 
-                        foreach (var q in oo.results.Where(o=>!o.IsValid))
+                        itemCount += oo.count;
+                        foreach (var q in oo.results.Where(o => !o.IsValid))
                         {
                             Debug.Print($"File: {Path.GetFileName(zipFileName)}. Entry: {entry.Name}. Quote: {q}");
                         }
                     }
             }
+
+            Debug.Print($"Total: {sw.ElapsedMilliseconds:N0}. Items: {itemCount:N0}");
             Logger.AddMessage($"Finished!");
         }
     }
