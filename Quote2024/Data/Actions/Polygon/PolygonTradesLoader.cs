@@ -22,6 +22,7 @@ namespace Data.Actions.Polygon
             var seqCount2 = 0;
             var sizes = new Dictionary<int, int>();
             var conditions = new Dictionary<byte, int> { { 0, 0 } };
+            var sConditions = new Dictionary<string, int> { { "", 0 } };
             var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
             foreach (var zipFileName in files)
             {
@@ -47,7 +48,11 @@ namespace Data.Actions.Polygon
                             lastSeq = item.sequence_number;
 
                             if (item.conditions == null)
-                                conditions[0]++;
+                            {
+                              conditions[0]++;
+                              sConditions[""]++;
+
+                            }
                             else
                             {
                                 foreach (var c in item.conditions)
@@ -56,6 +61,11 @@ namespace Data.Actions.Polygon
                                         conditions.Add(c, 0);
                                     conditions[c]++;
                                 }
+
+                                var key = $"{item.conditions.Length};" + string.Join(',', item.conditions.OrderBy(a=>a).Select(a=>a.ToString()));
+                                if (!sConditions.ContainsKey(key))
+                                    sConditions.Add(key, 0);
+                                sConditions[key]++;
                             }
                         }
 
@@ -95,6 +105,8 @@ namespace Data.Actions.Polygon
             }
 
             var aa1 = sizes.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
+            var aa21 = conditions.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
+            var aa22 = sConditions.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
         }
 
         public static void Start()

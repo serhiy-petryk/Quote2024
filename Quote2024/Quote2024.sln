@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5939CC9-3297-4C29-89A6-5C02F0535806}"
 	ProjectSection(SolutionItems) = preProject
 		Policies.txt = Policies.txt
+		PolygonTrades.txt = PolygonTrades.txt
 		RealTime.txt = RealTime.txt
 		Scanner.Results.txt = Scanner.Results.txt
 	EndProjectSection
