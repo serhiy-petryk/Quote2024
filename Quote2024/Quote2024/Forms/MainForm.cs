@@ -171,7 +171,9 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
+            // await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
+            
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTradesLoader.Test);
 
             // await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
 
