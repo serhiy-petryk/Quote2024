@@ -20,9 +20,12 @@ namespace Data.Tests.DBQ
             long byteCount = 0;
             long recCount = 0;
             var cnt1 = 0;
-            var cnt2 = 0;
-            var cnt3 = 0;
-            var cnt4 = 0;
+            var cnt21 = 0;
+            var cnt22 = 0;
+            var cnt23 = 0;
+            var cnt31 = 0;
+            var cnt32 = 0;
+            var cnt33 = 0;
             foreach (var zipFileName in files)
             {
                 Logger.AddMessage($"File: {zipFileName}");
@@ -52,14 +55,20 @@ namespace Data.Tests.DBQ
                         {
                             cnt1++;
                         }
+                        else if (price == lastPrice && volume == lastVolume)
+                            cnt21++;
                         else if (price == lastPrice && time == lastTime)
-                            cnt2++;
+                            cnt22++;
+                        else if (volume == lastVolume && time== lastTime)
+                            cnt23++;
                         else
                         {
                             if (price == lastPrice)
-                                cnt3++;
+                                cnt31++;
+                            if (volume == lastVolume)
+                                cnt32++;
                             if (time == lastTime)
-                                cnt4++;
+                                cnt33++;
                         }
                         lastPrice = price;
                         lastTime = time;
@@ -70,7 +79,7 @@ namespace Data.Tests.DBQ
 
             Debug.Print($"Bytes:\t{byteCount:N0}");
             Debug.Print($"Records:\t{recCount:N0}");
-            Debug.Print($"Cnt1:\t{cnt1:N0}\tCnt2:\t{cnt2:N0}\tCnt3:\t{cnt3:N0}\tCnt4:\t{cnt4:N0}");
+            Debug.Print($"Cnt1:\t{cnt1:N0}\tCnt21:\t{cnt21:N0}\tCnt22:\t{cnt22:N0}\tCnt23:\t{cnt23:N0}\tCnt31:\t{cnt31:N0}\tCnt32:\t{cnt32:N0}\tCnt33:\t{cnt33:N0}");
 
             Logger.AddMessage($"Finished!");
         }
