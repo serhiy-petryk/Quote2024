@@ -45,3 +45,10 @@ Count = 87
 {[3;12,14,41, 202335]}
 {[3;2,10,41, 190092]}
 
+Compression
+===========
+1. Original zipped json (2024-04-05) without BRK.A: 1'214'676'258 bytes (23.12 bytes/record)
+2. ProtoBuf (only time difference, price difference, volume): 379'900'312 bytes (7.23 bytes/record)
+3. Zipped ProtoBuf (only time difference, price difference, volume): 100'553'322 bytes (1.91 bytes/record)
+
+

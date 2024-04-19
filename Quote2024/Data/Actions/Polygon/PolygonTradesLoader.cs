@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Data.Helpers;
+using ProtoBuf;
 
 namespace Data.Actions.Polygon
 {
@@ -270,7 +271,7 @@ namespace Data.Actions.Polygon
             }
         }
 
-        private class cRoot
+        public class cRoot
         {
             public cResult[] results;
             public string status;
@@ -278,8 +279,18 @@ namespace Data.Actions.Polygon
             public string next_url;
         }
 
-        private class cResult
+        [ProtoContract]
+        public class cResult
         {
+            [ProtoMember(3)]
+            public int Price2;
+
+            [ProtoMember(2)]
+            public int Size2;
+
+            [ProtoMember(1)]
+            public ushort Seconds2;
+
             public byte[] conditions;
             public byte exchange;
             public string id;
