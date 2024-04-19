@@ -14,7 +14,7 @@ namespace Data.Tests.DBQ
 {
     public static class DbqTest
     {
-        public static void RunStatistics()    //76 274 milliseconds
+        public static void RunStatistics()    // 110 358 milliseconds (83 368 milliseconds - no actions)
         {
             var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
             long byteCount = 0;
@@ -31,7 +31,6 @@ namespace Data.Tests.DBQ
                 Logger.AddMessage($"File: {zipFileName}");
                 using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 {
-                    // var results = new List<PolygonTradesLoader.cResult>();
                     var results = new List<PolygonTradesLoader.cResult>();
                     foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                     {
