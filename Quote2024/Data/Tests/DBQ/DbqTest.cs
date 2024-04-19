@@ -14,6 +14,67 @@ namespace Data.Tests.DBQ
 {
     public static class DbqTest
     {
+        public static void RunStatistics()    //76 274 milliseconds
+        {
+            var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
+            long byteCount = 0;
+            long recCount = 0;
+            var cnt1 = 0;
+            var cnt2 = 0;
+            var cnt3 = 0;
+            var cnt4 = 0;
+            foreach (var zipFileName in files)
+            {
+                Logger.AddMessage($"File: {zipFileName}");
+                using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                {
+                    // var results = new List<PolygonTradesLoader.cResult>();
+                    var results = new List<PolygonTradesLoader.cResult>();
+                    foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                    {
+                        var oo = ZipUtils.DeserializeZipEntry<PolygonTradesLoader.cRoot>(entry);
+                        results.AddRange(oo.results);
+                    }
+
+                    recCount += results.Count;
+
+                    var lastPrice = 0;
+                    var lastTime = 0;
+                    var lastVolume = 0;
+
+                    foreach (var o in results)
+                    {
+                        var price = Convert.ToInt32(o.price * 10000);
+                        var volume = Convert.ToInt32(o.size);
+                        var time = Convert.ToInt32(o.sip_timestamp / 1000000000);
+
+                        if (price == lastPrice && volume == lastVolume && time == lastTime)
+                        {
+                            cnt1++;
+                        }
+                        else if (price == lastPrice && time == lastTime)
+                            cnt2++;
+                        else
+                        {
+                            if (price == lastPrice)
+                                cnt3++;
+                            if (time == lastTime)
+                                cnt4++;
+                        }
+                        lastPrice = price;
+                        lastTime = time;
+                        lastVolume = volume;
+                    }
+                }
+            }
+
+            Debug.Print($"Bytes:\t{byteCount:N0}");
+            Debug.Print($"Records:\t{recCount:N0}");
+            Debug.Print($"Cnt1:\t{cnt1:N0}\tCnt2:\t{cnt2:N0}\tCnt3:\t{cnt3:N0}\tCnt4:\t{cnt4:N0}");
+
+            Logger.AddMessage($"Finished!");
+        }
+
         public static void RunDbq()    //76 274 milliseconds
         {
             var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
@@ -29,7 +90,7 @@ namespace Data.Tests.DBQ
                     foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                     {
                         var oo = ZipUtils.DeserializeZipEntry<PolygonTradesLoader.cRoot>(entry);
-                        results.AddRange(oo.results.Where(a=>a.size>0.1).Select(a =>
+                        results.AddRange(oo.results.Where(a => a.size > 0.1).Select(a =>
                             new MbtTickHttp(TimeHelper.GetEstDateTimeFromUnixMilliseconds(a.sip_timestamp / 1000000),
                                 a.price, Convert.ToInt64(a.size), 0, 0)));
                     }

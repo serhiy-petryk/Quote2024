@@ -291,6 +291,7 @@ namespace Data.Actions.Polygon
             [ProtoMember(1)]
             public ushort Seconds2;
 
+            [ProtoMember(4)]
             public byte[] conditions;
             public byte exchange;
             public string id;
