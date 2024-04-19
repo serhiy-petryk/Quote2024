@@ -175,7 +175,7 @@ namespace Quote2024.Forms
 
             //await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTradesLoader.Test);
 
-            await Task.Factory.StartNew(Data.Tests.DBQ.DbqTest.RunStatistics);
+            await Task.Factory.StartNew(Data.Tests.DBQ.DbqTest.InvestigateNewCompressor);
 
             // await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
 

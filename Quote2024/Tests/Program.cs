@@ -27,7 +27,8 @@ namespace Tests
             // Protobuf.Tests.ReadFromZip();
             // Protobuf.Tests.ReadFromCsv();
 
-            RealTime.RealTimeYahooMinute.Start();
+            // RealTime.RealTimeYahooMinute.Start();
+            TradesCompressor.Investigate.InvestigateNewCompressor();
 
             Application.Run(new TestMainForm());
         }
