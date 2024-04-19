@@ -48,7 +48,11 @@ Count = 87
 Compression
 ===========
 1. Original zipped json (2024-04-05) without BRK.A: 1'214'676'258 bytes (23.12 bytes/record)
-2. ProtoBuf (only time difference, price difference, volume): 379'900'312 bytes (7.23 bytes/record)
+2. ProtoBuf (only time difference, price difference, volume): 379'900'312 bytes (7.23 bytes/record); duration ~90 secs
 3. Zipped ProtoBuf (only time difference, price difference, volume): 100'553'322 bytes (1.91 bytes/record)
+4. Dbq original (version of 2010): 148'465'041 bytes for 52'540'452 items (2.83 bytes/record); duration ~111 secs 
+5. Zipped Dbq original (version of 2010): 94'558'125 bytes for 52'540'452 items (1.80 bytes/record)
+
+
 
 
