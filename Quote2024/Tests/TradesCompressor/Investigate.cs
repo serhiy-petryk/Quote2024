@@ -6,6 +6,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sewer56.BitStream;
+using Sewer56.BitStream.ByteStreams;
 
 namespace Tests.TradesCompressor
 {
@@ -26,9 +28,10 @@ namespace Tests.TradesCompressor
             var times = new Dictionary<int, int>();
             var prices = new Dictionary<int, int>();
             var volumes = new Dictionary<int, int>();
-            foreach (var zipFileName in files)
+            foreach (var zipFileName in files.Take(1))
             {
                 // Logger.AddMessage($"File: {zipFileName}");
+                Debug.Print($"File: {zipFileName}");
                 using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 {
                     var results = new List<PolygonTradesLoader.cResult>();
@@ -44,6 +47,11 @@ namespace Tests.TradesCompressor
                     var lastPrice = Convert.ToInt32(results[0].price * 10000);
                     var lastVolume = Convert.ToInt32(results[0].size);
 
+                    var _data = new byte[1000 * 1000];
+                    var sData = new StringBuilder();
+                    var stream = new ArrayByteStream(_data);
+                    var bitStream = new BitStream<ArrayByteStream>(stream, 0);
+
                     var itemCount = 0;
                     foreach (var o in results)
                     {
@@ -54,10 +62,14 @@ namespace Tests.TradesCompressor
                         if (price == lastPrice && volume == lastVolume && time == lastTime)
                         { // prefix = 0x110
                             cnt1++;
+                            bitStream.Write8(0x06, 3);
+                            sData.Append(",110");
                         }
                         else if (price == lastPrice && time == lastTime)
                         { // prefix = 0x0
                             cnt2++;
+                            bitStream.Write8(0x0, 1);
+                            sData.Append(",0");
 
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
@@ -66,6 +78,9 @@ namespace Tests.TradesCompressor
                         else if (time == lastTime)
                         { // prefix = 0x10
                             cnt3++;
+
+                            sData.Append(",10");
+                            bitStream.Write8(0x02, 2);
 
                             var priceKey = lastPrice - price;
                             if (!prices.ContainsKey(priceKey))
@@ -77,17 +92,16 @@ namespace Tests.TradesCompressor
                             volumes[volume]++;
                         }
                         else
-                        {
+                        {   // prefix = 0x111
                             cnt4++;
+                            sData.Append(",111");
+                            bitStream.Write8(0x07, 3);
 
                             var timeKey = lastTime - time;
-                            if (timeKey < 0)
-                            {
-
-                            }
                             if (!times.ContainsKey(timeKey))
                                 times.Add(timeKey, 0);
                             times[timeKey]++;
+                            SaveTime(ref bitStream, timeKey, sData);
 
                             var priceKey = price - lastPrice;
                             if (!prices.ContainsKey(priceKey))
@@ -104,6 +118,26 @@ namespace Tests.TradesCompressor
                         lastVolume = volume;
                         itemCount++;
                     }
+
+                    var s = "";
+                    for (var k = 0; k < bitStream.ByteOffset; k++)
+                    {
+                        s = s + Convert.ToString(_data[k], 2).PadLeft(8, '0');
+                    }
+
+                    if (bitStream.NextByteIndex != bitStream.ByteOffset)
+                    {
+                        var s1 = Convert.ToString(_data[bitStream.ByteOffset], 2).PadLeft(8, '0');
+                        var s2 = s1.Substring(0, bitStream.BitOffset);
+                        s = s + s2;
+                    }
+
+                    if (!string.Equals(sData.ToString().Replace(",", ""), s))
+                    {
+
+                    }
+
+                    byteCount += bitStream.ByteOffset;
                 }
             }
 
@@ -122,5 +156,51 @@ namespace Tests.TradesCompressor
         }
 
 
+        private static void SaveTime(ref BitStream<ArrayByteStream> stream, int time, StringBuilder sb)
+        {
+            if (time == 0)
+            {
+                stream.WriteBit(0x0);
+                sb.Append(",0");
+                return;
+            }
+            else if (time == 1)
+            {
+                stream.Write8(0x4,3);
+                sb.Append(",100");
+                return;
+            }
+            else if (time == 2)
+            {
+                stream.Write8(0x5, 3);
+                sb.Append(",101");
+                return;
+            }
+            else if (time == 3)
+            {
+                stream.Write8(0x6, 3);
+                sb.Append(",110");
+                return;
+            }
+
+            stream.Write8(0x7, 3);
+            sb.Append(",111");
+            if (time <= byte.MaxValue)
+            {
+                stream.WriteBit(0x0);
+                sb.Append("0");
+                // stream.Write(Convert.ToByte(time));
+                // stream.Write32((uint)time, 8);
+                stream.Write8(Convert.ToByte(time), 8);
+                var a = Convert.ToString(time, 2).PadLeft(8, '0');
+                sb.Append(a);
+                return;
+            }
+            stream.WriteBit(0x1);
+            sb.Append("1");
+            stream.Write32(Convert.ToUInt32(time), 32);
+            var a1 = Convert.ToString(time, 2).PadLeft(32, '0');
+            sb.Append(a1);
+        }
     }
 }
