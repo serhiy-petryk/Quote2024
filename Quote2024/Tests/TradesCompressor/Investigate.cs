@@ -27,8 +27,8 @@ namespace Tests.TradesCompressor
             var cnt4 = 0;
             var times = new Dictionary<int, int>();
             var prices = new Dictionary<int, int>();
-            var volumes = new Dictionary<int, int>();
-            foreach (var zipFileName in files.Take(1))
+            var volumes = new Dictionary<ulong, int>();
+            foreach (var zipFileName in files)
             {
                 // Logger.AddMessage($"File: {zipFileName}");
                 Debug.Print($"File: {zipFileName}");
@@ -45,10 +45,10 @@ namespace Tests.TradesCompressor
 
                     var lastTime = Convert.ToInt32(results[0].sip_timestamp / 1000000000);
                     var lastPrice = Convert.ToInt32(results[0].price * 10000);
-                    var lastVolume = Convert.ToInt32(results[0].size);
+                    var lastVolume = Convert.ToUInt64(results[0].size);
 
-                    var _data = new byte[1000 * 1000];
-                    var sData = new StringBuilder();
+                    var _data = new byte[10000 * 1000];
+                    // var sData = new StringBuilder();
                     var stream = new ArrayByteStream(_data);
                     var bitStream = new BitStream<ArrayByteStream>(stream, 0);
 
@@ -57,62 +57,68 @@ namespace Tests.TradesCompressor
                     {
                         var time = Convert.ToInt32(o.sip_timestamp / 1000000000);
                         var price = Convert.ToInt32(o.price * 10000);
-                        var volume = Convert.ToInt32(o.size);
+                        var volume = Convert.ToUInt64(o.size);
 
                         if (price == lastPrice && volume == lastVolume && time == lastTime)
                         { // prefix = 0x110
                             cnt1++;
+
                             bitStream.Write8(0x06, 3);
-                            sData.Append(",110");
+                            // sData.Append(",110");
                         }
                         else if (price == lastPrice && time == lastTime)
                         { // prefix = 0x0
                             cnt2++;
+
                             bitStream.Write8(0x0, 1);
-                            sData.Append(",0");
+                            // sData.Append(",0");
 
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
                             volumes[volume]++;
+                            SaveVolume(ref bitStream, volume);
                         }
                         else if (time == lastTime)
                         { // prefix = 0x10
                             cnt3++;
 
-                            sData.Append(",10");
+                            // sData.Append(",10");
                             bitStream.Write8(0x02, 2);
 
                             var priceKey = lastPrice - price;
                             if (!prices.ContainsKey(priceKey))
                                 prices.Add(priceKey, 0);
                             prices[priceKey]++;
-                            SavePrice(ref bitStream, priceKey, sData);
+                            SavePrice(ref bitStream, priceKey);
 
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
                             volumes[volume]++;
+                            SaveVolume(ref bitStream, volume);
                         }
                         else
                         {   // prefix = 0x111
                             cnt4++;
-                            sData.Append(",111");
+
+                            // sData.Append(",111");
                             bitStream.Write8(0x07, 3);
 
                             var timeKey = lastTime - time;
                             if (!times.ContainsKey(timeKey))
                                 times.Add(timeKey, 0);
                             times[timeKey]++;
-                            // SaveTime(ref bitStream, timeKey, sData);
+                            SaveTime(ref bitStream, timeKey);
 
                             var priceKey = price - lastPrice;
                             if (!prices.ContainsKey(priceKey))
                                 prices.Add(priceKey, 0);
                             prices[priceKey]++;
-                            SavePrice(ref bitStream, priceKey, sData);
+                            SavePrice(ref bitStream, priceKey);
 
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
                             volumes[volume]++;
+                            SaveVolume(ref bitStream, volume);
                         }
 
                         lastTime = time;
@@ -121,7 +127,7 @@ namespace Tests.TradesCompressor
                         itemCount++;
                     }
 
-                    var s = "";
+                    /* var s = "";
                     for (var k = 0; k < bitStream.ByteOffset; k++)
                     {
                         s = s + Convert.ToString(_data[k], 2).PadLeft(8, '0');
@@ -137,7 +143,7 @@ namespace Tests.TradesCompressor
                     if (!string.Equals(sData.ToString().Replace(",", ""), s))
                     {
 
-                    }
+                    }*/
 
                     byteCount += bitStream.ByteOffset;
                 }
@@ -172,7 +178,8 @@ namespace Tests.TradesCompressor
             var times = new Dictionary<int, int>();
             var diffPrices = new Dictionary<int, int>();
             var diffPrices2 = new Dictionary<int, int>();
-            var volumes = new Dictionary<int, int>();
+            var volumes = new Dictionary<ulong, int>();
+            var volumes2 = new Dictionary<ulong, int>();
             foreach (var zipFileName in files)
             {
                 // Logger.AddMessage($"File: {zipFileName}");
@@ -190,14 +197,14 @@ namespace Tests.TradesCompressor
 
                     var lastTime = Convert.ToInt32(results[0].sip_timestamp / 1000000000);
                     var lastPrice = Convert.ToInt32(results[0].price * 10000);
-                    var lastVolume = Convert.ToInt32(results[0].size);
+                    var lastVolume = Convert.ToUInt64(results[0].size);
 
                     var itemCount = 0;
                     foreach (var o in results)
                     {
                         var time = Convert.ToInt32(o.sip_timestamp / 1000000000);
                         var price = Convert.ToInt32(o.price * 10000);
-                        var volume = Convert.ToInt32(o.size);
+                        var volume = Convert.ToUInt64(o.size);
 
                         if (price == lastPrice && volume == lastVolume && time == lastTime)
                         { // prefix = 0x110
@@ -210,6 +217,11 @@ namespace Tests.TradesCompressor
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
                             volumes[volume]++;
+
+                            var volumeKey2 = volume % 100 == 0 ? volume / 100 : volume;
+                            if (!volumes2.ContainsKey(volumeKey2))
+                                volumes2.Add(volumeKey2, 0);
+                            volumes2[volumeKey2]++;
                         }
                         else if (time == lastTime)
                         { // prefix = 0x10
@@ -230,6 +242,11 @@ namespace Tests.TradesCompressor
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
                             volumes[volume]++;
+
+                            var volumeKey2 = volume % 100 == 0 ? volume / 100 : volume;
+                            if (!volumes2.ContainsKey(volumeKey2))
+                                volumes2.Add(volumeKey2, 0);
+                            volumes2[volumeKey2]++;
                         }
                         else
                         {   // prefix = 0x111
@@ -255,6 +272,11 @@ namespace Tests.TradesCompressor
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
                             volumes[volume]++;
+
+                            var volumeKey2 = volume % 100 == 0 ? volume / 100 : volume;
+                            if (!volumes2.ContainsKey(volumeKey2))
+                                volumes2.Add(volumeKey2, 0);
+                            volumes2[volumeKey2]++;
                         }
 
                         lastTime = time;
@@ -262,7 +284,6 @@ namespace Tests.TradesCompressor
                         lastVolume = volume;
                         itemCount++;
                     }
-
                 }
             }
 
@@ -278,120 +299,157 @@ namespace Tests.TradesCompressor
             var aa1 = times.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
             var aa21 = diffPrices.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
             var aa22 = diffPrices2.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
-            var aa3 = volumes.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
+            var aa31 = volumes.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
+            var aa32 = volumes2.OrderByDescending(a => a.Value).ToDictionary(a => a.Key, a => a.Value);
         }
 
 
-        private static void SaveTime(ref BitStream<ArrayByteStream> stream, int time, StringBuilder sb)
+        private static void SaveTime(ref BitStream<ArrayByteStream> stream, int time, StringBuilder sb = null)
         {
             if (time == 0)
             {
                 stream.WriteBit(0x0);
-                sb.Append(",0");
-                return;
+                sb?.Append(",0");
             }
             else if (time == 1)
             {
                 stream.Write8(0x4, 3);
-                sb.Append(",100");
-                return;
+                sb?.Append(",100");
             }
             else if (time == 2)
             {
                 stream.Write8(0x5, 3);
-                sb.Append(",101");
-                return;
+                sb?.Append(",101");
             }
             else if (time == 3)
             {
                 stream.Write8(0x6, 3);
-                sb.Append(",110");
-                return;
+                sb?.Append(",110");
             }
-
-            stream.Write8(0x7, 3);
-            sb.Append(",111");
-            if (time <= byte.MaxValue)
+            else
             {
-                stream.WriteBit(0x0);
-                sb.Append("0");
-                // stream.Write(Convert.ToByte(time));
-                // stream.Write32((uint)time, 8);
-                stream.Write8(Convert.ToByte(time), 8);
-                var a = Convert.ToString(time, 2).PadLeft(8, '0');
-                sb.Append(a);
-                return;
+                stream.Write8(0x7, 3);
+                sb?.Append(",111");
+                if (time <= byte.MaxValue)
+                {
+                    stream.WriteBit(0x0);
+                    sb?.Append("0");
+                    // stream.Write(Convert.ToByte(time));
+                    // stream.Write32((uint)time, 8);
+                    stream.Write8(Convert.ToByte(time), 8);
+                    var a = Convert.ToString(time, 2).PadLeft(8, '0');
+                    sb?.Append(a);
+                }
+                else
+                {
+                    stream.WriteBit(0x1);
+                    sb?.Append("1");
+                    stream.Write32(Convert.ToUInt32(time), 32);
+                    sb?.Append(Convert.ToString(time, 2).PadLeft(32, '0'));
+                }
             }
-            stream.WriteBit(0x1);
-            sb.Append("1");
-            stream.Write32(Convert.ToUInt32(time), 32);
-            var a1 = Convert.ToString(time, 2).PadLeft(32, '0');
-            sb.Append(a1);
         }
 
-        private static void SavePrice(ref BitStream<ArrayByteStream> stream, int diffPrice, StringBuilder sb)
+        private static void SavePrice(ref BitStream<ArrayByteStream> stream, int diffPrice, StringBuilder sb = null)
         {
             if (diffPrice < 0)
             {
                 stream.WriteBit(0x1);
-                sb.Append("1");
+                sb?.Append("1");
                 diffPrice = -diffPrice;
             }
             else
             {
                 stream.WriteBit(0x0);
-                sb.Append("0");
+                sb?.Append("0");
             }
 
             if (diffPrice % 50 == 0)
             {
                 stream.WriteBit(0x1);
-                sb.Append("1");
+                sb?.Append("1");
                 diffPrice = diffPrice / 50;
             }
             else
             {
                 stream.WriteBit(0x0);
-                sb.Append("0");
+                sb?.Append("0");
             }
 
             if (diffPrice == 0)
             {
                 stream.Write8(0, 2);
-                sb.Append("00");
+                sb?.Append("00");
             }
             else if (diffPrice == 1)
             {
                 stream.Write8(0x1, 2);
-                sb.Append("01");
+                sb?.Append("01");
             }
             else if (diffPrice == 2)
             {
                 stream.Write8(0x2, 2);
-                sb.Append("10");
+                sb?.Append("10");
             }
             else
             {
                 stream.Write8(0x3, 2);
-                sb.Append("11");
+                sb?.Append("11");
                 if (diffPrice <= Byte.MaxValue)
                 {
                     stream.Write8(Convert.ToByte(diffPrice), 8);
-                    sb.Append(Convert.ToString(diffPrice, 2).PadLeft(8, '0'));
+                    sb?.Append(Convert.ToString(diffPrice, 2).PadLeft(8, '0'));
                 }
                 else if (diffPrice <= UInt16.MaxValue)
                 {
                     stream.Write8(0x0, 8);
-                    sb.Append("00000000");
+                    sb?.Append("00000000");
                     stream.Write16(Convert.ToUInt16(diffPrice), 16);
-                    sb.Append(Convert.ToString(diffPrice, 2).PadLeft(16, '0'));
+                    sb?.Append(Convert.ToString(diffPrice, 2).PadLeft(16, '0'));
                 }
                 else
                 {
                     stream.Write8(0x1, 8);
-                    sb.Append("00000001");
+                    sb?.Append("00000001");
                     stream.Write32((uint)diffPrice, 32);
-                    sb.Append(Convert.ToString(diffPrice, 2).PadLeft(32, '0'));
+                    sb?.Append(Convert.ToString(diffPrice, 2).PadLeft(32, '0'));
+                }
+            }
+        }
+        private static void SaveVolume(ref BitStream<ArrayByteStream> stream, ulong volume, StringBuilder sb = null)
+        {
+            if (volume % 100 == 0)
+            {
+                stream.WriteBit(0x1);
+                sb?.Append("1");
+                volume = volume / 100;
+            }
+            else
+            {
+                stream.WriteBit(0x0);
+                sb?.Append("0");
+            }
+
+            if (volume == 0)
+            {
+                stream.WriteBit(0x0);
+                sb?.Append("0");
+            }
+            else
+            {
+                stream.WriteBit(0x1);
+                sb?.Append("1");
+                if (volume <= byte.MaxValue)
+                {
+                    stream.Write8(Convert.ToByte(volume), 8);
+                    sb?.Append(Convert.ToString((byte)volume, 2).PadLeft(8, '0'));
+                }
+                else
+                {
+                    stream.Write8(0x0, 8);
+                    sb?.Append("00000000");
+                    stream.Write64(volume, 64);
+                    sb?.Append(Convert.ToString((long)volume, 2).PadLeft(64, '0'));
                 }
             }
         }
