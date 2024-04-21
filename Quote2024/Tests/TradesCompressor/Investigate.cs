@@ -127,6 +127,19 @@ namespace Tests.TradesCompressor
                         itemCount++;
                     }
 
+                    // end of stream
+                    bitStream.Write8(0x1, 3);
+
+                    byteCount += bitStream.ByteOffset;
+
+                    var fn = zipFileName.Replace("2024-04", "New2024-04").Replace(".zip", ".bin");
+                    var data2 = new byte[bitStream.ByteOffset];
+                    Array.Copy(_data, data2, bitStream.ByteOffset);
+                    File.WriteAllBytes(fn, data2);
+
+                    // sData.Append("001");
+
+
                     /* var s = "";
                     for (var k = 0; k < bitStream.ByteOffset; k++)
                     {
@@ -144,8 +157,6 @@ namespace Tests.TradesCompressor
                     {
 
                     }*/
-
-                    byteCount += bitStream.ByteOffset;
                 }
             }
 
@@ -175,12 +186,13 @@ namespace Tests.TradesCompressor
             var cnt2 = 0;
             var cnt3 = 0;
             var cnt4 = 0;
+            var repeats = new Dictionary<int, int>();
             var times = new Dictionary<int, int>();
             var diffPrices = new Dictionary<int, int>();
             var diffPrices2 = new Dictionary<int, int>();
             var volumes = new Dictionary<ulong, int>();
             var volumes2 = new Dictionary<ulong, int>();
-            foreach (var zipFileName in files)
+            foreach (var zipFileName in files.Take(1))
             {
                 // Logger.AddMessage($"File: {zipFileName}");
                 Debug.Print($"File: {zipFileName}");
@@ -200,6 +212,7 @@ namespace Tests.TradesCompressor
                     var lastVolume = Convert.ToUInt64(results[0].size);
 
                     var itemCount = 0;
+                    var repeat = 0;
                     foreach (var o in results)
                     {
                         var time = Convert.ToInt32(o.sip_timestamp / 1000000000);
@@ -209,10 +222,12 @@ namespace Tests.TradesCompressor
                         if (price == lastPrice && volume == lastVolume && time == lastTime)
                         { // prefix = 0x110
                             cnt1++;
+                            repeat++;
                         }
                         else if (price == lastPrice && time == lastTime)
                         { // prefix = 0x0
                             cnt2++;
+                            SaveRepeats(ref repeats, ref repeat);
 
                             if (!volumes.ContainsKey(volume))
                                 volumes.Add(volume, 0);
@@ -226,6 +241,7 @@ namespace Tests.TradesCompressor
                         else if (time == lastTime)
                         { // prefix = 0x10
                             cnt3++;
+                            SaveRepeats(ref repeats, ref repeat);
 
                             var priceKey = lastPrice - price;
                             if (!diffPrices.ContainsKey(priceKey))
@@ -251,6 +267,7 @@ namespace Tests.TradesCompressor
                         else
                         {   // prefix = 0x111
                             cnt4++;
+                            SaveRepeats(ref repeats, ref repeat);
 
                             var timeKey = lastTime - time;
                             if (!times.ContainsKey(timeKey))
@@ -306,6 +323,8 @@ namespace Tests.TradesCompressor
 
         private static void SaveTime(ref BitStream<ArrayByteStream> stream, int time, StringBuilder sb = null)
         {
+            // return;
+
             if (time == 0)
             {
                 stream.WriteBit(0x0);
@@ -352,6 +371,8 @@ namespace Tests.TradesCompressor
 
         private static void SavePrice(ref BitStream<ArrayByteStream> stream, int diffPrice, StringBuilder sb = null)
         {
+            // return;
+
             if (diffPrice < 0)
             {
                 stream.WriteBit(0x1);
@@ -418,6 +439,8 @@ namespace Tests.TradesCompressor
         }
         private static void SaveVolume(ref BitStream<ArrayByteStream> stream, ulong volume, StringBuilder sb = null)
         {
+            // return;
+
             if (volume % 100 == 0)
             {
                 stream.WriteBit(0x1);
@@ -430,7 +453,7 @@ namespace Tests.TradesCompressor
                 sb?.Append("0");
             }
 
-            if (volume == 0)
+            if (volume == 1)
             {
                 stream.WriteBit(0x0);
                 sb?.Append("0");
@@ -451,6 +474,17 @@ namespace Tests.TradesCompressor
                     stream.Write64(volume, 64);
                     sb?.Append(Convert.ToString((long)volume, 2).PadLeft(64, '0'));
                 }
+            }
+        }
+
+        private static void SaveRepeats(ref Dictionary<int,int> repeats, ref int repeat)
+        {
+            if (repeat != 0)
+            {
+                if (!repeats.ContainsKey(repeat))
+                    repeats.Add(repeat, 0);
+                repeats[repeat]++;
+                repeat = 0;
             }
         }
     }

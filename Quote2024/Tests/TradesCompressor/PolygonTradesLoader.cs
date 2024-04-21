@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProtoBuf;
 
 namespace Tests.TradesCompressor
 {
@@ -16,22 +17,29 @@ namespace Tests.TradesCompressor
             public string next_url;
         }
 
+        [ProtoContract]
         public class cResult
         {
+            [ProtoMember(1)]
+            public ushort Seconds2;
+
+            [ProtoMember(2)]
             public int Price2;
 
-            public int Size2;
-
-            public ushort Seconds2;
+            [ProtoMember(3)]
+            public uint Size2;
 
             public byte[] conditions;
             public byte exchange;
             public string id;
             public long participant_timestamp;
+
             public float price;
             public int sequence_number;
+
             public long sip_timestamp; // syncronized with sequence_number
-            public double size;
+
+            public float size;
             public byte type;
             public int trf_id;
             public long trf_timestamp;
