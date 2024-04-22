@@ -67,10 +67,10 @@ namespace Data.Actions.Polygon
                       "inner join dbQ2024..DayPolygon p2 on a.Symbol=p2.Symbol and d.Prev2=p2.Date "+
                       "inner join dbQ2024..DayPolygon p3 on a.Symbol=p3.Symbol and d.Prev3=p3.Date "+
                       $"where a.Date='{date:yyyy-MM-dd}' and a.IsTest is null and "+
-                      "a.[Close] between 5.0 and 5000.0 and " +
-                      "p1.[Close]*p1.[Volume]/1000000>=50 and p1.TradeCount>=1000 and " +
-                      "p2.[Close]*p2.[Volume]/1000000>=50 and p2.TradeCount>=1000 and "+
-                      "p3.[Close]*p3.[Volume]/1000000>=50 and p3.TradeCount>=1000";
+                      "a.High > 5.0 and a.Low < 5000.0 and " +
+                      "p1.[Close]*p1.[Volume]/1000000>=50 and p1.TradeCount>=10000 and " +
+                      "p2.[Close]*p2.[Volume]/1000000>=50 and p2.TradeCount>=10000 and "+
+                      "p3.[Close]*p3.[Volume]/1000000>=50 and p3.TradeCount>=10000";
 
             var symbols = new List<string>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
