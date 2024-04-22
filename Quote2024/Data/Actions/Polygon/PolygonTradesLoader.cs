@@ -243,20 +243,20 @@ namespace Data.Actions.Polygon
                     Logger.AddMessage($"Downloading {cnt} data chunk into {Path.GetFileName(zipFileName)} for {symbol}/{date:yyyy-MM-dd}");
 
                     url = url + "&apiKey=" + PolygonCommon.GetApiKey2003();
-                    // var filename = folder + $@"\SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json";
+                    // var filename = folder + $@"\PolygonTrades_{cnt:D2}_{date:yyyyMMdd}.json";
                     // Logger.AddMessage($"Downloading {cnt} data chunk into {Path.GetFileName(filename)} for {date:yyyy-MM-dd}");
 
                     var o = Data.Helpers.Download.DownloadToBytes(url, true);
                     if (o.Item2 != null)
                         throw new Exception(
-                            $"PolygonSymbolsLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                            $"PolygonTradesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
-                    // var entry = new VirtualFileEntry(Path.Combine(Path.GetFileName(folder), $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), o.Item1);
-                    var entry = new VirtualFileEntry($@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json", o.Item1);
+                    // var entry = new VirtualFileEntry(Path.Combine(Path.GetFileName(folder), $@"PolygonTrades_{cnt:D2}_{date:yyyyMMdd}.json"), o.Item1);
+                    var entry = new VirtualFileEntry($@"PolygonTrades_{cnt:D2}_{date:yyyyMMdd}.json", o.Item1);
                     virtualFileEntries.Add(entry);
 
                     var oo = ZipUtils.DeserializeBytes<cRoot>(entry.Content);
-                    //File.WriteAllText(Path.Combine(folder, $@"SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json"), (byte[])o);
+                    //File.WriteAllText(Path.Combine(folder, $@"PolygonTrades_{cnt:D2}_{date:yyyyMMdd}.json"), (byte[])o);
 
                     //var oo = JsonConvert.DeserializeObject<cRoot>((string)o);
                     if (oo.status != "OK")
