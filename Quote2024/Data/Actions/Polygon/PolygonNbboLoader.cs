@@ -14,9 +14,9 @@ namespace Data.Actions.Polygon
         public static void Start()
         {
             var date = new DateTime(2024, 04, 5);
-            var symbols = Actions.Polygon.PolygonCommon.GetSymbolsForStrategies(date);
+            var symbols = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(date);
 
-            foreach (var symbol in symbols)
+            foreach (var symbol in symbols.Keys)
                 Download(symbol, new DateTime(2024, 4, 5));
 
             Logger.AddMessage($"Finished!");
@@ -85,15 +85,15 @@ namespace Data.Actions.Polygon
             public long participant_timestamp;
             public int sequence_number;
             public long sip_timestamp; // ??? for trades: syncronized with sequence_number
-            public byte type;
+            public byte tape;
 
             public long trf_timestamp; // ??
+            public DateTime SipDt => TimeHelper.GetEstDateTimeFromUnixMilliseconds(sip_timestamp / 1000000);
+            public TimeSpan SipTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(sip_timestamp / 1000000).TimeOfDay;
 
             /*            public DateTime ParticipantDt => TimeHelper.GetEstDateTimeFromUnixMilliseconds(participant_timestamp / 1000000);
-                        public DateTime SipDt => TimeHelper.GetEstDateTimeFromUnixMilliseconds(sip_timestamp / 1000000);
                         public DateTime TrfDt => TimeHelper.GetEstDateTimeFromUnixMilliseconds(trf_timestamp / 1000000);
                         public TimeSpan ParticipantTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(participant_timestamp / 1000000).TimeOfDay;
-                        public TimeSpan SipTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(sip_timestamp / 1000000).TimeOfDay;
                         // public DateTime TrfDt => TimeHelper.GetEstDateTimeFromUnixMilliseconds(trf_timestamp / 1000000);*/
         }
     }

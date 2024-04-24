@@ -59,9 +59,11 @@ namespace Data.Actions.Polygon
             return myTicker;
         }
 
-        public static List<string> GetSymbolsForStrategies(DateTime date)
+        public static Dictionary<string, float> GetSymbolsAndHighToLowForStrategies(DateTime date)
         {
-            var sql = "select a.Symbol, a.[Close]*a.[Volume]/1000000 TradeValue from dbQ2024..DayPolygon a "+
+            var sql = "select a.Symbol, a.[Close]*a.[Volume]/1000000 TradeValue, "+
+                      "((p1.High-p1.Low)/(p1.High+p1.Low)*2 + (p2.High-p2.Low)/(p2.High+p2.Low)*2 + (p3.High-p3.Low)/(p3.High+p3.Low)*2)/3 * 100 avgHighToLow "+
+                      "from dbQ2024..DayPolygon a " +
                       "inner join dbQ2024..TradingDays d on a.Date=d.Date "+
                       "inner join dbQ2024..DayPolygon p1 on a.Symbol=p1.Symbol and d.Prev1=p1.Date "+
                       "inner join dbQ2024..DayPolygon p2 on a.Symbol=p2.Symbol and d.Prev2=p2.Date "+
@@ -72,7 +74,7 @@ namespace Data.Actions.Polygon
                       "p2.[Close]*p2.[Volume]/1000000>=50 and p2.TradeCount>=10000 and "+
                       "p3.[Close]*p3.[Volume]/1000000>=50 and p3.TradeCount>=10000";
 
-            var symbols = new List<string>();
+            var symbols = new Dictionary<string, float>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
@@ -80,7 +82,7 @@ namespace Data.Actions.Polygon
                 cmd.CommandText = sql;
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
-                        symbols.Add((string)rdr["symbol"]);
+                        symbols.Add((string)rdr["symbol"], Convert.ToSingle(rdr["avgHighToLow"]));
             }
 
             return symbols;

@@ -113,9 +113,9 @@ namespace Data.Actions.Polygon
         public static void Start()
         {
             var date = new DateTime(2024, 04, 5);
-            var symbols = Actions.Polygon.PolygonCommon.GetSymbolsForStrategies(date);
+            var symbols = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(date);
 
-            foreach (var symbol in symbols)
+            foreach (var symbol in symbols.Keys)
                 Download(symbol, new DateTime(2024, 4, 5));
 
             Logger.AddMessage($"Finished!");
