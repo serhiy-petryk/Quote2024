@@ -82,7 +82,10 @@ namespace Data.Actions.Polygon
                 cmd.CommandText = sql;
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
-                        symbols.Add((string)rdr["symbol"], Convert.ToSingle(rdr["avgHighToLow"]));
+                    {
+                        if (Convert.ToSingle(rdr["avgHighToLow"]) > 0.1)
+                            symbols.Add((string)rdr["symbol"], Convert.ToSingle(rdr["avgHighToLow"]));
+                    }
             }
 
             return symbols;
