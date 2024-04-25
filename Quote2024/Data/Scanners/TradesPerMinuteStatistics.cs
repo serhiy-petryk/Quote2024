@@ -398,7 +398,7 @@ Time	Count	Trades	% change
 15:58:00	260312	469	114,3902439	!!
 15:59:00	260384	846	180,3837953	!!!
 */
-    public class TradesPerMinute
+    public class TradesPerMinuteStatistics
     {
         public static void Start()
         {
