@@ -34,21 +34,21 @@ namespace Data.Scanners
                 aa.Add(ts);
                 ts = ts.Add(new TimeSpan(0, 15, 0));
             }
-            Start("dbQ2024..Min15Polygon", aa.ToArray(), aa.Where(a => a <= Settings.MarketEndOfShortenedDay).ToArray());
+            Start("dbQ2024Temp1..Min15Polygon", aa.ToArray(), aa.Where(a => a <= Settings.MarketEndOfShortenedDay).ToArray());
         }
 
         public static void StartHourHalf()
         {
             var timeCommon = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            Start("dbQ2024..HourHalfPolygon", timeCommon, timeShortened);
+            Start("dbQ2024Temp1..HourHalfPolygon", timeCommon, timeShortened);
         }
 
         public static void StartHour()
         {
             var timeCommon = "09:30,10:00,11:00,12:00,13:00,14:00,15:00,15:45,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,11:00,12:00,12:45,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            Start("dbQ2024..HourPolygon2", timeCommon, timeShortened);
+            Start("dbQ2024Temp1..HourPolygon2", timeCommon, timeShortened);
         }
 
         public static void Start(string tableName, TimeSpan[] timeCommon, TimeSpan[] timeShortened)
