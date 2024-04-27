@@ -14,10 +14,10 @@ namespace Data.Actions.Polygon
         public static void Start()
         {
             var date = new DateTime(2024, 04, 5);
-            var symbols = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(date);
+            var tickerAndDateAndHighToLow = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(new [] {date});
 
-            foreach (var symbol in symbols.Keys)
-                Download(symbol, new DateTime(2024, 4, 5));
+            foreach (var symbol in tickerAndDateAndHighToLow.Keys)
+                Download(symbol, date);
 
             Logger.AddMessage($"Finished!");
         }

@@ -22,27 +22,18 @@ namespace Data.Strategies
             var beforePriceRangePercent = 1f;
             var highToLowPercent = 0.5f;
 
-            Logger.AddMessage($"Define dates");
+            Logger.AddMessage($"Select tickers");
             var zipFileName = @"E:\Quote\WebData\Minute\Polygon2003\Data\MP2003_20240406.zip";
-            var tickerAndDateAndHighToLow = new Dictionary<string, Dictionary<DateTime, float>>();
+            Dictionary<string, Dictionary<DateTime, float>> tickerAndDateAndHighToLow;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
             {
                 var entry = zip.Entries.First(a => a.Name.Contains("_AA_"));
                 var oo = ZipUtils.DeserializeZipEntry<PolygonCommon.cMinuteRoot>(entry);
-                foreach (var d in oo.results.Select(a => a.DateTime.Date).Distinct().OrderBy(a => a))
-                {
-                    Logger.AddMessage($"Define tickers for {d:yyyy-MM-dd}");
-                    var aa = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(d);
-                    foreach (var kvp in aa)
-                    {
-                        if (!tickerAndDateAndHighToLow.ContainsKey(kvp.Key))
-                            tickerAndDateAndHighToLow.Add(kvp.Key, new Dictionary<DateTime, float>());
-                        tickerAndDateAndHighToLow[kvp.Key].Add(d, kvp.Value);
-                    }
-                    // break;
-                }
+                tickerAndDateAndHighToLow = PolygonCommon.GetSymbolsAndHighToLowForStrategies(oo.results.Select(a => a.DateTime.Date)
+                    .Distinct().OrderBy(a => a).ToArray());
             }
 
+            Logger.AddMessage($"Calculate data");
             Debug.Print($"BeforeTicks: {beforeTickCount}\tPrevPriceRange,%: {beforePriceRangePercent}\tHighToLow,%: {highToLowPercent}");
             Debug.Print("Ticker\tDateTime\tDailyHighToLow\tGap\tGap,%\tHighLow,%\t K trades\tPrevClose\tOpen\tHigh\tLow\tClose\tTrades\tProfit,%");
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
@@ -114,23 +105,13 @@ namespace Data.Strategies
 
             Logger.AddMessage($"Define dates");
             var zipFileName = @"E:\Quote\WebData\Minute\Polygon2003\Data\MP2003_20240406.zip";
-            var tickerAndDateAndHighToLow = new Dictionary<string, Dictionary<DateTime, float>>();
+            Dictionary<string, Dictionary<DateTime, float>> tickerAndDateAndHighToLow;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
             {
                 var entry = zip.Entries.First(a => a.Name.Contains("_AA_"));
                 var oo = ZipUtils.DeserializeZipEntry<PolygonCommon.cMinuteRoot>(entry);
-                foreach (var d in oo.results.Select(a => a.DateTime.Date).Distinct().OrderBy(a => a))
-                {
-                    Logger.AddMessage($"Define tickers for {d:yyyy-MM-dd}");
-                    var aa = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(d);
-                    foreach (var kvp in aa)
-                    {
-                        if (!tickerAndDateAndHighToLow.ContainsKey(kvp.Key))
-                            tickerAndDateAndHighToLow.Add(kvp.Key, new Dictionary<DateTime, float>());
-                        tickerAndDateAndHighToLow[kvp.Key].Add(d, kvp.Value);
-                    }
-                    // break;
-                }
+                tickerAndDateAndHighToLow = PolygonCommon.GetSymbolsAndHighToLowForStrategies(oo.results.Select(a => a.DateTime.Date)
+                    .Distinct().OrderBy(a => a).ToArray());
             }
 
             Debug.Print($"BeforeTicks: {beforeTickCount}\tPrevPriceRange,%: {beforePriceRangePercent}\tHighToLow,%: {highToLowPercent}");

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Data.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -59,22 +60,27 @@ namespace Data.Actions.Polygon
             return myTicker;
         }
 
-        public static Dictionary<string, float> GetSymbolsAndHighToLowForStrategies(DateTime date)
+        public static Dictionary<string, Dictionary<DateTime, float>> GetSymbolsAndHighToLowForStrategies(DateTime[] dates)
         {
-            var sql = "select a.Symbol, a.[Close]*a.[Volume]/1000000 TradeValue, "+
-                      "((p1.High-p1.Low)/(p1.High+p1.Low)*2 + (p2.High-p2.Low)/(p2.High+p2.Low)*2 + (p3.High-p3.Low)/(p3.High+p3.Low)*2)/3 * 100 avgHighToLow "+
+            var sb = new StringBuilder();
+            foreach (var date in dates)
+                sb.Append($",'{date:yyyy-MM-dd}'");
+            sb.Remove(0, 1);
+
+            var sql = "select a.Symbol, a.Date, a.[Close]*a.[Volume]/1000000 TradeValue, " +
+                      "((p1.High-p1.Low)/(p1.High+p1.Low)*2 + (p2.High-p2.Low)/(p2.High+p2.Low)*2 + (p3.High-p3.Low)/(p3.High+p3.Low)*2)/3 * 100 avgHighToLow " +
                       "from dbQ2024..DayPolygon a " +
-                      "inner join dbQ2024..TradingDays d on a.Date=d.Date "+
-                      "inner join dbQ2024..DayPolygon p1 on a.Symbol=p1.Symbol and d.Prev1=p1.Date "+
-                      "inner join dbQ2024..DayPolygon p2 on a.Symbol=p2.Symbol and d.Prev2=p2.Date "+
-                      "inner join dbQ2024..DayPolygon p3 on a.Symbol=p3.Symbol and d.Prev3=p3.Date "+
-                      $"where a.Date='{date:yyyy-MM-dd}' and a.IsTest is null and "+
+                      "inner join dbQ2024..TradingDays d on a.Date=d.Date " +
+                      "inner join dbQ2024..DayPolygon p1 on a.Symbol=p1.Symbol and d.Prev1=p1.Date " +
+                      "inner join dbQ2024..DayPolygon p2 on a.Symbol=p2.Symbol and d.Prev2=p2.Date " +
+                      "inner join dbQ2024..DayPolygon p3 on a.Symbol=p3.Symbol and d.Prev3=p3.Date " +
+                      $"where a.Date IN({sb}) and a.IsTest is null and " +
                       "a.High > 5.0 and a.Low < 5000.0 and " +
                       "p1.[Close]*p1.[Volume]/1000000>=50 and p1.TradeCount>=10000 and " +
-                      "p2.[Close]*p2.[Volume]/1000000>=50 and p2.TradeCount>=10000 and "+
+                      "p2.[Close]*p2.[Volume]/1000000>=50 and p2.TradeCount>=10000 and " +
                       "p3.[Close]*p3.[Volume]/1000000>=50 and p3.TradeCount>=10000";
 
-            var symbols = new Dictionary<string, float>();
+            var tickerAndDateAndHighToLow = new Dictionary<string, Dictionary<DateTime, float>>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
@@ -83,12 +89,19 @@ namespace Data.Actions.Polygon
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
-                        if (Convert.ToSingle(rdr["avgHighToLow"]) > 0.1)
-                            symbols.Add((string)rdr["symbol"], Convert.ToSingle(rdr["avgHighToLow"]));
+                        var symbol = (string)rdr["symbol"];
+                        var date = (DateTime)rdr["date"];
+                        var avgHighToLow = Convert.ToSingle(rdr["avgHighToLow"]);
+                        if (avgHighToLow > 0.1)
+                        {
+                            if (!tickerAndDateAndHighToLow.ContainsKey(symbol))
+                                tickerAndDateAndHighToLow.Add(symbol, new Dictionary<DateTime, float>());
+                            tickerAndDateAndHighToLow[symbol].Add(date, avgHighToLow);
+                        }
                     }
             }
 
-            return symbols;
+            return tickerAndDateAndHighToLow;
         }
 
         #region ========  Json classes  ===========

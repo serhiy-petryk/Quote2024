@@ -89,8 +89,8 @@ namespace Data.Strategies.HighLow
             var endTime = new TimeSpan(15, 30, 0);
             var scanTime = new TimeSpan(0, 30, 0);
 
-            var symbolsAndHighToLow = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(date);
-            var symbols = symbolsAndHighToLow.Keys.ToArray();
+            var tickerAndDateAndHighToLow = Actions.Polygon.PolygonCommon.GetSymbolsAndHighToLowForStrategies(new[] { date });
+            var symbols = tickerAndDateAndHighToLow.Keys.ToArray();
             // var symbols = new List<string>{"A", "AA", "AAAU"};
 
             var zipFileName = @"E:\Quote\WebData\Minute\Polygon2003\Data\MP2003_20240406.zip";
@@ -118,7 +118,7 @@ namespace Data.Strategies.HighLow
                     var low = kvp.Value.Where(a => a.t >= ticks1 && a.t < ticks2).Min(a => a.l);
                     var count = kvp.Value.Count(a => a.t >= ticks1 && a.t < ticks2);
                     var highToLow = Convert.ToSingle(Math.Round((high - low) / (high + low) * 200f, 2));
-                    var prevHighToLow = symbolsAndHighToLow[kvp.Key];
+                    var prevHighToLow = tickerAndDateAndHighToLow[kvp.Key][date];
                     if (low > 5.0f && high < 5000.0f && count >= 20 && highToLow/prevHighToLow > 1.0f)
                     {
                         var lastClose = kvp.Value.Last(a => a.t >= ticks1 && a.t < ticks2).c;
