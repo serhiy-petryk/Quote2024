@@ -8,6 +8,10 @@ namespace Data.Actions.Polygon
         {
             Logger.AddMessage($"Synchronize Polygon Day and Symbols data");
             DbHelper.RunProcedure("dbQ2024..pSynchronizePolygonDayAndSymbols");
+
+            Logger.AddMessage($"Update DayPolygonSummary data");
+            DbHelper.RunProcedure("dbQ2024..pUpdateDayPolygonSummary");
+            
             Logger.AddMessage($"!Finished.");
         }
     }
