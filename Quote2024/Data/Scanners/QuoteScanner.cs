@@ -34,14 +34,14 @@ namespace Data.Scanners
                 aa.Add(ts);
                 ts = ts.Add(new TimeSpan(0, 15, 0));
             }
-            Start("dbQ2024Temp1..Min15Polygon", aa.ToArray(), aa.Where(a => a <= Settings.MarketEndOfShortenedDay).ToArray());
+            Start("dbQ2024Tests2..Min15Polygon", aa.ToArray(), aa.Where(a => a <= Settings.MarketEndOfShortenedDay).ToArray());
         }*/
 
         public static void StartHourHalf()
         {
             var timeCommon = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            var tableName = "dbQ2024Temp1..HourHalfPolygon";
+            var tableName = "dbQ2024Tests2..HourHalfPolygon";
             var sourceSql = "select a.Symbol, a.Date from dbQ2024Minute..MinutePolygonLog a " +
                             "inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date " +
                             "where year(a.date) in (2023) and a.RowStatus IN (2, 5) and " +
@@ -53,7 +53,7 @@ namespace Data.Scanners
         {
             var timeCommon = "09:30,10:00,11:00,12:00,13:00,14:00,15:00,15:45,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,11:00,12:00,12:45,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            var tableName = "dbQ2024Temp1..HourPolygon";
+            var tableName = "dbQ2024Tests2..HourPolygon";
             var sourceSql = "select a.Symbol, a.Date from dbQ2024Minute..MinutePolygonLog a "+
                             "inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date "+
                             "where year(a.date) in (2021, 2022, 2023) and a.RowStatus IN (2, 5) and "+
