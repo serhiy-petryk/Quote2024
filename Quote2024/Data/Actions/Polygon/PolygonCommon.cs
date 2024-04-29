@@ -67,7 +67,7 @@ namespace Data.Actions.Polygon
                 sb.Append($",'{date:yyyy-MM-dd}'");
             sb.Remove(0, 1);
 
-            var sql1 = "select a.Symbol, a.Date, a.[Close]*a.[Volume]/1000000 TradeValue, " +
+            /*var sql1 = "select a.Symbol, a.Date, a.[Close]*a.[Volume]/1000000 TradeValue, " +
                       "((p1.High-p1.Low)/(p1.High+p1.Low)*2 + (p2.High-p2.Low)/(p2.High+p2.Low)*2 + (p3.High-p3.Low)/(p3.High+p3.Low)*2)/3 * 100 Avg3HighLowPercent " +
                       "from dbQ2024..DayPolygon a " +
                       "inner join dbQ2024..TradingDays d on a.Date=d.Date " +
@@ -78,7 +78,7 @@ namespace Data.Actions.Polygon
                       "a.High > 5.0 and a.Low < 5000.0 and " +
                       "p1.[Close]*p1.[Volume]/1000000>=50 and p1.TradeCount>=10000 and " +
                       "p2.[Close]*p2.[Volume]/1000000>=50 and p2.TradeCount>=10000 and " +
-                      "p3.[Close]*p3.[Volume]/1000000>=50 and p3.TradeCount>=10000";
+                      "p3.[Close]*p3.[Volume]/1000000>=50 and p3.TradeCount>=10000";*/
             var sql = "select * from dbQ2024..DayPolygonSummary a inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date "+
                       $"where a.Date IN ({sb}) and a.Min3TradeCount >= 10000 and a.Min3TradeValue >= 50 and "+
                       "b.IsTest is null and b.High > 5.0 and b.Low < 5000.0 ";
