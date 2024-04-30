@@ -41,11 +41,11 @@ namespace Data.Scanners
         {
             var timeCommon = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            var tableName = "dbQ2024Tests2..HourHalfPolygon";
+            var tableName = "dbQ2024Tests2..HourHalfPolygon3";
             var sourceSql = "select a.Symbol, a.Date from dbQ2024Minute..MinutePolygonLog a " +
                             "inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date " +
                             "where year(a.date) in (2023) and a.RowStatus IN (2, 5) and " +
-                            "a.[High]*a.Volume > 5000000 and a.TradeCount > 500 and b.IsTest is null";
+                            "a.[High]*a.Volume >= 5000000 and a.TradeCount >= 500 and b.IsTest is null";
             Start(tableName, timeCommon, timeShortened, sourceSql);
         }
 
@@ -54,9 +54,9 @@ namespace Data.Scanners
             var timeCommon = "09:30,10:00,11:00,12:00,13:00,14:00,15:00,15:45,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,11:00,12:00,12:45,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var tableName = "dbQ2024Tests2..HourPolygon";
-            var sourceSql = "select a.Symbol, a.Date from dbQ2024Minute..MinutePolygonLog a "+
-                            "inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date "+
-                            "where year(a.date) in (2021, 2022, 2023) and a.RowStatus IN (2, 5) and "+
+            var sourceSql = "select a.Symbol, a.Date from dbQ2024Minute..MinutePolygonLog a " +
+                            "inner join dbQ2024..DayPolygon b on a.Symbol = b.Symbol and a.Date = b.Date " +
+                            "where year(a.date) in (2021, 2022, 2023) and a.RowStatus IN (2, 5) and " +
                             "a.[High]*a.Volume >= 5000000 and a.TradeCount >= 500 and b.IsTest is null";
             Start(tableName, timeCommon, timeShortened, sourceSql, 5.0f, 500);
         }
@@ -71,7 +71,7 @@ namespace Data.Scanners
         }
 
         public static void Start(string tableName, TimeSpan[] timeCommon, TimeSpan[] timeShortened, string sourceSql,
-            float minTurnover = float.MaxValue, int minTradeCount = int.MaxValue)
+            float minTurnover = float.MinValue, int minTradeCount = int.MinValue)
         {
             var timeRangeCommon = new List<(TimeSpan, TimeSpan)>();
             for (var k = 0; k < timeCommon.Length - 1; k++)
