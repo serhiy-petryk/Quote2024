@@ -31,9 +31,9 @@ namespace Data.Actions.Chartmill
 
             // Parse and save data to database
             Logger.AddMessage($"Parse and save to database");
-            ParseJsonAndSaveToDb(zipFileName);
+            var itemCount = ParseJsonAndSaveToDb(zipFileName);
 
-            Logger.AddMessage($"!Finished. Items: itemCount:N0. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
+            Logger.AddMessage($"!Finished. Items: {itemCount:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
         }
 
         public static void DownloadAndSaveToZipHistory()
@@ -65,7 +65,7 @@ namespace Data.Actions.Chartmill
             Logger.AddMessage($"!Finished.");
         }
 
-        private static void ParseJsonAndSaveToDb(string zipFileName)
+        private static int ParseJsonAndSaveToDb(string zipFileName)
         {
             var dateKey = DateTime.ParseExact(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1], "yyyyMMdd",
                 CultureInfo.InvariantCulture);
@@ -97,6 +97,8 @@ namespace Data.Actions.Chartmill
                 "Exchange", "Sector", "Industry", "Name", "ISIN", "Country", "Type", "Etf");
 
             DbHelper.RunProcedure("dbQ2023Others..pUpdateScreenerChartmill");
+
+            return data.Count;
         }
 
         private static string DownloadAndSaveToZip(DateTime? date)
