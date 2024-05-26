@@ -12,10 +12,6 @@ namespace Data.Actions.Polygon
 {
     public static class PolygonMinuteScan
     {
-        private static readonly DateTime From = new DateTime(2018, 1, 1);
-        private static readonly DateTime To = new DateTime(2024, 12, 29);
-        // private static readonly DateTime From = new DateTime(2023, 1, 1);
-        // private static readonly DateTime To = new DateTime(2023, 3, 1);
         private const int MinTurnover = 50;
         private const int MinTradeCount = 5000;
 
@@ -45,11 +41,8 @@ namespace Data.Actions.Polygon
             Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}. Bytes: {byteCount:N0}");
         }
 
-        public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetQuotes(DateTime? from = null, DateTime? to = null)
+        public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetQuotes(DateTime from, DateTime to)
         {
-            if (!from.HasValue) from = From;
-            if (!to.HasValue) to = To;
-
             var sw = new Stopwatch();
             sw.Start();
 
@@ -58,7 +51,7 @@ namespace Data.Actions.Polygon
 
             Logger.AddMessage($"Started");
 
-            foreach (var oo in GetData(from.Value, to.Value))
+            foreach (var oo in GetData(from, to))
             {
                 if (itemCount % 100 == 0)
                     Logger.AddMessage($"Items: {itemCount}");
@@ -74,11 +67,8 @@ namespace Data.Actions.Polygon
             Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}. Bytes: {byteCount:N0}");
         }
 
-        public static void Start(DateTime? from = null, DateTime? to = null)
+        public static void Start(DateTime from, DateTime to)
         {
-            if (!from.HasValue) from = From;
-            if (!to.HasValue) from = To;
-
             var sw = new Stopwatch();
             sw.Start();
 
@@ -87,7 +77,7 @@ namespace Data.Actions.Polygon
 
             Logger.AddMessage($"Started");
 
-            foreach (var oo in GetData(from.Value, to.Value))
+            foreach (var oo in GetData(from, to))
             {
                 if (itemCount % 100 == 0)
                     Logger.AddMessage($"Items: {itemCount}");
