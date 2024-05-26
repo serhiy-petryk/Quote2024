@@ -35,7 +35,7 @@ namespace Data.Scanners
                 "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
             
             foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(new DateTime(2018, 1, 1),
-                         new DateTime(2024, 12, 29)))
+                         new DateTime(2024, 12, 29), 50f, 5000))
             {
                 var symbol = oo.Item1;
                 var date = oo.Item2;
