@@ -47,7 +47,7 @@ namespace Data.Scanners
                             "a.Symbol + CONVERT(nchar(8), date, 112) not in "+
                             "(select Symbol + CONVERT(nchar(8), date, 112) from dbQ2024..DayPolygon where IsTest is not null) and " +
                             "a.[High]*a.Volume >= 1000000 and a.TradeCount >= 500";
-            Start(tableName, timeCommon, timeShortened, sourceSql, 1.0f, 500);
+            Start(tableName, timeCommon, timeShortened, new DateTime(2021, 1, 1), new DateTime(2099, 12, 31), 1.0f, 500);
         }
 
         public static void StartHour()
@@ -60,20 +60,20 @@ namespace Data.Scanners
                             "a.Symbol + CONVERT(nchar(8), date, 112) not in " +
                             "(select Symbol + CONVERT(nchar(8), date, 112) from dbQ2024..DayPolygon where IsTest is not null) and " +
                             "a.[High]*a.Volume >= 1000000 and a.TradeCount >= 500";
-            Start(tableName, timeCommon, timeShortened, sourceSql, 1.0f, 500);
+            Start(tableName, timeCommon, timeShortened, new DateTime(2022, 1, 1), new DateTime(2099, 12, 31), 1.0f, 500);
         }
 
-        public static void StartTestHour()
+        /*public static void StartTestHour()
         {
             var timeCommon = "09:30,10:00,11:00,12:00,13:00,14:00,15:00,15:45,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,11:00,12:00,12:45,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var tableName = "dbQ2024Tests..temp_OpenClose_Hour_2024_02";
             var sourceSql = "select symbol, Date3 Date from dbQ2024Tests..temp_OpenClose_2024_02";
             Start(tableName, timeCommon, timeShortened, sourceSql);
-        }
+        }*/
 
-        public static void Start(string tableName, TimeSpan[] timeCommon, TimeSpan[] timeShortened, string sourceSql,
-            float minTurnover = float.MinValue, int minTradeCount = int.MinValue)
+        public static void Start(string tableName, TimeSpan[] timeCommon, TimeSpan[] timeShortened, DateTime fromDate, DateTime toDate, // string sourceSql,
+            float minTradeValue = float.MinValue, int minTradeCount = int.MinValue)
         {
             var timeRangeCommon = new List<(TimeSpan, TimeSpan)>();
             for (var k = 0; k < timeCommon.Length - 1; k++)
@@ -99,7 +99,7 @@ namespace Data.Scanners
                 "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20",
                 "Prev2Ema2_30", "PrevEma2_30", "Ema2_30", "CloseAtEma2_30");
 
-            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(sourceSql))
+            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetMinuteQuotesByDate(fromDate, toDate, minTradeValue, minTradeCount))
             {
                 var symbol = oo.Item1;
                 var date = oo.Item2;
@@ -264,7 +264,7 @@ namespace Data.Scanners
                     }
                 }
 
-                if (results.Select(a => a.Volume * a.Close / 1000000f).Any(a => a >= minTurnover)
+                if (results.Select(a => a.Volume * a.Close / 1000000f).Any(a => a >= minTradeValue)
                     && results.Any(a => a.TradeCount >= minTradeCount))
                     allResults.AddRange(results);
                 else

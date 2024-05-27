@@ -34,7 +34,7 @@ namespace Data.Scanners
             DbHelper.ClearAndSaveToDbTable(allResults, "dbQ2023Others..xx_scanner", "Symbol", "Date", "From", "To",
                 "Count", "TradeCount", "HighBefore", "LowBefore", "Average", "Open", "High", "Low", "Close", "Final", "FinalTime");
             
-            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(new DateTime(2018, 1, 1),
+            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetMinuteQuotesByDate(new DateTime(2018, 1, 1),
                          new DateTime(2024, 12, 29), 50f, 5000))
             {
                 var symbol = oo.Item1;

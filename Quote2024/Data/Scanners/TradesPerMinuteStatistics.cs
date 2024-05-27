@@ -404,7 +404,7 @@ Time	Count	Trades	% change
         {
             var result = new Dictionary<TimeSpan, float[]>();
             var quoteCount = 0;
-            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetQuotes(new DateTime(2023, 1, 1),
+            foreach (var oo in Data.Actions.Polygon.PolygonMinuteScan.GetMinuteQuotesByDate(new DateTime(2023, 1, 1),
                          new DateTime(2024, 1, 1), 50f, 5000))
             {
                 quoteCount += oo.Item3.Length;
