@@ -26,8 +26,7 @@ namespace Data.Tests
             }
 
             sw.Stop();
-            Debug.Print($"Test3. Items: {itemCount:N0}. Duration: {sw.ElapsedMilliseconds:N0}");
+            Debug.Print($"Test. Items: {itemCount:N0}. Duration: {sw.ElapsedMilliseconds:N0}");
         }
-
     }
 }

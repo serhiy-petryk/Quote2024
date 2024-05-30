@@ -13,17 +13,40 @@ namespace Data.Actions.Polygon
 {
     public static class PolygonMinuteScan
     {
+
+        public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetMinuteQuotesByDate(string sqlWithSymbolAndDate)
+        {
+            var sql = $"SELECT a.Folder, a.Symbol, a.Date FROM dbQ2024Minute..MinutePolygonLog a inner join " +
+                                        $"({sqlWithSymbolAndDate}) b on a.Symbol = b.Symbol and a.Date = b.Date " +
+                                        "WHERE RowStatus IN (2, 5) ORDER BY a.Folder, a.Symbol, a.Date";
+
+            return GetMinuteQuotes(sql);
+        }
+
         public static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetMinuteQuotesByDate(DateTime from, DateTime to, float minTradeValue, int minTradeCount)
+        {
+            var sql = $"SELECT a.Folder, a.Symbol, a.Date FROM dbQ2024Minute..MinutePolygonLog a " +
+                                        "inner join dbQ2024..DayPolygon b on a.Symbol=b.Symbol and a.Date=b.Date " +
+                                        "WHERE b.IsTest IS NULL AND a.RowStatus IN (2, 5) " +
+                                        $"AND a.Date BETWEEN '{from:yyyy-MM-dd}' AND '{to:yyyy-MM-dd}' AND " +
+                                        $"a.[Close]*a.[Volume]>={(minTradeValue * 1000000).ToString(CultureInfo.InvariantCulture)} AND a.TradeCount>={minTradeCount} " +
+                                        "ORDER BY a.Folder, a.Symbol, a.Date";
+
+            return GetMinuteQuotes(sql);
+        }
+
+        private static IEnumerable<(string, DateTime, PolygonCommon.cMinuteItem[])> GetMinuteQuotes(string sql)
         {
             var sw = new Stopwatch();
             sw.Start();
 
             var itemCount = 0;
+            long byteCount = 0;
 
             Logger.AddMessage($"Started");
 
             Task<(string, List<(DateTime, PolygonCommon.cMinuteItem[])>)> task = null;
-            foreach (var oo in GetBytes_ZipFile(from, to, minTradeValue, minTradeCount))
+            foreach (var oo in GetDatesAndBytes(sql))
             {
                 if (itemCount % 100 == 0)
                     Logger.AddMessage($"Items: {itemCount}");
@@ -31,15 +54,15 @@ namespace Data.Actions.Polygon
 
                 if (task != null)
                 {
-                    foreach (var o in task.Result.Item2)
-                        yield return (task.Result.Item1, o.Item1, o.Item2);
+                    foreach (var oo1 in task.Result.Item2)
+                        yield return (task.Result.Item1, oo1.Item1, oo1.Item2);
                 }
 
                 task = Task.Run(() =>
                 {
-                    var jsonData = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<PolygonCommon.cMinuteRoot>(oo.Item2);
+                    var jsonData = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<PolygonCommon.cMinuteRoot>(oo.Item3);
                     var result = new List<(DateTime, PolygonCommon.cMinuteItem[])>();
-                    foreach (var date in oo.Item3)
+                    foreach (var date in oo.Item2)
                     {
                         var fromTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date);
                         var toTicks = fromTicks + TimeHelper.UnixMillisecondsForOneDay; // next day
@@ -53,16 +76,17 @@ namespace Data.Actions.Polygon
 
             if (task != null)
             {
-                foreach (var o in task.Result.Item2)
-                    yield return (task.Result.Item1, o.Item1, o.Item2);
+                foreach (var oo1 in task.Result.Item2)
+                    yield return (task.Result.Item1, oo1.Item1, oo1.Item2);
             }
 
-            Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}.");
+            sw.Stop();
+
+            Logger.AddMessage($"Finished!!! {sw.Elapsed.TotalSeconds:N0} seconds. Items: {itemCount:N0}. Bytes: {byteCount:N0}");
         }
 
-        private static IEnumerable<(string, byte[], List<DateTime>)> GetBytes_ZipFile(DateTime from, DateTime to, float minTradeValue, int minTradeCount)
+        private static IEnumerable<(string, List<DateTime>, byte[])> GetDatesAndBytes(string sql)
         {
-            // var foldersAndSymbolsAndDates = new Dictionary<string, Dictionary<string, List<DateTime>>>();
             string lastFolder = null;
             string lastSymbol = null;
             byte[] lastBytes = null;
@@ -74,12 +98,7 @@ namespace Data.Actions.Polygon
             {
                 conn.Open();
                 cmd.CommandTimeout = 300;
-                cmd.CommandText = $"SELECT a.* FROM dbQ2024Minute..MinutePolygonLog a "+
-                                  "inner join dbQ2024..DayPolygon b on a.Symbol=b.Symbol and a.Date=b.Date "+
-                                  "WHERE b.IsTest IS NULL AND a.RowStatus IN (2, 5) " +
-                                  $"AND a.Date BETWEEN '{from:yyyy-MM-dd}' AND '{to:yyyy-MM-dd}' AND " +
-                                  $"a.[Close]*a.[Volume]>={(minTradeValue * 1000000).ToString(CultureInfo.InvariantCulture)} AND a.TradeCount>={minTradeCount} " +
-                                  "ORDER BY a.Folder, a.Symbol, a.Date";
+                cmd.CommandText = sql;
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
@@ -123,7 +142,7 @@ namespace Data.Actions.Polygon
             if (lastBytes != null)
                 yield return GetResults();
 
-            (string, byte[], List<DateTime>) GetResults() => (lastSymbol, lastBytes, lastDates);
+            (string, List<DateTime>, byte[]) GetResults() => (lastSymbol, lastDates, lastBytes);
         }
     }
 }
