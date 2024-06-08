@@ -33,7 +33,8 @@ namespace Data.Actions.Chartmill
             if (cookies == null)
             {
                 var url = @"https://www.chartmill.com/chartmill-rest/auth/login";
-                var parameters = "{\"username\":\"is201279@yahoo.com\",\"password\":\"q1234567Q\"}";
+                var userAndPassword = Data.Helpers.CsUtils.GetApiKeys("chartmill.com")[0].Split('^');
+                var parameters = $"{{\"username\":\"{userAndPassword[0]}\",\"password\":\"{userAndPassword[1]}\"}}";
                 var o = Download.GetCookiesOfPost(url, parameters);
                 if (o is CookieCollection cc)
                     cookies = cc;
