@@ -48,7 +48,7 @@ namespace Data.Helpers
             }
         }
 
-        public static object PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null)
+        public static object PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null)
         {
             // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
             using (var wc = new WebClientEx())
@@ -57,6 +57,11 @@ namespace Data.Helpers
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
                 wc.Headers.Add(HttpRequestHeader.ContentType, contentType ?? "application/x-www-form-urlencoded"); // very important for Investing.Splits
+                if (cookies != null)
+                {
+                    wc.Cookies = new CookieContainer();
+                    wc.Cookies.Add(cookies);
+                }
 
                 try
                 {
@@ -64,6 +69,35 @@ namespace Data.Helpers
                     if (isJson && (response.Length < 2 || response[0] != 0x7b || response[response.Length - 1] != 0x7d))
                         throw new Exception($"Downloaded content is not in JSON format");
                     return response;
+                }
+                catch (Exception ex)
+                {
+                    if (ex is WebException)
+                    {
+                        Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
+                        return ex;
+                    }
+                    else
+                        throw ex;
+                }
+            }
+        }
+
+        public static object GetCookiesOfPost(string url, string parameters)
+        {
+            // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
+            using (var wc = new WebClientEx())
+            {
+                wc.Encoding = System.Text.Encoding.UTF8;
+                wc.IsXmlHttpRequest = false;
+                wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                wc.Headers.Add(HttpRequestHeader.ContentType, "application/json");
+                wc.Cookies = new CookieContainer();
+
+                try
+                {
+                    var response = wc.UploadData(url, "POST", wc.Encoding.GetBytes(parameters));
+                    return wc.ResponseCookies;
                 }
                 catch (Exception ex)
                 {
@@ -87,6 +121,14 @@ namespace Data.Helpers
             public int? TimeoutInMilliseconds;
             public CookieContainer Cookies;
             public bool IsXmlHttpRequest;
+            public CookieCollection ResponseCookies;
+
+            protected override WebResponse GetWebResponse(WebRequest request)
+            {
+                var response = base.GetWebResponse(request);
+                ResponseCookies = ((HttpWebResponse)response).Cookies;
+                return response;
+            }
 
             protected override WebRequest GetWebRequest(Uri address)
             {

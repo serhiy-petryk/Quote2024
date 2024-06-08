@@ -73,6 +73,9 @@ namespace Data.Actions.Polygon
                 }
             }
 
+            Logger.AddMessage($"Run sql procedure: pUpdateSymbolsXrefAndSectors");
+            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXrefAndSectors");
+
             Logger.AddMessage($"!Finished. Processed {fileCount} files with {itemCount:N0} items");
         }
 

@@ -4,12 +4,15 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using Data.Helpers;
 
 namespace Data.Actions.Chartmill
 {
     public class ChartmillScreenerLoader
     {
+        private static CookieCollection cookies;
+
         private const string Url = @"https://www.chartmill.com/chartmill-rest/screener";
         // private const string parameters2 = @"{""sort"":""ticker"",""sortDir"":""ASC"",""tickers"":null,""conditions"":null,""exchanges"":""125,119,3"",""indexes"":null,""types"":null,""date"":null,""sectors"":""12"",""loadWatchListId"":null,""start"":20}";
         // private const string parameters = @"{""sort"":""ticker"",""sortDir"":""ASC"",""tickers"":null,""conditions"":null,""exchanges"":""125,119,3"",""indexes"":null,""types"":null,""date"":null,""sectors"":""1,12,36,79,124,146,165,193,216,234,247"",""loadWatchListId"":null,""start"":40}";
@@ -25,6 +28,19 @@ namespace Data.Actions.Chartmill
         public static void Start()
         {
             Logger.AddMessage($"Started");
+
+            Logger.AddMessage($"Get cookies ..");
+            if (cookies == null)
+            {
+                var url = @"https://www.chartmill.com/chartmill-rest/auth/login";
+                var parameters = "{\"username\":\"is201279@yahoo.com\",\"password\":\"q1234567Q\"}";
+                var o = Download.GetCookiesOfPost(url, parameters);
+                if (o is CookieCollection cc)
+                    cookies = cc;
+                else
+                    throw new Exception(
+                        $"ChartmillScreenerLoader: Can't get cookies from {url}. Error message: {((Exception)o).Message}");
+            }
 
             Logger.AddMessage($"Data is downloading ..");
             var zipFileName = DownloadAndSaveToZip(null);
@@ -121,7 +137,7 @@ namespace Data.Actions.Chartmill
                         .Replace("{1}", date.Value.ToString("yyyy-MM-dd"))
                     : ParameterTemplate.Replace("{0}", from.ToString());
 
-                var o = Download.PostToBytes(Url, parameters, false, false, "application/json");
+                var o = Download.PostToBytes(Url, parameters, false, false, "application/json", cookies);
                 if (o is Exception ex)
                     throw new Exception(
                         $"ChartmillScreenerLoader: Error while download from {Url}. Error message: {ex.Message}");
