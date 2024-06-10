@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace Data.Helpers
 {
-    public class Download : WebClient
+    public class WebClientExt : WebClient
     {
         #region ====  Static region  ====
         public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false)
         {
-            using (var wc = new Download())
+            using (var wc = new WebClientExt())
             {
                 if (noProxy) wc.Proxy = null;
                 wc.Encoding = System.Text.Encoding.UTF8;
@@ -23,7 +23,7 @@ namespace Data.Helpers
 
         public static (byte[], CookieCollection, Exception) GetToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieCollection cookies = null)
         {
-            using (var wc = new Download())
+            using (var wc = new WebClientExt())
             {
                 wc.Encoding = System.Text.Encoding.UTF8;
                 wc._isXmlHttpRequest = isXmlHttpRequest;
@@ -54,7 +54,7 @@ namespace Data.Helpers
         public static (byte[], CookieCollection, Exception) PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null)
         {
             // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
-            using (var wc = new Download())
+            using (var wc = new WebClientExt())
             {
                 wc.Encoding = System.Text.Encoding.UTF8;
                 wc._isXmlHttpRequest = isXmlHttpRequest;

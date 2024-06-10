@@ -25,7 +25,7 @@ namespace Data.Actions.Eoddata
                 };
 
                 var url = @"https://www.eoddata.com";
-                var o1 = Download.GetToBytes(url, false, false, null);
+                var o1 = WebClientExt.GetToBytes(url, false, false, null);
                 var content = System.Text.Encoding.UTF8.GetString(o1.Item1);
                 var ss = content.Split("input type=\"hidden\"");
                 for (var k = 1; k < ss.Length; k++)
@@ -44,7 +44,7 @@ namespace Data.Actions.Eoddata
                     cookies.AllKeys.Select(a =>
                         System.Net.WebUtility.UrlEncode(a) + "=" + System.Net.WebUtility.UrlEncode(cookies[a]))));
 
-                var o2 = Download.PostToBytes(url, parameters, false, false, "application/x-www-form-urlencoded",
+                var o2 = WebClientExt.PostToBytes(url, parameters, false, false, "application/x-www-form-urlencoded",
                     o1.Item2);
                 _eoddataCookies = o2.Item2;
 

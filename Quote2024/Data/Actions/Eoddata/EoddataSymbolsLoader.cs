@@ -28,7 +28,7 @@ namespace Data.Actions.Eoddata
             {
                 Logger.AddMessage($"Download Symbols data for {exchange}");
                 var url = string.Format(UrlTemplate, exchange);
-                var o = Download.GetToBytes(url, false, false, cookies);
+                var o = WebClientExt.GetToBytes(url, false, false, cookies);
                 if (o.Item3 != null)
                     throw new Exception($"EoddataSymbolsLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 

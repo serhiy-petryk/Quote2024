@@ -41,7 +41,7 @@ namespace Data.Actions.Polygon
 
                     url = url + "&apiKey=" + PolygonCommon.GetApiKey2003();
 
-                    var o = Data.Helpers.Download.GetToBytes(url, true);
+                    var o = Data.Helpers.WebClientExt.GetToBytes(url, true);
                     if (o.Item3 != null)
                         throw new Exception(
                             $"PolygonNbboLoader: Error while download from {url}. Error message: {o.Item3.Message}");

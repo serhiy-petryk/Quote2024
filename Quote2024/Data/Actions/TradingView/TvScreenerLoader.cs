@@ -22,7 +22,7 @@ namespace Data.Actions.TradingView
             var zipFileName = $@"E:\Quote\WebData\Screener\TradingView\TVScreener_{timeStamp}.zip";
 
             Logger.AddMessage($"Download data from {URL}");
-            var o = Download.PostToBytes(URL, parameters, true);
+            var o = WebClientExt.PostToBytes(URL, parameters, true);
             if (o.Item3 is Exception ex)
                 throw new Exception($"TvScreenerLoader: Error while download from {URL}. Error message: {ex.Message}");
 

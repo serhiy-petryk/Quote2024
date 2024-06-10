@@ -29,7 +29,7 @@ namespace Data.RealTime
             var tasks = new ConcurrentDictionary<string, Task<byte[]>>();
             foreach (var ticker in tickers)
             {
-                var task = Download.DownloadToBytesAsync(string.Format(UrlTemplate, ticker, fromTimestamp, apiKey, fromTimestamp));
+                var task = WebClientExt.DownloadToBytesAsync(string.Format(UrlTemplate, ticker, fromTimestamp, apiKey, fromTimestamp));
                 tasks[ticker] = task;
             }
 
@@ -75,7 +75,7 @@ namespace Data.RealTime
             var tasks = new ConcurrentDictionary<string, Task<byte[]>>();
             foreach (var ticker in tickers)
             {
-                var task = Download.DownloadToBytesAsync(string.Format(UrlTemplate, ticker, fromTimestamp, apiKey));
+                var task = WebClientExt.DownloadToBytesAsync(string.Format(UrlTemplate, ticker, fromTimestamp, apiKey));
                 tasks[ticker] = task;
             }
 

@@ -71,7 +71,7 @@ namespace Data.Actions.Nasdaq
             var url = StartUrl;
             while (url != null)
             {
-                var o = Download.GetToBytes(url, false, true);
+                var o = WebClientExt.GetToBytes(url, false, true);
                 if (o.Item3 != null)
                     throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
@@ -107,7 +107,7 @@ namespace Data.Actions.Nasdaq
                     {
                         var url = string.Format(urlTemplate, commit.Value.Item1, exchange.ToLower());
                         // Can't check json format -> last symbol is '\n'
-                        var o = Download.GetToBytes(url, false, true);
+                        var o = WebClientExt.GetToBytes(url, false, true);
                         if (o.Item3 != null)
                             throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 

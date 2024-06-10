@@ -27,7 +27,7 @@ namespace Data.RealTime.Stooq
             {
                 var urlTicker = ticker.StartsWith('^') ? ticker : ticker + ".us";
                 // var aa = Download.DownloadToBytes(string.Format(UrlTemplate, urlTicker.ToLower()), false);
-                var task = Download.DownloadToBytesAsync(string.Format(UrlTemplate, urlTicker.ToLower()));
+                var task = WebClientExt.DownloadToBytesAsync(string.Format(UrlTemplate, urlTicker.ToLower()));
                 tasks[ticker] = task;
             }
 
@@ -43,7 +43,7 @@ namespace Data.RealTime.Stooq
                     {
                         var urlTicker = kvp.Key.StartsWith('^') ? kvp.Key : kvp.Key + ".us";
                         // var aa = await Download.DownloadToBytesAsync(string.Format(UrlTemplate, urlTicker.ToLower()));
-                        validTickers[kvp.Key] = await Download.DownloadToBytesAsync(string.Format(UrlTemplate, urlTicker.ToLower()));
+                        validTickers[kvp.Key] = await WebClientExt.DownloadToBytesAsync(string.Format(UrlTemplate, urlTicker.ToLower()));
                     }
                 }
                 catch (Exception ex)
@@ -88,7 +88,7 @@ namespace Data.RealTime.Stooq
             var tasks = new ConcurrentDictionary<string, Task<byte[]>>();
             foreach (var ticker in tickers)
             {
-                var task = Download.DownloadToBytesAsync(string.Format(UrlTemplate, ticker));
+                var task = WebClientExt.DownloadToBytesAsync(string.Format(UrlTemplate, ticker));
                 tasks[ticker] = task;
             }
 

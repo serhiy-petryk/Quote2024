@@ -50,7 +50,7 @@ namespace Data.Actions.Polygon
                         var filename = folder + $@"\SymbolsPolygon_{cnt:D2}_{date:yyyyMMdd}.json";
                         Logger.AddMessage($"Downloading {cnt} data chunk into {Path.GetFileName(filename)} for {date:yyyy-MM-dd}");
 
-                        var o = Download.GetToBytes(url, true);
+                        var o = WebClientExt.GetToBytes(url, true);
                         if (o.Item3 != null)
                             throw new Exception($"PolygonSymbolsLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 

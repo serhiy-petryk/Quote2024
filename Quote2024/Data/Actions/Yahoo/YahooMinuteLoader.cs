@@ -56,7 +56,7 @@ namespace Data.Actions.Yahoo
                     Logger.AddMessage($@"Downloaded {cnt:N0} files from {yahooSymbols.Count:N0}");
 
                 var url = string.Format(UrlTemplate, symbol, fromInSeconds, toInSeconds);
-                var o = Download.GetToBytes(url, false);
+                var o = WebClientExt.GetToBytes(url, false);
                 if (o.Item3 != null)
                     downloadErrors.Add($"{symbol}\t{o.Item3.Message}");
                 else

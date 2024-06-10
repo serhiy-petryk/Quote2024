@@ -78,7 +78,7 @@ namespace Data.Actions.Yahoo
             // Download data
             Logger.AddMessage($"Download data for {symbol}");
             var url = string.Format(UrlTemplate, fromUnixSeconds, toUnixSeconds, symbol);
-            var o = Download.GetToBytes(url, false);
+            var o = WebClientExt.GetToBytes(url, false);
             if (o.Item3 != null)
                 throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
@@ -113,7 +113,7 @@ namespace Data.Actions.Yahoo
             // Download data
             Logger.AddMessage($"Download data for {symbol}");
             var url = string.Format(UrlTemplateForTradingDaysOnly, fromUnixSeconds, toUnixSeconds, symbol);
-            var o = Download.GetToBytes(url, false);
+            var o = WebClientExt.GetToBytes(url, false);
             if (o.Item3 != null)
                 throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 

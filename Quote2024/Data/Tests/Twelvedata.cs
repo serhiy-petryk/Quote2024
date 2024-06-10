@@ -13,7 +13,7 @@ namespace Data.Tests
             // var url = @"https://api.twelvedata.com/complex_data?apikey=your_api_key"
             var url = @"https://api.twelvedata.com/complex_data";
 
-            var o = Download.PostToBytes(url, postData, false);
+            var o = WebClientExt.PostToBytes(url, postData, false);
             /*"methods": [
             "time_series",
             {

@@ -24,7 +24,7 @@ namespace Data.Actions.Investing
 
             // Download data
             Logger.AddMessage($"Download data from {URL}");
-            var o = Download.PostToBytes(URL, postData, true, true);
+            var o = WebClientExt.PostToBytes(URL, postData, true, true);
             if (o.Item3 is Exception ex)
                 throw new Exception($"InvestingSplitsLoader: Error while download from {URL}. Error message: {ex.Message}");
 

@@ -20,7 +20,7 @@ namespace Data.Actions.Eoddata
             var zipFileName = $@"E:\Quote\WebData\Splits\Eoddata\EoddataSplits_{timeStamp.Item2}.zip";
 
             // Download html data
-            var o = Download.GetToBytes(URL, false, true);
+            var o = WebClientExt.GetToBytes(URL, false, true);
             if (o.Item3 != null)
                 throw new Exception($"EoddataSplitsLoader: Error while download from {URL}. Error message: {o.Item3.Message}");
 
