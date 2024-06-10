@@ -107,8 +107,8 @@ namespace Data.Actions.MorningStar
 
                 var url = string.Format(UrlTemplate, sector, 1);
                 var o = Helpers.Download.GetToBytes(url, true);
-                if (o.Item2 != null)
-                    throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                if (o.Item3 != null)
+                    throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                 var entryName = string.Format(entryNameTemplate, sector, "0");
                 var entry = new VirtualFileEntry(entryName, o.Item1);
@@ -123,8 +123,8 @@ namespace Data.Actions.MorningStar
 
                     url = string.Format(UrlTemplate, sector, k + 1);
                     o = Helpers.Download.GetToBytes(url, true);
-                    if (o.Item2 != null)
-                        throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                    if (o.Item3 != null)
+                        throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                     entryName = string.Format(entryNameTemplate, sector, k.ToString());
                     entry = new VirtualFileEntry(entryName, o.Item1);

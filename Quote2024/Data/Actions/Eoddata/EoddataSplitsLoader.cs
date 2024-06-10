@@ -21,8 +21,8 @@ namespace Data.Actions.Eoddata
 
             // Download html data
             var o = Download.GetToBytes(URL, false, true);
-            if (o.Item2 != null)
-                throw new Exception($"EoddataSplitsLoader: Error while download from {URL}. Error message: {o.Item2.Message}");
+            if (o.Item3 != null)
+                throw new Exception($"EoddataSplitsLoader: Error while download from {URL}. Error message: {o.Item3.Message}");
 
             var htmlContent = System.Text.Encoding.UTF8.GetString(o.Item1);
 

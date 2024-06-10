@@ -42,9 +42,9 @@ namespace Data.Actions.Polygon
                     url = url + "&apiKey=" + PolygonCommon.GetApiKey2003();
 
                     var o = Data.Helpers.Download.GetToBytes(url, true);
-                    if (o.Item2 != null)
+                    if (o.Item3 != null)
                         throw new Exception(
-                            $"PolygonNbboLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                            $"PolygonNbboLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                     var entry = new VirtualFileEntry($@"NbboPolygon_{cnt:D2}_{date:yyyyMMdd}.json", o.Item1);
                     virtualFileEntries.Add(entry);

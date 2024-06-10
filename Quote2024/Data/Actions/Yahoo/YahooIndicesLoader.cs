@@ -79,8 +79,8 @@ namespace Data.Actions.Yahoo
             Logger.AddMessage($"Download data for {symbol}");
             var url = string.Format(UrlTemplate, fromUnixSeconds, toUnixSeconds, symbol);
             var o = Download.GetToBytes(url, false);
-            if (o.Item2 != null)
-                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+            if (o.Item3 != null)
+                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
             /*var content = Encoding.UTF8.GetString(o.Item1).Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
             var oo = ZipUtils.DeserializeString<Models.MinuteYahoo>(content);*/
@@ -114,8 +114,8 @@ namespace Data.Actions.Yahoo
             Logger.AddMessage($"Download data for {symbol}");
             var url = string.Format(UrlTemplateForTradingDaysOnly, fromUnixSeconds, toUnixSeconds, symbol);
             var o = Download.GetToBytes(url, false);
-            if (o.Item2 != null)
-                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+            if (o.Item3 != null)
+                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
             var content = Encoding.UTF8.GetString(o.Item1).Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
             var oo = ZipUtils.DeserializeString<Models.MinuteYahoo>(content);

@@ -57,8 +57,8 @@ namespace Data.Actions.Yahoo
 
                 var url = string.Format(UrlTemplate, symbol, fromInSeconds, toInSeconds);
                 var o = Download.GetToBytes(url, false);
-                if (o.Item2 != null)
-                    downloadErrors.Add($"{symbol}\t{o.Item2.Message}");
+                if (o.Item3 != null)
+                    downloadErrors.Add($"{symbol}\t{o.Item3.Message}");
                 else
                 {
                     var entry = new VirtualFileEntry($@"YahooMinute_{timeStamp.Item2}\yMin-{symbol}.txt", o.Item1);

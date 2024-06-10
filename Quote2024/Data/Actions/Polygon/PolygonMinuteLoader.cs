@@ -115,8 +115,8 @@ namespace Data.Actions.Polygon
                 // var url = $"https://api.polygon.io/v2/aggs/ticker/{urlTicker}/range/1/minute/{from:yyyy-MM-dd}/{to:yyyy-MM-dd}?adjusted=false&sort=asc&limit=50000&apiKey={PolygonCommon.GetApiKey()}";
                 var url = string.Format(UrlTemplate, symbol, from.ToString("yyyy-MM-dd"), to.ToString("yyyy-MM-dd"), PolygonCommon.GetApiKey2003());
                 var o = Download.GetToBytes(url, true);
-                if (o.Item2 != null)
-                    throw new Exception($"PolygonMinuteLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                if (o.Item3 != null)
+                    throw new Exception($"PolygonMinuteLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                 task?.Wait();
                 task = File.WriteAllTextAsync(fileName, System.Text.Encoding.UTF8.GetString(o.Item1));
@@ -157,8 +157,8 @@ namespace Data.Actions.Polygon
                 // var url = $"https://api.polygon.io/v2/aggs/ticker/{urlTicker}/range/1/minute/{from:yyyy-MM-dd}/{to:yyyy-MM-dd}?adjusted=false&sort=asc&limit=50000&apiKey={PolygonCommon.GetApiKey()}";
                 var url = string.Format(UrlTemplate, urlTicker, from.ToString("yyyy-MM-dd"), to.ToString("yyyy-MM-dd"), PolygonCommon.GetApiKey2003());
                 var o = Download.GetToBytes(url, true);
-                if (o.Item2 != null)
-                    throw new Exception($"PolygonMinuteLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                if (o.Item3 != null)
+                    throw new Exception($"PolygonMinuteLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                 ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { new VirtualFileEntry(entryName, o.Item1) });
             }

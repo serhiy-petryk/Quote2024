@@ -19,8 +19,8 @@ namespace Data.Actions.StockAnalysis
 
             // Download html data
             var o = Download.GetToBytes(Url, true);
-            if (o.Item2 != null)
-                throw new Exception($"StockAnalysisIPOs: Error while download from {Url}. Error message: {o.Item2.Message}");
+            if (o.Item3 != null)
+                throw new Exception($"StockAnalysisIPOs: Error while download from {Url}. Error message: {o.Item3.Message}");
 
             // Save html data to zip
             var entry = new VirtualFileEntry($"StockAnalysisIPOs_{timeStamp.Item2}.json", o.Item1);

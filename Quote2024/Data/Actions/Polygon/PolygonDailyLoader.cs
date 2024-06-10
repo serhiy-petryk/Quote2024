@@ -46,8 +46,8 @@ namespace Data.Actions.Polygon
                 {
                     var url = $@"https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/{date:yyyy-MM-dd}?adjusted=false&apiKey={PolygonCommon.GetApiKey2003()}";
                     var o = Download.GetToBytes(url, true);
-                    if (o.Item2 != null)
-                        throw new Exception($"PolygonDailyLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                    if (o.Item3 != null)
+                        throw new Exception($"PolygonDailyLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                     var jsonFileName = $"DayPolygon_{date:yyyyMMdd}.json";
                     ZipUtils.ZipVirtualFileEntries(zipFileName, new[] {new VirtualFileEntry(jsonFileName, o.Item1)});

@@ -72,8 +72,8 @@ namespace Data.Actions.Nasdaq
             while (url != null)
             {
                 var o = Download.GetToBytes(url, false, true);
-                if (o.Item2 != null)
-                    throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                if (o.Item3 != null)
+                    throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                 /*
                 var filename = string.Format(HtmlFileNameTemplate, cnt.ToString());
@@ -108,8 +108,8 @@ namespace Data.Actions.Nasdaq
                         var url = string.Format(urlTemplate, commit.Value.Item1, exchange.ToLower());
                         // Can't check json format -> last symbol is '\n'
                         var o = Download.GetToBytes(url, false, true);
-                        if (o.Item2 != null)
-                            throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item2.Message}");
+                        if (o.Item3 != null)
+                            throw new Exception($"NasdaqScreenerGithubLoader: Error while download from {url}. Error message: {o.Item3.Message}");
 
                         var jsonFileName = Path.Combine(Path.GetFileNameWithoutExtension(zipFileName),
                             string.Format(JsonFileNameTemplate, timeStamp, exchange));

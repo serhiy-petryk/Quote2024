@@ -34,8 +34,8 @@ namespace Data.Actions.Wikipedia
             foreach (var oo in UrlsAndFilenames)
             {
                 var o = Download.GetToBytes(oo.Item1, false);
-                if (o.Item2 != null)
-                    throw new Exception($"WikipediaIndexLoader: Error while download from {oo.Item1}. Error message: {o.Item2.Message}");
+                if (o.Item3 != null)
+                    throw new Exception($"WikipediaIndexLoader: Error while download from {oo.Item1}. Error message: {o.Item3.Message}");
 
                 var entry = new VirtualFileEntry(string.Format(oo.Item2, timeStamp.Item2), o.Item1);
                 virtualFileEntries.Add(entry);

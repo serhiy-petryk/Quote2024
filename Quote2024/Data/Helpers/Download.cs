@@ -20,7 +20,7 @@ namespace Data.Helpers
             }
         }
 
-        public static (byte[], /*CookieCollection,*/ Exception) GetToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieCollection cookies = null)
+        public static (byte[], CookieCollection, Exception) GetToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieCollection cookies = null)
         {
             using (var wc = new WebClientEx())
             {
@@ -28,25 +28,21 @@ namespace Data.Helpers
                 // wc.Cookies = cookies;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                if (cookies != null)
-                {
-                    wc.Cookies = new CookieContainer();
-                    wc.Cookies.Add(cookies);
-                }
+                wc.Cookies.Add(cookies ?? new CookieCollection());
 
                 try
                 {
                     var response = wc.DownloadData(url);
                     if (isJson && !IsJsonFormat(response))
                         throw new Exception($"Downloaded content is not in JSON format");
-                    return (response, null);
+                    return (response, wc.ResponseCookies, null);
                 }
                 catch (Exception ex)
                 {
                     if (ex is WebException)
                     {
                         Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
-                        return (null, ex);
+                        return (null, wc.ResponseCookies, ex);
                     }
                     else
                         throw ex;
@@ -88,11 +84,7 @@ namespace Data.Helpers
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
                 wc.Headers.Add(HttpRequestHeader.ContentType, contentType ?? "application/x-www-form-urlencoded"); // very important for Investing.Splits
-                if (cookies != null)
-                {
-                    wc.Cookies = new CookieContainer();
-                    wc.Cookies.Add(cookies);
-                }
+                wc.Cookies.Add(cookies ?? new CookieCollection());
 
                 try
                 {
