@@ -140,7 +140,7 @@ namespace Data.Actions.Polygon
 
                     url = url + "&apiKey=" + PolygonCommon.GetApiKey2003();
 
-                    var o = Data.Helpers.Download.DownloadToBytes(url, true);
+                    var o = Data.Helpers.Download.GetToBytes(url, true);
                     if (o.Item2 != null)
                         throw new Exception(
                             $"PolygonTradesLoader: Error while download from {url}. Error message: {o.Item2.Message}");

@@ -22,7 +22,7 @@ namespace Data.Actions.StockAnalysis
             var zipFileName = Folder + $"StockAnalysisActions_{timeStamp.Item2}.zip";
 
             // Download html data
-            var o = Download.DownloadToBytes(Url, false);
+            var o = Download.GetToBytes(Url, false);
             if (o.Item2 != null)
                 throw new Exception($"StockAnalysisActions: Error while download from {Url}. Error message: {o.Item2.Message}");
 

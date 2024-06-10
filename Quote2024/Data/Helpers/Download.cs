@@ -20,7 +20,7 @@ namespace Data.Helpers
             }
         }
 
-        public static (byte[], Exception) DownloadToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieContainer cookies = null)
+        public static (byte[], Exception) GetToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieContainer cookies = null)
         {
             using (var wc = new WebClientEx())
             {

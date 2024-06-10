@@ -106,7 +106,7 @@ namespace Data.Actions.MorningStar
                 Logger.AddMessage($"Process {sector} sector");
 
                 var url = string.Format(UrlTemplate, sector, 1);
-                var o = Helpers.Download.DownloadToBytes(url, true);
+                var o = Helpers.Download.GetToBytes(url, true);
                 if (o.Item2 != null)
                     throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 
@@ -122,7 +122,7 @@ namespace Data.Actions.MorningStar
                         Logger.AddMessage($"Process {sector} sector. Downloaded {k} pages from {oo.pagination.totalPages}");
 
                     url = string.Format(UrlTemplate, sector, k + 1);
-                    o = Helpers.Download.DownloadToBytes(url, true);
+                    o = Helpers.Download.GetToBytes(url, true);
                     if (o.Item2 != null)
                         throw new Exception($"MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 

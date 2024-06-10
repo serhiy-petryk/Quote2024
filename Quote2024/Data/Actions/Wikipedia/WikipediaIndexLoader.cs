@@ -33,7 +33,7 @@ namespace Data.Actions.Wikipedia
             // Download data
             foreach (var oo in UrlsAndFilenames)
             {
-                var o = Download.DownloadToBytes(oo.Item1, false);
+                var o = Download.GetToBytes(oo.Item1, false);
                 if (o.Item2 != null)
                     throw new Exception($"WikipediaIndexLoader: Error while download from {oo.Item1}. Error message: {o.Item2.Message}");
 

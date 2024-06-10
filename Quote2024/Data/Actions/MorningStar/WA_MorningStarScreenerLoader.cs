@@ -147,7 +147,7 @@ namespace Data.Actions.MorningStar
                     var filename = Path.Combine(HtmlDataFolder, $"{sectorKey}_{item.TimeStamp}.html");
                     if (!File.Exists(filename))
                     {
-                        var o = Download.DownloadToBytes(url, false);
+                        var o = Download.GetToBytes(url, false);
                         if (o.Item2 != null)
                             throw new Exception($"WA_MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
                         File.WriteAllBytes(filename, o.Item1);
@@ -167,7 +167,7 @@ namespace Data.Actions.MorningStar
                 Logger.AddMessage($"Process {sector} sector");
                 var url = string.Format(ListUrlTemplate, sector);
                 var filename = Path.Combine($@"{ListDataFolder}", $"{sector}.txt");
-                var o = Helpers.Download.DownloadToBytes(url, false);
+                var o = Helpers.Download.GetToBytes(url, false);
                 if (o.Item2 != null)
                     throw new Exception($"WA_MorningStarScreenerLoader: Error while download from {url}. Error message: {o.Item2.Message}");
                 File.WriteAllBytes(filename, o.Item1);

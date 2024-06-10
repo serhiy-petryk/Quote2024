@@ -51,7 +51,7 @@ namespace Data.Actions.Eoddata
                 var cookies = EoddataCommon.GetEoddataCookies();
 
                 // Get k parameter of eoddata url
-                var o = Download.DownloadToBytes(URL_HOME, false, false, cookies);
+                var o = Download.GetToBytes(URL_HOME, false, false, cookies);
                 if (o.Item2 != null)
                     throw new Exception($"EoddataDailyLoader: Error while download from {URL_HOME}. Error message: {o.Item2.Message}");
 
@@ -67,7 +67,7 @@ namespace Data.Actions.Eoddata
                 {
                     Logger.AddMessage($"Download Eoddata daily data for {fileId.Item1} and {fileId.Item2}");
                     var url = string.Format(URL_TEMPLATE, fileId.Item1, fileId.Item2, kParameter.Substring(2));
-                    o = Download.DownloadToBytes(url, false, false, cookies);
+                    o = Download.GetToBytes(url, false, false, cookies);
                     if (o.Item2 != null)
                         throw new Exception($"EoddataDailyLoader: Error while download from {url}. Error message: {o.Item2.Message}");
 

@@ -33,7 +33,7 @@ namespace Data.Actions.Nasdaq
             {
                 var stockUrl = string.Format(StockUrlTemplate, exchange);
                 Logger.AddMessage($"Download STOCK data for {exchange} from {stockUrl}");
-                var o = Download.DownloadToBytes(stockUrl, true, true);
+                var o = Download.GetToBytes(stockUrl, true, true);
                 if (o.Item2 != null)
                     throw new Exception($"NasdaqScreenerLoader: Error while download from {StockUrlTemplate}. Error message: {o.Item2.Message}");
 
@@ -42,7 +42,7 @@ namespace Data.Actions.Nasdaq
             }
 
             Logger.AddMessage($"Download ETF data from {EtfUrl}");
-            var o2 = Download.DownloadToBytes(EtfUrl, true, true);
+            var o2 = Download.GetToBytes(EtfUrl, true, true);
             if (o2.Item2 != null)
                 throw new Exception($"NasdaqScreenerLoader: Error while download from {EtfUrl}. Error message: {o2.Item2.Message}");
 
