@@ -53,7 +53,6 @@ namespace Quote2024.Forms
             this.Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.loaderItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnTest = new System.Windows.Forms.Button();
-            this.lblEoddataLogged = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -105,7 +104,6 @@ namespace Quote2024.Forms
             this.tpLoader.Controls.Add(this.btnRunMultiItemsLoader);
             this.tpLoader.Controls.Add(this.dataGridView1);
             this.tpLoader.Controls.Add(this.btnTest);
-            this.tpLoader.Controls.Add(this.lblEoddataLogged);
             this.tpLoader.Location = new System.Drawing.Point(4, 24);
             this.tpLoader.Name = "tpLoader";
             this.tpLoader.Padding = new System.Windows.Forms.Padding(3);
@@ -117,7 +115,7 @@ namespace Quote2024.Forms
             // btnYahooWebSocketForm
             // 
             this.btnYahooWebSocketForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnYahooWebSocketForm.Location = new System.Drawing.Point(398, 98);
+            this.btnYahooWebSocketForm.Location = new System.Drawing.Point(398, 57);
             this.btnYahooWebSocketForm.Name = "btnYahooWebSocketForm";
             this.btnYahooWebSocketForm.Size = new System.Drawing.Size(186, 36);
             this.btnYahooWebSocketForm.TabIndex = 78;
@@ -230,7 +228,7 @@ namespace Quote2024.Forms
             // btnRunMultiItemsLoader
             // 
             this.btnRunMultiItemsLoader.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(398, 47);
+            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(398, 6);
             this.btnRunMultiItemsLoader.Name = "btnRunMultiItemsLoader";
             this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 37);
             this.btnRunMultiItemsLoader.TabIndex = 68;
@@ -330,18 +328,6 @@ namespace Quote2024.Forms
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
-            // lblEoddataLogged
-            // 
-            this.lblEoddataLogged.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblEoddataLogged.BackColor = System.Drawing.Color.Red;
-            this.lblEoddataLogged.ForeColor = System.Drawing.Color.White;
-            this.lblEoddataLogged.Location = new System.Drawing.Point(398, 6);
-            this.lblEoddataLogged.Name = "lblEoddataLogged";
-            this.lblEoddataLogged.Size = new System.Drawing.Size(159, 22);
-            this.lblEoddataLogged.TabIndex = 65;
-            this.lblEoddataLogged.Text = "Not logged in eoddata.com";
-            this.lblEoddataLogged.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
@@ -378,7 +364,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tpLoader;
-        private System.Windows.Forms.Label lblEoddataLogged;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.DataGridView dataGridView1;

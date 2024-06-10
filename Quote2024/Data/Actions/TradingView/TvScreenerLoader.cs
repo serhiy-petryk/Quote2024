@@ -23,10 +23,10 @@ namespace Data.Actions.TradingView
 
             Logger.AddMessage($"Download data from {URL}");
             var o = Download.PostToBytes(URL, parameters, true);
-            if (o is Exception ex)
+            if (o.Item3 is Exception ex)
                 throw new Exception($"TvScreenerLoader: Error while download from {URL}. Error message: {ex.Message}");
 
-            var entry = new VirtualFileEntry( $"{Path.GetFileNameWithoutExtension(zipFileName)}.json", (byte[])o);
+            var entry = new VirtualFileEntry( $"{Path.GetFileNameWithoutExtension(zipFileName)}.json", o.Item1);
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
             
             // Parse and save data to database

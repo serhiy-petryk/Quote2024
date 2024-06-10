@@ -139,16 +139,15 @@ namespace Data.Actions.Chartmill
                     : ParameterTemplate.Replace("{0}", from.ToString());
 
                 var o = Download.PostToBytes(Url, parameters, false, false, "application/json", cookies);
-                if (o is Exception ex)
+                if (o.Item3 is Exception ex)
                     throw new Exception(
                         $"ChartmillScreenerLoader: Error while download from {Url}. Error message: {ex.Message}");
-                var bytes = (byte[])o;
 
                 var entryName = string.Format(entryNameTemplate, from.ToString());
-                var entry = new VirtualFileEntry(entryName, bytes);
+                var entry = new VirtualFileEntry(entryName, o.Item1);
                 virtualFileEntries.Add(entry);
 
-                var oo = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<cRoot>(bytes);
+                var oo = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<cRoot>(o.Item1);
                 rows = oo.total;
                 from = oo.from + oo.result.Length;
 

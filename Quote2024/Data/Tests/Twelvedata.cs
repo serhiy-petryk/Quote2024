@@ -27,7 +27,7 @@ namespace Data.Tests
             }
             ]
         }"*/
-            var s = System.Text.Encoding.UTF8.GetString((byte[])o);
+            var s = System.Text.Encoding.UTF8.GetString(o.Item1);
             var k = s.Length;
             Debug.Print($"{DateTime.Now:HH:mm:ss}");
         }

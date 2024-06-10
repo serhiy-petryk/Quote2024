@@ -48,7 +48,32 @@ namespace Data.Helpers
             }
         }
 
-        public static object PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null)
+        public static (byte[], CookieCollection, Exception) GetToBytes(string url, CookieContainer cookies)
+        {
+            using (var wc = new WebClientEx())
+            {
+                wc.Encoding = System.Text.Encoding.UTF8;
+                wc.Cookies = cookies ?? new CookieContainer();
+                wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                try
+                {
+                    var response = wc.DownloadData(url);
+                    return (response, wc.ResponseCookies, null);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is WebException)
+                    {
+                        Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
+                        return (null, wc.ResponseCookies, ex);
+                    }
+                    else
+                        throw ex;
+                }
+            }
+        }
+
+        public static (byte[], CookieCollection, Exception) PostToBytes(string url, string parameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null)
         {
             // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
             using (var wc = new WebClientEx())
@@ -68,14 +93,14 @@ namespace Data.Helpers
                     var response = wc.UploadData(url, "POST", wc.Encoding.GetBytes(parameters));
                     if (isJson && (response.Length < 2 || response[0] != 0x7b || response[response.Length - 1] != 0x7d))
                         throw new Exception($"Downloaded content is not in JSON format");
-                    return response;
+                    return (response, wc.ResponseCookies, null);
                 }
                 catch (Exception ex)
                 {
                     if (ex is WebException)
                     {
                         Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
-                        return ex;
+                        return (null, wc.ResponseCookies, ex);
                     }
                     else
                         throw ex;
@@ -137,6 +162,7 @@ namespace Data.Helpers
                 request.AllowAutoRedirect = true;
                 request.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
                 request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                // request.AllowAutoRedirect = false;
 
                 /*request.ContentType = "application/json";
                 request.MediaType = "application/json";
