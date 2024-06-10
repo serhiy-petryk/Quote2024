@@ -25,7 +25,7 @@ namespace Data.Actions.Eoddata
                 };
 
                 var url = @"https://www.eoddata.com";
-                var o = Download.GetToBytes(url, null);
+                var o = Download.GetToBytes(url, false, false, null);
                 var content = System.Text.Encoding.UTF8.GetString(o.Item1);
                 var ss = content.Split("input type=\"hidden\"");
                 for (var k = 1; k < ss.Length; k++)

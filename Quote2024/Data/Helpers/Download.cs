@@ -28,6 +28,7 @@ namespace Data.Helpers
                 // wc.Cookies = cookies;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                wc.Cookies = new CookieContainer();
                 wc.Cookies.Add(cookies ?? new CookieCollection());
 
                 try
@@ -35,31 +36,6 @@ namespace Data.Helpers
                     var response = wc.DownloadData(url);
                     if (isJson && !IsJsonFormat(response))
                         throw new Exception($"Downloaded content is not in JSON format");
-                    return (response, wc.ResponseCookies, null);
-                }
-                catch (Exception ex)
-                {
-                    if (ex is WebException)
-                    {
-                        Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
-                        return (null, wc.ResponseCookies, ex);
-                    }
-                    else
-                        throw ex;
-                }
-            }
-        }
-
-        public static (byte[], CookieCollection, Exception) GetToBytes(string url, CookieContainer cookies)
-        {
-            using (var wc = new WebClientEx())
-            {
-                wc.Encoding = System.Text.Encoding.UTF8;
-                wc.Cookies = cookies ?? new CookieContainer();
-                wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                try
-                {
-                    var response = wc.DownloadData(url);
                     return (response, wc.ResponseCookies, null);
                 }
                 catch (Exception ex)
@@ -84,6 +60,7 @@ namespace Data.Helpers
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
                 wc.Headers.Add(HttpRequestHeader.ContentType, contentType ?? "application/x-www-form-urlencoded"); // very important for Investing.Splits
+                wc.Cookies = new CookieContainer();
                 wc.Cookies.Add(cookies ?? new CookieCollection());
 
                 try
