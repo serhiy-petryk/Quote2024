@@ -20,7 +20,7 @@ namespace Data.Actions.Eoddata
                     { "ctl00$Menu1$s1$txtSearch", "" },
                     { "ctl00$cph1$lg1$txtEmail", userAndPassword[0] },
                     { "ctl00$cph1$lg1$txtPassword", userAndPassword[1] },
-                    { "ctl00$cph1$lg1$chkRemember", "on" },
+                    { "ctl00$cph1$lg1$chkRemember", "off" },
                     { "ctl00$cph1$lg1$btnLogin", "Login" }
                 };
 
@@ -30,15 +30,14 @@ namespace Data.Actions.Eoddata
                 var ss = content.Split("input type=\"hidden\"");
                 for (var k = 1; k < ss.Length; k++)
                 {
-                    var s1 = ss[k];
-                    var s2 = s1.Substring(0, s1.IndexOf("/>", StringComparison.InvariantCulture));
-                    var k1 = s2.IndexOf("id=\"", StringComparison.InvariantCulture);
-                    var k2 = s2.IndexOf("\"", k1 + 4, StringComparison.InvariantCulture);
-                    var id = s2.Substring(k1 + 4, k2 - k1 - 4);
-                    k1 = s2.IndexOf("value=\"", StringComparison.InvariantCulture);
-                    k2 = s2.IndexOf("\"", k1 + 7, StringComparison.InvariantCulture);
-                    var value = s2.Substring(k1 + 7, k2 - k1 - 7);
-                    cookies.Add(id, value);
+                    var s = ss[k].Substring(0, ss[k].IndexOf("/>", StringComparison.InvariantCulture));
+                    var k1 = s.IndexOf("name=\"", StringComparison.InvariantCulture);
+                    var k2 = s.IndexOf("\"", k1 + 6, StringComparison.InvariantCulture);
+                    var name = s.Substring(k1 + 6, k2 - k1 - 6);
+                    k1 = s.IndexOf("value=\"", StringComparison.InvariantCulture);
+                    k2 = s.IndexOf("\"", k1 + 7, StringComparison.InvariantCulture);
+                    var value = s.Substring(k1 + 7, k2 - k1 - 7);
+                    cookies.Add(name, value);
                 }
 
                 var parameters = System.Net.WebUtility.HtmlDecode(string.Join("&",
