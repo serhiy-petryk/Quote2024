@@ -20,14 +20,20 @@ namespace Data.Helpers
             }
         }
 
-        public static (byte[], Exception) GetToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieContainer cookies = null)
+        public static (byte[], /*CookieCollection,*/ Exception) GetToBytes(string url, bool isJson, bool isXmlHttpRequest = false, CookieCollection cookies = null)
         {
             using (var wc = new WebClientEx())
             {
                 wc.Encoding = System.Text.Encoding.UTF8;
-                wc.Cookies = cookies;
+                // wc.Cookies = cookies;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                if (cookies != null)
+                {
+                    wc.Cookies = new CookieContainer();
+                    wc.Cookies.Add(cookies);
+                }
+
                 try
                 {
                     var response = wc.DownloadData(url);
