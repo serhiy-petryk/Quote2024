@@ -8,11 +8,11 @@ namespace Data.Actions.Eoddata
 {
     public static class EoddataCommon
     {
-        private static CookieCollection EoddataCookies = null;
+        private static CookieCollection _eoddataCookies = null;
 
         public static System.Net.CookieCollection GetEoddataCookies()
         {
-            if (EoddataCookies == null)
+            if (_eoddataCookies == null)
             {
                 var userAndPassword = Data.Helpers.CsUtils.GetApiKeys("eoddata.com")[0].Split('^');
                 var cookies = new NameValueCollection
@@ -46,10 +46,10 @@ namespace Data.Actions.Eoddata
 
                 var o2 = Download.PostToBytes(url, parameters, false, false, "application/x-www-form-urlencoded",
                     o.Item2);
-                EoddataCookies = o2.Item2;
+                _eoddataCookies = o2.Item2;
             }
 
-            return EoddataCookies;
+            return _eoddataCookies;
         }
 
     }
