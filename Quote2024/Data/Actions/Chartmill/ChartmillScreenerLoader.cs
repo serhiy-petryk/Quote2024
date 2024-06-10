@@ -35,12 +35,11 @@ namespace Data.Actions.Chartmill
                 var url = @"https://www.chartmill.com/chartmill-rest/auth/login";
                 var userAndPassword = Data.Helpers.CsUtils.GetApiKeys("chartmill.com")[0].Split('^');
                 var parameters = $"{{\"username\":\"{userAndPassword[0]}\",\"password\":\"{userAndPassword[1]}\"}}";
-                var o = Download.GetCookiesOfPost(url, parameters);
-                if (o is CookieCollection cc)
-                    cookies = cc;
-                else
+                var o = Download.PostToBytes(url, parameters, false);
+                if (o.Item3 is Exception ex)
                     throw new Exception(
-                        $"ChartmillScreenerLoader: Can't get cookies from {url}. Error message: {((Exception)o).Message}");
+                        $"ChartmillScreenerLoader: Can't get cookies from {url}. Error message: {o.Item3.Message}");
+                cookies = o.Item2;
             }
 
             Logger.AddMessage($"Data is downloading ..");

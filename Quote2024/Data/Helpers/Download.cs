@@ -108,35 +108,6 @@ namespace Data.Helpers
             }
         }
 
-        public static object GetCookiesOfPost(string url, string parameters)
-        {
-            // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
-            using (var wc = new WebClientEx())
-            {
-                wc.Encoding = System.Text.Encoding.UTF8;
-                wc.IsXmlHttpRequest = false;
-                wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                wc.Headers.Add(HttpRequestHeader.ContentType, "application/json");
-                wc.Cookies = new CookieContainer();
-
-                try
-                {
-                    var response = wc.UploadData(url, "POST", wc.Encoding.GetBytes(parameters));
-                    return wc.ResponseCookies;
-                }
-                catch (Exception ex)
-                {
-                    if (ex is WebException)
-                    {
-                        Debug.Print($"{DateTime.Now}. Web Exception: {url}. Message: {ex.Message}");
-                        return ex;
-                    }
-                    else
-                        throw ex;
-                }
-            }
-        }
-
         private static bool IsJsonFormat(byte[] response) => response.Length > 1 &&
             ((response[0] == '{' && response[response.Length - 1] == '}') ||
              (response[0] == '[' && response[response.Length - 1] == ']'));
