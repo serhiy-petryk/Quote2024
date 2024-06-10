@@ -25,7 +25,6 @@ namespace Data.Helpers
             using (var wc = new WebClientEx())
             {
                 wc.Encoding = System.Text.Encoding.UTF8;
-                // wc.Cookies = cookies;
                 wc.IsXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
                 wc.Cookies = new CookieContainer();
@@ -108,7 +107,6 @@ namespace Data.Helpers
                 request.AllowAutoRedirect = true;
                 request.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
                 request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                // request.AllowAutoRedirect = false;
 
                 /*request.ContentType = "application/json";
                 request.MediaType = "application/json";
