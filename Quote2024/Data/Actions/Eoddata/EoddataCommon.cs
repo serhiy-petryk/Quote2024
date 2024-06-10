@@ -25,8 +25,8 @@ namespace Data.Actions.Eoddata
                 };
 
                 var url = @"https://www.eoddata.com";
-                var o = Download.GetToBytes(url, false, false, null);
-                var content = System.Text.Encoding.UTF8.GetString(o.Item1);
+                var o1 = Download.GetToBytes(url, false, false, null);
+                var content = System.Text.Encoding.UTF8.GetString(o1.Item1);
                 var ss = content.Split("input type=\"hidden\"");
                 for (var k = 1; k < ss.Length; k++)
                 {
@@ -45,8 +45,15 @@ namespace Data.Actions.Eoddata
                         System.Net.WebUtility.UrlEncode(a) + "=" + System.Net.WebUtility.UrlEncode(cookies[a]))));
 
                 var o2 = Download.PostToBytes(url, parameters, false, false, "application/x-www-form-urlencoded",
-                    o.Item2);
+                    o1.Item2);
                 _eoddataCookies = o2.Item2;
+
+                if (_eoddataCookies["ASP.NET_SessionId"] == null)
+                    throw new Exception("No 'ASP.NET_SessionId' cookie");
+                if (_eoddataCookies["EODDataAdmin"] == null)
+                    throw new Exception("No 'EODDataAdmin' cookie");
+                if (_eoddataCookies["EODDataLogin"] == null)
+                    throw new Exception("No 'EODDataLogin' cookie");
             }
 
             return _eoddataCookies;
