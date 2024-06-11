@@ -16,7 +16,6 @@ namespace Data.Helpers
             {
                 if (noProxy) wc.Proxy = null;
                 wc.Encoding = System.Text.Encoding.UTF8;
-                // wc.Cookies = cookies;
                 wc._isXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
                 return wc.DownloadDataTaskAsync(url);

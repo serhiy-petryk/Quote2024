@@ -40,9 +40,9 @@ namespace Data.Actions.Eoddata
                     cookies.Add(name, value);
                 }
 
-                var parameters = System.Net.WebUtility.HtmlDecode(string.Join("&",
+                var parameters = string.Join("&",
                     cookies.AllKeys.Select(a =>
-                        System.Net.WebUtility.UrlEncode(a) + "=" + System.Net.WebUtility.UrlEncode(cookies[a]))));
+                        System.Net.WebUtility.UrlEncode(a) + "=" + System.Net.WebUtility.UrlEncode(cookies[a])));
 
                 var o2 = WebClientExt.PostToBytes(url, parameters, false, false, "application/x-www-form-urlencoded",
                     o1.Item2);
