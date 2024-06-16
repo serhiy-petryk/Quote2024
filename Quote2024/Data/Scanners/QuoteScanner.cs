@@ -42,11 +42,11 @@ namespace Data.Scanners
         {
             var timeCommon = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00".Split(',').Select(TimeSpan.Parse).ToArray();
             var timeShortened = "09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00".Split(',').Select(TimeSpan.Parse).ToArray();
-            var tableName = "dbQ2024Tests2..HourHalfPolygon2";
+            var tableName = "dbQ2024Tests3..Polygon30Min";
             var minuteQuotes =
-                PolygonMinuteScan.GetMinuteQuotesByDate(new DateTime(2021, 1, 1), new DateTime(2099, 12, 31), 1.0f,
+                PolygonMinuteScan.GetMinuteQuotesByDate(new DateTime(2018, 1, 1), new DateTime(2099, 12, 31), 1.0f,
                     500);
-            Start(tableName, timeCommon, timeShortened, minuteQuotes, 1.0f, 500);
+            Start(tableName, timeCommon, timeShortened, minuteQuotes, 5.0f, 500);
         }
 
         public static void StartHour()
@@ -84,8 +84,10 @@ namespace Data.Scanners
             var resultsCount = 0;
 
             DbHelper.ClearAndSaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
-                "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count", "OpenDelayInMinutes",
-                "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext", "HighBefore", "LowBefore",
+                "Close", "Volume", "TradeCount", "Final5Min", "Final10Min", "Final15Min", "Final20Min", "Final",
+                "FinalDelayInMinutes", "Count", "OpenDelayInMinutes", "OpenNextDelayInMinutes", "OpenNext",
+                "HighNext", "LowNext", "HighBefore", "LowBefore", "HighTime", "LowTime", "HighTimeBefore",
+                "LowTimeBefore",
                 "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
                 "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
                 "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30",
@@ -124,6 +126,10 @@ namespace Data.Scanners
                     results.Add(result);
 
                     var fromUnixTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1));
+                    var fromUnixTicks_5Min = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1 + TimeSpan.FromMinutes(5)));
+                    var fromUnixTicks_10Min = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1 + TimeSpan.FromMinutes(10)));
+                    var fromUnixTicks_15Min = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1 + TimeSpan.FromMinutes(15)));
+                    var fromUnixTicks_20Min = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item1 + TimeSpan.FromMinutes(20)));
                     var toUnixTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date.Add(o1.Item2));
                     var countFull = 0;
                     bool? wma_10_Up = null;
@@ -162,12 +168,23 @@ namespace Data.Scanners
                             if (countFull == 0)
                             {
                                 result.HighBefore = quote.h;
+                                result.HighTimeBefore = quote.DateTime.TimeOfDay;
                                 result.LowBefore = quote.l;
+                                result.LowTimeBefore = quote.DateTime.TimeOfDay;
                             }
                             else
                             {
-                                if (result.HighBefore < quote.h) result.HighBefore = quote.h;
-                                if (result.LowBefore > quote.l) result.LowBefore = quote.l;
+                                if (result.HighBefore < quote.h)
+                                {
+                                    result.HighBefore = quote.h;
+                                    result.HighTimeBefore = quote.DateTime.TimeOfDay;
+                                }
+
+                                if (result.LowBefore > quote.l)
+                                {
+                                    result.LowBefore = quote.l;
+                                    result.LowTimeBefore = quote.DateTime.TimeOfDay;
+                                }
                             }
                         }
                         else if (quote.t < toUnixTicks)
@@ -181,6 +198,8 @@ namespace Data.Scanners
                                 result.Open = quote.o;
                                 result.High = quote.h;
                                 result.Low = quote.l;
+                                result.HighTime = quote.DateTime.TimeOfDay;
+                                result.LowTime = quote.DateTime.TimeOfDay;
                                 result.Close = quote.c;
                                 result.OpenDelayInMinutes = Convert.ToByte((quote.t - fromUnixTicks) / 60000);
 
@@ -222,10 +241,20 @@ namespace Data.Scanners
                                 }
 
                                 if (quote.h > result.HighNext) result.HighNext = quote.h;
+
                                 if (quote.l < result.LowNext) result.LowNext = quote.l;
 
-                                if (quote.h > result.High) result.High = quote.h;
-                                if (quote.l < result.Low) result.Low = quote.l;
+                                if (quote.h > result.High)
+                                {
+                                    result.High = quote.h;
+                                    result.HighTime = quote.DateTime.TimeOfDay;
+                                }
+
+                                if (quote.l < result.Low)
+                                {
+                                    result.Low = quote.l;
+                                    result.LowTime = quote.DateTime.TimeOfDay;
+                                }
                                 result.Close = quote.c;
                             }
 
@@ -257,6 +286,11 @@ namespace Data.Scanners
                             }
                         }
 
+                        if (!result.Final5Min.HasValue && quote.t >= fromUnixTicks_5Min) result.Final5Min = quote.o;
+                        if (!result.Final10Min.HasValue && quote.t >= fromUnixTicks_10Min) result.Final10Min = quote.o;
+                        if (!result.Final15Min.HasValue && quote.t >= fromUnixTicks_15Min) result.Final15Min = quote.o;
+                        if (!result.Final20Min.HasValue && quote.t >= fromUnixTicks_20Min) result.Final20Min = quote.o;
+
                         countFull++;
                     }
                 }
@@ -267,24 +301,23 @@ namespace Data.Scanners
                     allResults.AddRange(results);
                 else
                 {
-                    var aa = results.Select(a => a.Volume * a.Close / 1000000f).ToArray();
-                    var aa1 = results.Select(a => a.TradeCount).ToArray();
+                    // var aa = results.Select(a => a.Volume * a.Close / 1000000f).ToArray();
+                    // var aa1 = results.Select(a => a.TradeCount).ToArray();
                 }
 
                 if (allResults.Count > 100000)
                 {
                     DbHelper.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
-                        "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count", "OpenDelayInMinutes",
-                        "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext", "HighBefore", "LowBefore",
-                        "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
-                        "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
-                        "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30",
-                        "PrevEma_10", "PrevEma_10", "Ema_10", "CloseAtEma_10",
-                        "PrevEma_20", "PrevEma_20", "Ema_20", "CloseAtEma_20",
-                        "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30",
-                        "Prev2Ema2_10", "PrevEma2_10", "Ema2_10", "CloseAtEma2_10",
-                        "Prev2Ema2_20", "PrevEma2_20", "Ema2_20", "CloseAtEma2_20",
-                        "Prev2Ema2_30", "PrevEma2_30", "Ema2_30", "CloseAtEma2_30");
+                        "Close", "Volume", "TradeCount", "Final5Min", "Final10Min", "Final15Min", "Final20Min", "Final",
+                        "FinalDelayInMinutes", "Count", "OpenDelayInMinutes", "OpenNextDelayInMinutes", "OpenNext",
+                        "HighNext", "LowNext", "HighBefore", "LowBefore", "HighTime", "LowTime", "HighTimeBefore",
+                        "LowTimeBefore",
+                        "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10", "Prev2Wma_20",
+                        "PrevWma_20", "Wma_20", "CloseAtWma_20", "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30",
+                        "PrevEma_10", "PrevEma_10", "Ema_10", "CloseAtEma_10", "PrevEma_20", "PrevEma_20", "Ema_20",
+                        "CloseAtEma_20", "Prev2Ema_30", "PrevEma_30", "Ema_30", "CloseAtEma_30", "Prev2Ema2_10",
+                        "PrevEma2_10", "Ema2_10", "CloseAtEma2_10", "Prev2Ema2_20", "PrevEma2_20", "Ema2_20",
+                        "CloseAtEma2_20", "Prev2Ema2_30", "PrevEma2_30", "Ema2_30", "CloseAtEma2_30");
                     allResults.Clear();
                 }
             }
@@ -292,8 +325,10 @@ namespace Data.Scanners
             if (allResults.Count > 0)
             {
                 DbHelper.SaveToDbTable(allResults, tableName, "Symbol", "Date", "Time", "To", "Open", "High", "Low",
-                    "Close", "Volume", "TradeCount", "Final", "FinalDelayInMinutes", "Count", "OpenDelayInMinutes",
-                    "OpenNextDelayInMinutes", "OpenNext", "HighNext", "LowNext", "HighBefore", "LowBefore",
+                    "Close", "Volume", "TradeCount", "Final5Min", "Final10Min", "Final15Min", "Final20Min", "Final",
+                    "FinalDelayInMinutes", "Count", "OpenDelayInMinutes", "OpenNextDelayInMinutes", "OpenNext",
+                    "HighNext", "LowNext", "HighBefore", "LowBefore", "HighTime", "LowTime", "HighTimeBefore",
+                    "LowTimeBefore",
                     "Prev2Wma_10", "PrevWma_10", "Wma_10", "CloseAtWma_10",
                     "Prev2Wma_20", "PrevWma_20", "Wma_20", "CloseAtWma_20",
                     "Prev2Wma_30", "PrevWma_30", "Wma_30", "CloseAtWma_30",
@@ -320,6 +355,11 @@ namespace Data.Scanners
         public float Low;
         public float Close;
         public float Volume;
+
+        public float? Final5Min;
+        public float? Final10Min;
+        public float? Final15Min;
+        public float? Final20Min;
         public float? Final;
         public short? FinalDelayInMinutes;
 
@@ -334,6 +374,11 @@ namespace Data.Scanners
 
         public float HighBefore;
         public float LowBefore;
+
+        public TimeSpan HighTime;
+        public TimeSpan LowTime;
+        public TimeSpan HighTimeBefore;
+        public TimeSpan LowTimeBefore;
 
         public float Prev2Wma_10;
         public float PrevWma_10;

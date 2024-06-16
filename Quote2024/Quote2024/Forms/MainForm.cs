@@ -97,8 +97,8 @@ namespace Quote2024.Forms
 
             // await Task.Factory.StartNew(Data.Actions.Chartmill.ChartmillScreenerLoader.ParseAllZipFiles);
 
-            // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
-            await Task.Factory.StartNew(Data.Tests.ScannerIntraday.Test);
+            await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
+            // await Task.Factory.StartNew(Data.Tests.ScannerIntraday.Test);
             // await Task.Factory.StartNew(Data.Tests.ScannerIntraday.Test2);
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
             // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
