@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -31,8 +32,34 @@ namespace Data.Actions.MorningStar
         }*/
 
         public static List<string> BadTickers = new List<string>();
-        public static string GetMyTicker(string morningStarTicker)
+
+        public static string GetMorningStarProfileTicker(string myTicker)
         {
+            var morningStarTicker = myTicker;
+            if (morningStarTicker.Contains("^"))
+            {
+                morningStarTicker = morningStarTicker.Replace("^", "-p");
+            }
+            else if (morningStarTicker.EndsWith(".U"))
+            {
+
+            }
+            else if (morningStarTicker.EndsWith(".WS"))
+            {
+                morningStarTicker = "";
+            }
+            else if (morningStarTicker.EndsWith(".A") || morningStarTicker.EndsWith(".B") || morningStarTicker.EndsWith(".C"))
+            {
+            }
+            else
+            {
+            }
+
+            return morningStarTicker;
+        }
+
+        public static string GetMyTicker(string morningStarTicker)
+            {
             var testSymbol = morningStarTicker;
             if (morningStarTicker == "PSA/pG")
             {
