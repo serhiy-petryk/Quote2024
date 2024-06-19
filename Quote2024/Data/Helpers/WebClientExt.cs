@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Data.Helpers
 {
@@ -9,7 +10,31 @@ namespace Data.Helpers
     {
         private enum Method {Get, Post}
 
+        private class cIpCountry
+        {
+            public string ip;
+            public string country;
+        }
         #region ====  Static region  ====
+
+        public static void CheckVpnConnection()
+        {
+            var country = WebClientExt.GetMyIpCountry();
+            if (string.IsNullOrEmpty(country) || string.Equals(country, "UA", StringComparison.InvariantCultureIgnoreCase))
+                MessageBox.Show("Please, check VPN connection");
+        }
+
+        private static string GetMyIpCountry()
+        {
+            var response = WebClientExt.GetToBytes($"https://ipapi.co/json/", false);
+            if (response.Item1 != null)
+            {
+                var oo = SpanJson.JsonSerializer.Generic.Utf8.Deserialize<cIpCountry>(response.Item1);
+                return oo.country;
+            }
+            return null;
+        }
+
         public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false)
         {
             using (var wc = new WebClientExt())
