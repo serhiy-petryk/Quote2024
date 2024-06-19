@@ -14,10 +14,11 @@ namespace Data.Actions.MorningStar
     public static class MorningStarSymbolsLoader
     {
         // https://www.morningstar.com/api/v2/stocks/xnas/naaa/quote
-        private const string UrlTemplateApi = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
-        private const string UrlTemplate = @"https://www.morningstar.com/stocks/{1}/{0}/quote";
-        private const string FileTemplate = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_{1}_{0}.html";
-        private const string FileTemplateApi = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240617.3\MSProfile_{1}_{0}.json";
+        private const string UrlTemplateJson = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
+        private const string UrlTemplateHtml = @"https://www.morningstar.com/stocks/{1}/{0}/quote";
+        private const string FileTemplateHtml = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_{1}_{0}.html";
+        private const string FileTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240617.3\MSProfile_{1}_{0}.json";
+        private const string FolderTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_{0}";
 
         public static void Test()
         {
@@ -89,7 +90,7 @@ namespace Data.Actions.MorningStar
         public static List<MsSymbolItem> CheckFilesX(List<MsSymbolItem> originalItems)
         {
             var data = new List<MsSymbolItem>();
-            var files = Directory.GetFiles(Path.GetDirectoryName(FileTemplateApi), "*.json");
+            var files = Directory.GetFiles(Path.GetDirectoryName(FileTemplateJson), "*.json");
             foreach (var file in files)
             {
                 var oo = ZipUtils.DeserializeBytes<cRoot>(File.ReadAllBytes(file));
@@ -122,8 +123,8 @@ namespace Data.Actions.MorningStar
                 PolygonSymbol = polygonSymbol;
                 MsSymbol = MorningStarCommon.GetMorningStarProfileTicker(PolygonSymbol);
                 Exchange = exchange;
-                Url = string.Format(UrlTemplateApi, MsSymbol.ToLower(), Exchange.ToLower());
-                Filename = string.Format(FileTemplateApi, PolygonSymbol, Exchange);
+                Url = string.Format(UrlTemplateJson, MsSymbol.ToLower(), Exchange.ToLower());
+                Filename = string.Format(FileTemplateJson, PolygonSymbol, Exchange);
             }
         }
 
@@ -254,10 +255,10 @@ namespace Data.Actions.MorningStar
                 var tasks = new ConcurrentDictionary<(string, string, string), Task<byte[]>>();
                 foreach (var symbolAndExchange in listItem)
                 {
-                    var filename = string.Format(FileTemplate, symbolAndExchange.Item1, symbolAndExchange.Item3);
+                    var filename = string.Format(FileTemplateHtml, symbolAndExchange.Item1, symbolAndExchange.Item3);
                     if (!File.Exists(filename))
                     {
-                        var url = string.Format(UrlTemplate, symbolAndExchange.Item2.ToLower(), symbolAndExchange.Item3.ToLower());
+                        var url = string.Format(UrlTemplateHtml, symbolAndExchange.Item2.ToLower(), symbolAndExchange.Item3.ToLower());
                         var task = WebClientExt.DownloadToBytesAsync(url);
                         tasks[symbolAndExchange] = task;
                     }
@@ -275,7 +276,7 @@ namespace Data.Actions.MorningStar
                     {
                         // release control to the caller until the task is done, which will be near immediate for each task following the first
                         var data = await kvp.Value;
-                        var filename = string.Format(FileTemplate, kvp.Key.Item1, kvp.Key.Item3);
+                        var filename = string.Format(FileTemplateHtml, kvp.Key.Item1, kvp.Key.Item3);
                         File.WriteAllBytes(filename, data);
                     }
                     catch (Exception ex)
@@ -380,7 +381,7 @@ namespace Data.Actions.MorningStar
 
         public static void ParseAll()
         {
-            var files = Directory.GetFiles(Path.GetDirectoryName(FileTemplate), "*.html");
+            var files = Directory.GetFiles(Path.GetDirectoryName(FileTemplateHtml), "*.html");
             foreach (var file in files)
             {
                 var content = File.ReadAllText(file);
