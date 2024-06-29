@@ -42,7 +42,7 @@ namespace Data.Actions.Yahoo
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
-                cmd.CommandText = "select max([date]) MaxDate from dbQ2023Others..TradingDays";
+                cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
                 var o = cmd.ExecuteScalar();
                 if (o is DateTime) maxDate = (DateTime)o;
             }
@@ -63,8 +63,8 @@ namespace Data.Actions.Yahoo
                                    "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
                                    "where b.Symbol is null");
 
-                Logger.AddMessage($"Update trading days in dbQ2023Others database");
-                DbHelper.RunProcedure("dbQ2023Others..pRefreshTradingDays");
+                // Logger.AddMessage($"Update trading days in dbQ2023Others database");
+                // DbHelper.RunProcedure("dbQ2023Others..pRefreshTradingDays");
                 
                 Logger.AddMessage($"Update trading days in dbQ2024 database");
                 DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");

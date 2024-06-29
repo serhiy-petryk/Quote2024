@@ -20,7 +20,7 @@ namespace Data.Actions.Yahoo
             {
                 conn.Open();
                 cmd.CommandTimeout = 150;
-                cmd.CommandText = "SELECT min(date) MinDate, max(date) MaxDate FROM dbQ2023Others..TradingDays where Date >= DATEADD(day, -7, GetDate())";
+                cmd.CommandText = "SELECT min(date) MinDate, max(date) MaxDate FROM dbQ2024..TradingDays where Date >= DATEADD(day, -7, GetDate())";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {

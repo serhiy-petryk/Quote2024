@@ -27,7 +27,7 @@ namespace Data.Actions.Eoddata
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
-                cmd.CommandText = "SELECT [date] FROM dbQ2023Others..TradingDays WHERE [date] > DATEADD(day,-30, GETDATE())";
+                cmd.CommandText = "SELECT [date] FROM dbQ2024..TradingDays WHERE [date] > DATEADD(day,-30, GETDATE())";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                         tradingDays.Add((DateTime) rdr["Date"]);
