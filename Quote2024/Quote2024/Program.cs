@@ -28,6 +28,8 @@ namespace Quote2024
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            Data.Helpers.WebClientExt.CheckVpnConnection();
+
             Application.Run(new MainForm());
         }
     }
