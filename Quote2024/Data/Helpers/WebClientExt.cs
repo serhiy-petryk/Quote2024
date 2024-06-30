@@ -65,8 +65,14 @@ namespace Data.Helpers
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
                 if (method == Method.Post)
                     wc.Headers.Add(HttpRequestHeader.ContentType, contentType ?? "application/x-www-form-urlencoded"); // very important for Investing.Splits
-                wc._cookies = new CookieContainer();
-                wc._cookies.Add(cookies ?? new CookieCollection());
+                if (cookies != null)
+                {
+                    wc._cookies = new CookieContainer();
+                    wc._cookies.Add(cookies);
+                }
+                // Very slowly
+                //wc._cookies = new CookieContainer();
+                //wc._cookies.Add(cookies ?? new CookieCollection());
 
                 try
                 {
@@ -113,10 +119,10 @@ namespace Data.Helpers
             request.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-            /*request.ContentType = "application/json";
-            request.MediaType = "application/json";
-            request.Accept = "application/json";
-            request.Method = "POST";*/
+            //request.ContentType = "application/json";
+            //request.MediaType = "application/json";
+            //request.Accept = "application/json";
+            //request.Method = "POST";
 
             if (_isXmlHttpRequest)
                 request.Headers.Add("X-Requested-With", "XMLHttpRequest");
