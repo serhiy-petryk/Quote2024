@@ -38,6 +38,42 @@ namespace Data.Actions.Yahoo
             Helpers.Logger.AddMessage($"Finished. Items: {symbolItems.Count:N0}");
         }
 
+        public static List<(string,string)> GetUrlAndFilenames(List<YahooSectorItem> symbolItems, string dateKey)
+        {
+            const int chunkSize = 20;
+            var tempFilename = string.Format(FileNameTemplate, chunkSize.ToString(), dateKey, "");
+            var folder = Path.GetDirectoryName(tempFilename);
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            var urlAndFilenames = new List<(string, string)>();
+            var symbolsToDownload = new List<YahooSectorItem>();
+            var chunkCount = 0;
+            foreach (var item in symbolItems)
+            {
+                symbolsToDownload.Add(item);
+                if (symbolsToDownload.Count == chunkSize)
+                {
+                    var filename = string.Format(FileNameTemplate, chunkSize.ToString(), dateKey, chunkCount.ToString());
+                    var url = string.Format(UrlTemplate, string.Join(',', symbolsToDownload.Select(a => a.YahooSymbol)));
+                    urlAndFilenames.Add((url,filename));
+                    symbolsToDownload.Clear();
+                    chunkCount++;
+                }
+            }
+
+            if (symbolsToDownload.Count > 0)
+            {
+                var filename = string.Format(FileNameTemplate, chunkSize.ToString(), dateKey, chunkCount.ToString());
+                var url = string.Format(UrlTemplate, string.Join(',', symbolsToDownload.Select(a => a.YahooSymbol)));
+                urlAndFilenames.Add((url, filename));
+                symbolsToDownload.Clear();
+                chunkCount++;
+            }
+
+            return urlAndFilenames;
+        }
+
         public static void DownloadItems(List<YahooSectorItem> symbolItems, string dateKey)
         {
             const int chunkSize = 20;
