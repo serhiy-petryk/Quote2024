@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Data.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -32,10 +27,10 @@ namespace Data.Actions.Yahoo
         {
             Logger.AddMessage($"Started");
             var timeStamp = TimeHelper.GetTimeStamp();
-            var symbolItems = GetSymbolsAndExchanges().OrderBy(a => a.YahooSymbol).ToList();
-            DownloadItems(symbolItems, timeStamp.Item2);
+            var symbolXref = GetSymbolXref();
+            DownloadItems(symbolXref, timeStamp.Item2);
 
-            Helpers.Logger.AddMessage($"Finished. Items: {symbolItems.Count:N0}");
+            Helpers.Logger.AddMessage($"Finished. Items: {symbolXref.Count:N0}");
         }
 
         public static List<(string,string)> GetUrlAndFilenames(List<YahooSectorItem> symbolItems, string dateKey)
@@ -74,7 +69,7 @@ namespace Data.Actions.Yahoo
             return urlAndFilenames;
         }
 
-        public static void DownloadItems(List<YahooSectorItem> symbolItems, string dateKey)
+        public static void DownloadItems(Dictionary<string,string> symbolXref, string dateKey)
         {
             const int chunkSize = 20;
 
@@ -83,19 +78,19 @@ namespace Data.Actions.Yahoo
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            var symbolsToDownload = new List<YahooSectorItem>();
+            var symbolsToDownload = new List<string>();
             var count = 0;
             var chunkCount = 0;
-            foreach (var item in symbolItems)
+            foreach (var kvp in symbolXref)
             {
                 count++;
-                symbolsToDownload.Add(item);
+                symbolsToDownload.Add(kvp.Key);
                 if (symbolsToDownload.Count == chunkSize)
                 {
                     var filename = string.Format(FileNameTemplate, chunkSize.ToString(), dateKey, chunkCount.ToString());
                     if (!File.Exists(filename))
                     {
-                        var url = string.Format(UrlTemplate, string.Join(',', symbolsToDownload.Select(a => a.YahooSymbol)));
+                        var url = string.Format(UrlTemplate, string.Join(',', symbolsToDownload));
                         var o = WebClientExt.GetToBytes(url, true);
                         if (o.Item3 != null)
                             throw new Exception(
@@ -104,7 +99,7 @@ namespace Data.Actions.Yahoo
                         File.WriteAllBytes(filename, o.Item1);
                     }
 
-                    Helpers.Logger.AddMessage($"Downloaded sectors for {count} items from {symbolItems.Count:N0}");
+                    Helpers.Logger.AddMessage($"Downloaded sectors for {count} items from {symbolXref.Count:N0}");
 
                     symbolsToDownload.Clear();
                     chunkCount++;
@@ -116,7 +111,7 @@ namespace Data.Actions.Yahoo
                 var filename = string.Format(FileNameTemplate, chunkSize.ToString(), dateKey, chunkCount.ToString());
                 if (!File.Exists(filename))
                 {
-                    var url = string.Format(UrlTemplate, string.Join(',', symbolsToDownload.Select(a => a.YahooSymbol)));
+                    var url = string.Format(UrlTemplate, string.Join(',', symbolsToDownload));
                     var o = WebClientExt.GetToBytes(url, true);
                     if (o.Item3 != null)
                         throw new Exception(
@@ -125,7 +120,7 @@ namespace Data.Actions.Yahoo
                     File.WriteAllBytes(filename, o.Item1);
                 }
 
-                Helpers.Logger.AddMessage($"Downloaded sectors for {count} items from {symbolItems.Count:N0}");
+                Helpers.Logger.AddMessage($"Downloaded sectors for {count} items from {symbolXref.Count:N0}");
 
                 symbolsToDownload.Clear();
                 chunkCount++;
@@ -133,23 +128,20 @@ namespace Data.Actions.Yahoo
 
         }
 
-        private static List<YahooSectorItem> GetSymbolsAndExchanges()
+        private static Dictionary<string, string> GetSymbolXref()
         {
-            var data = new List<YahooSectorItem>();
+            var data = new Dictionary<string, string>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
                 cmd.CommandText = "SELECT DISTINCT exchange, symbol, YahooSymbol FROM dbQ2024..SymbolsPolygon " +
                                   "WHERE isnull([To],'2099-12-31')>=dateadd(month, -1, GetDate()) and IsTest is null " +
-                                  "and MyType not like 'ET%' and MyType not in ('FUND', 'RIGHT', 'WARRANT') and YahooSymbol is not null";
+                                  "and MyType not like 'ET%' and MyType not in ('RIGHT') and YahooSymbol is not null";
+//                "and MyType not like 'ET%' and MyType not in ('FUND', 'RIGHT', 'WARRANT') and YahooSymbol is not null";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
-                    {
-                        var item = new YahooSectorItem((string)rdr["symbol"], (string)rdr["YahooSymbol"]);
-                        if (!string.IsNullOrEmpty(item.YahooSymbol))
-                            data.Add(item);
-                    }
+                        data.Add((string)rdr["YahooSymbol"], (string)rdr["symbol"]);
             }
 
             return data;
