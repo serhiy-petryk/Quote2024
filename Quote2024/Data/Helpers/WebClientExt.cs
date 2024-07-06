@@ -35,7 +35,7 @@ namespace Data.Helpers
             return null;
         }
 
-        public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false)
+        public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false, CookieCollection cookies = null)
         {
             using (var wc = new WebClientExt())
             {
@@ -43,6 +43,11 @@ namespace Data.Helpers
                 wc.Encoding = System.Text.Encoding.UTF8;
                 wc._isXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                if (cookies != null)
+                {
+                    wc._cookies = new CookieContainer();
+                    wc._cookies.Add(cookies);
+                }
                 return wc.DownloadDataTaskAsync(url);
             }
         }
@@ -118,6 +123,7 @@ namespace Data.Helpers
             request.AllowAutoRedirect = true;
             request.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            request.Accept = "text/html,*/*"; // text/html,*/* - for auth in finance.yahoo
 
             //request.ContentType = "application/json";
             //request.MediaType = "application/json";

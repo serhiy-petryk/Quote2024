@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Compression;
+using System.Net;
 using Data.Actions.Polygon;
+using Data.Helpers;
 using Data.Models;
 
 namespace Data.Actions.Yahoo
@@ -11,6 +13,38 @@ namespace Data.Actions.Yahoo
         public const string MinuteYahooDataFolder = @"D:\Quote\WebData\Minute\Yahoo\Data\";
         public const string MinuteYahooLogFolder = @"D:\Quote\WebData\Minute\Yahoo\Logs\";
         public const string MinuteYahooCorrectionFiles = MinuteYahooDataFolder + "YahooMinuteCorrections.txt";
+
+        private static CookieCollection _yahooCookies = null;
+        private static string _crumb;
+
+        public static System.Net.CookieCollection GetYahooCookies(bool refresh)
+        {
+            if (_yahooCookies == null || refresh)
+            {
+                // var url = @"https://fc.yahoo.com/";
+                // var url = @"https://finance.yahoo.com/quote/MSFT/profile/";
+                // var url = @"https://finance.yahoo.com/screener/predefined/sec-ind_sec-largest-equities_basic-materials";
+                var urlX2 = @"https://query1.finance.yahoo.com/ws/insights/v3/finance/insights?disableRelatedReports=true&formatted=true&getAllResearchReports=false&reportsCount=0&ssl=true&symbols=A&lang=en-US&region=US";
+                var urlX1 = @"https://query1.finance.yahoo.com/ws/insights/v3/finance/insights?disableRelatedReports=true&formatted=true&getAllResearchReports=false&reportsCount=0&ssl=true&symbols=A,AA,MSFT,EZY&lang=en-US&region=US";
+
+                var url = @"https://finance.yahoo.com";
+                var o1 = WebClientExt.GetToBytes(url, false, false, new CookieCollection());
+                var content1 = System.Text.Encoding.UTF8.GetString(o1.Item1);
+                _yahooCookies = o1.Item2;
+
+                /*var crambUrl = "https://query2.finance.yahoo.com/v1/test/getcrumb";
+                var o2 = WebClientExt.GetToBytes(crambUrl, false, false, _yahooCookies);
+                _crumb = System.Text.Encoding.UTF8.GetString(o2.Item1);*/
+
+                // var o3 = WebClientExt.GetToBytes(urlX1, false, false, _yahooCookies);
+                var o3 = WebClientExt.GetToBytes(urlX1, false);
+                var sectorContent = System.Text.Encoding.UTF8.GetString(o3.Item1);
+            }
+
+            return _yahooCookies;
+        }
+
+
 
         public static IEnumerable<(string, List<Quote>)> GetMinuteDataFromZipFile(string zipFileName, Dictionary<string, string> errorLog)
         {
