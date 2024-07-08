@@ -50,8 +50,9 @@ namespace Data.Actions.Yahoo
                     continue;
                 }
 
+                // 2020 year format
                 i1 = content.IndexOf("<h1 class=\"D(ib) Fz(1", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 1702, 2020-01-01, 2020-08-03
+                if (i1 > -1) // Count, from, to: 20652, 2020-01-01, 2024-06-27
                 { // AA_20200512043535.html
                     var k2 = content.IndexOf("<h1 class=\"D(ib) Fz(1", i1 + 5, StringComparison.InvariantCulture);
                     if (k2 != -1)
@@ -59,167 +60,32 @@ namespace Data.Actions.Yahoo
 
                     var i2 = content.IndexOf(">Sector<", i1, StringComparison.InvariantCulture);
                     if (i2 == -1) i2 = content.IndexOf(">Sector(s)<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector())
-                    {
+                    if (i2 == -1 && CheckSector2020())
+                        throw new Exception("Check YahooProfile parser");
 
-                    }
                     SaveToDict(1);
                     continue;
                 }
 
+                // 2024 year format
                 i1 = content.IndexOf("<h1 class=\"svelte-", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 417, 2024-03-23, 2024-05-06
+                if (i1 > -1) // Count, from, to: 1328, 2023-11-12, 2024-07-05
                 { // AAON_20240503140454.html
                     var k2 = content.IndexOf("<h1 class=\"svelte-", i1 + 5, StringComparison.InvariantCulture);
                     if (k2 != -1)
                         throw new Exception("Check YahooProfile parser");
 
                     var i2 = content.IndexOf(">Sector: </dt>", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector2())
-                    {
+                    if (i2 == -1 && CheckSector2024())
+                        throw new Exception("Check YahooProfile parser");
 
-                    }
                     SaveToDict(2);
                     continue;
                 }
 
-                /*i1 = content.IndexOf("<h1 class=\"D(ib) Fz(16px) Lh(18px)\" data-reactid=\"7\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 1702, 2020-01-01, 2020-08-03
-                { // AA_20200512043535.html
-                    var i2 = content.IndexOf(">Sector<", i1, StringComparison.InvariantCulture);
-                    if (i2==-1) i2 = content.IndexOf(">Sector(s)<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector())
-                    {
+                throw new Exception("Check YahooProfile parser");
 
-                    }
-                    SaveToDict(1);
-                    continue;
-                }
 
-                i1 = content.IndexOf("<h1 class=\"D(ib) Fz(18px)\" data-reactid=\"7\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 9240, 2020-03-08, 2022-01-21
-                { // A_20201127012313.html
-                    var i2 = content.IndexOf(">Sector(s)<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1) i2 = content.IndexOf(">Sector<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector())
-                    {
-
-                    }
-                    SaveToDict(2);
-                    continue;
-                }
-
-                i1 = content.IndexOf("<h1 class=\"D(ib) Fz(18px)\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 9304, 2021-11-04, 2024-04-15
-                { //A_20220124182731.html
-                    var i2 = content.IndexOf(">Sector(s)<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1) i2 = content.IndexOf(">Sector<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector())
-                    {
-
-                    }
-                    SaveToDict(3);
-                    continue;
-                }
-
-                i1 = content.IndexOf("<h1 class=\"D(ib) Fz(16px) Lh(18px)\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 406, 2023-05-24, 2024-06-27
-                { // AAN_20230609055307.html
-                    var i2 = content.IndexOf(">Sector(s)<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1) i2 = content.IndexOf(">Sector<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector3())
-                    {
-
-                    }
-                    SaveToDict(4);
-                    continue;
-                }
-
-                i1 = content.IndexOf("<h1 class=\"svelte-1dqn7jb\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 5, 2023-11-12, 2023-12-30
-                { // DISH_20231226205342.html
-                    var i2 = content.IndexOf(">Sector: </dt>", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1)
-                    {
-
-                    }
-
-                    SaveToDict(5);
-                    continue;
-                }
-
-                i1 = content.IndexOf("<h1 class=\"svelte-169tggr\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 10, 2024-01-29, 2024-03-16
-                { // AI_20240211152301.html
-                    var i2 = content.IndexOf(">Sector: </dt>", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1)
-                    {
-
-                    }
-                    SaveToDict(6);
-                    continue;
-                }
-
-                i1 = content.IndexOf("<h1 class=\"svelte-ufs8hf\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 417, 2024-03-23, 2024-05-06
-                { // AAON_20240503140454.html
-                    var i2 = content.IndexOf(">Sector: </dt>", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector2())
-                    {
-
-                    }
-                    SaveToDict(7);
-                    continue;
-                }
-
-                i1 = content.IndexOf("<h1 class=\"svelte-3a2v0c\">", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 897, 2024-05-06, 2024-07-05
-                { // A_20240627204404.html
-                    var i2 = content.IndexOf(">Sector: </dt>", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector2())
-                    { //ILMNV_20240624224841.html
-
-                    }
-                    SaveToDict(8);
-                    continue;
-                }*/
-
-                if (file.EndsWith("ACT_20230406035606.html") || file.EndsWith("AXP_20230410144059.html") ||
-                    file.EndsWith("OXM_20230429222332.html") || file.EndsWith("SONO_20230422222307.html") ||
-                    file.EndsWith("WAB_20230417233217.html"))
-                { // Bad files
-                    SaveToDict(9);
-                    continue;
-                }
-
-                if (i1 == -1)
-                {
-                }
-                /*
-                var i1 = content.IndexOf(">Sector(s)<", StringComparison.InvariantCulture);
-                if (i1 == -1)
-                {
-                    i1 = content.IndexOf(">Sector: <", StringComparison.InvariantCulture);
-                }
-
-                if (i1 == -1)
-                {
-                    i1 = content.IndexOf(">Sector<", StringComparison.InvariantCulture);
-                }
-
-                if (i1 == -1)
-                {
-                    i1 = content.IndexOf("\"sector\":\"", StringComparison.InvariantCulture);
-                }
-
-                if (i1 == -1)
-                {
-                    i1 = content.IndexOf(">Fund Overview<", StringComparison.InvariantCulture);
-                    if (i1 == -1)
-                    {
-
-                    }
-                }*/
                 void SaveToDict(int id)
                 {
                     var ss = Path.GetFileNameWithoutExtension(file).Split('_');
@@ -238,11 +104,7 @@ namespace Data.Actions.Yahoo
                     if (dateKey > to) oldData[2] = dateKey;
                 }
 
-                bool HasSector()
-                {
-                    return content.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase) != -1;
-                }
-                bool CheckSector()
+                bool CheckSector2020()
                 {
                     var content1 = content.Replace("https://finance.yahoo.com/sectors\" title=\"Sectors\">Sectors", "\">");
                     var a1 = content1.Length;
@@ -251,17 +113,11 @@ namespace Data.Actions.Yahoo
                     content1 = content1.Replace("finance.yahoo.com/sector/", "x");
                     if (content1.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase) == -1)
                         return false;
-                    if (content1.IndexOf(">Profile Information Not Available<",
-                            StringComparison.InvariantCulture) != -1)
-                    { // CNH_20240520210256.html
-                        return false;
-                    }
 
-                    // if (content1.IndexOf("playback timings (ms):", StringComparison.InvariantCulture) != -1) return false;
                     return true;
                 }
 
-                bool CheckSector2()
+                bool CheckSector2024()
                 {
                     var content1 = content;
                     if (content1.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase) == -1)
@@ -277,36 +133,18 @@ namespace Data.Actions.Yahoo
                         return false;
                     }
 
-                    // if (content1.IndexOf("playback timings (ms):", StringComparison.InvariantCulture) != -1) return false;
                     return true;
                 }
-
-                bool CheckSector3()
-                {
-                    var content1 = content.Replace("sector information, ", "");
-                    if (content1.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase) == -1)
-                        return false;
-
-                    // if (content1.IndexOf("playback timings (ms):", StringComparison.InvariantCulture) != -1) return false;
-                    return true;
-                }
-
             }
             Logger.AddMessage($"Finished");
 
             foreach(var kvp in dict.OrderBy(a=>a.Key))
                 Debug.Print($"{kvp.Key}\t{kvp.Value[0]}\t{((DateTime)kvp.Value[1]):yyyy-MM-dd}\t{((DateTime)kvp.Value[2]):yyyy-MM-dd}");
             /*
-0	144	2020-08-14	2024-03-05
-1	1702	2020-01-01	2020-08-03
-2	9240	2020-03-08	2022-01-21
-3	9304	2021-11-04	2024-04-15
-4	406	2023-05-24	2024-06-27
-5	5	2023-11-12	2023-12-30
-6	10	2024-01-29	2024-03-16
-7	417	2024-03-23	2024-05-06
-8	897	2024-05-06	2024-07-05
-9	5	2023-04-06	2023-04-29
+Dict: id, recs, from, to
+1	20652	2020-01-01	2024-06-27 (2020 format)
+2	1328	2023-11-12	2024-07-05 (2024 format)
+9	144	2020-08-14	2024-03-05
             */
         }
 
