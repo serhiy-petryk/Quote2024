@@ -10,48 +10,50 @@ namespace Data.Helpers
             var filename2 = @"E:\Quote\WebData\Splits\StockSplitHistory\StockSplitHistory_20230304\sshAMST.html";
             var filename3 = @"E:\Quote\WebData\Symbols\Quantumonline\Profiles\Profiles\pA.html";
             // var filename = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_arcx_esba.html";
-            var filename = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data\ZWS_20240226082342.html";
+            var filename = @"E:\Quote\WebData\Symbols\Yahoo\Profile\ok\ABNB_20230519031517.html";
             var s = RemoveUselessTags(File.ReadAllText(filename));
         }
 
         public static void ProcessFolder()
         {
             var sourceFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data";
-            var destinationFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA1";
+            var destinationFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data.Short";
 
-            var files = Directory.GetFiles(sourceFolder, "A*.html");
+            var files = Directory.GetFiles(sourceFolder, "*.html");
             foreach (var file in files)
             {
-                File.Delete(file);
-                continue;
-                /*var newContext = RemoveUselessTags(File.ReadAllText(file));
                 var newFileName = Path.Combine(destinationFolder, Path.GetFileName(file));
-                File.WriteAllText(newFileName, newContext);
+                if (!File.Exists(newFileName))
+                {
+                    var newContext = RemoveUselessTags(File.ReadAllText(file));
+                    File.WriteAllText(newFileName, newContext);
 
-                var lastWriteTime = File.GetLastWriteTime(file);
-                File.SetLastWriteTime(newFileName, lastWriteTime);
-                var lastAccessTime = File.GetLastAccessTime(file);
-                File.SetLastWriteTime(newFileName, lastAccessTime);
-                var creationTime = File.GetCreationTime(file);
-                File.SetCreationTime(newFileName, creationTime);*/
+                    var lastWriteTime = File.GetLastWriteTime(file);
+                    File.SetLastWriteTime(newFileName, lastWriteTime);
+                    var lastAccessTime = File.GetLastAccessTime(file);
+                    File.SetLastWriteTime(newFileName, lastAccessTime);
+                    var creationTime = File.GetCreationTime(file);
+                    File.SetCreationTime(newFileName, creationTime);
+                }
             }
+            Helpers.Logger.AddMessage($"Finished");
         }
 
         public static string RemoveUselessTags(string htmlContent)
         {
             var len = htmlContent.Length;
-            var i1 = htmlContent.IndexOf("<body ", StringComparison.InvariantCulture);
-            var i2 = htmlContent.LastIndexOf("<body ", StringComparison.InvariantCulture);
-            if (i1 == -1 && i2 == -1)
+            var i1 = htmlContent.IndexOf("<!-- BEGIN WAYBACK TOOLBAR INSERT -->", StringComparison.InvariantCulture);
+            var i2 = htmlContent.LastIndexOf("<!-- END WAYBACK TOOLBAR INSERT -->", StringComparison.InvariantCulture);
+            if (i1 > -1 && i2 > i1) // file from web.archive.org
             {
-                i1 = htmlContent.IndexOf("<body>", StringComparison.InvariantCulture);
-                i2 = htmlContent.LastIndexOf("<body>", StringComparison.InvariantCulture);
+                htmlContent = htmlContent.Substring(0, i1) + htmlContent.Substring(i2 + 35);
             }
-            var i3 = htmlContent.IndexOf("</body>", StringComparison.InvariantCulture);
-            var i4 = htmlContent.LastIndexOf("</body>", StringComparison.InvariantCulture);
-            if (i1 != -1 && i3 != -1 && i1 == i2 && i3 == i4)
+
+            i1 = htmlContent.IndexOf("<body", StringComparison.InvariantCulture);
+            i2 = htmlContent.LastIndexOf("</body>", StringComparison.InvariantCulture);
+            if (i2>i1 && i1>-1)
             {
-                htmlContent = htmlContent.Substring(i1, i3 - i1 + 7);
+                htmlContent = htmlContent.Substring(i1, i2 - i1 + 7);
             }
 
             i1 = htmlContent.IndexOf("</script>", StringComparison.InvariantCulture);
