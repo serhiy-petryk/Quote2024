@@ -16,12 +16,28 @@ namespace Data.Helpers
 
         public static void ProcessFolder()
         {
-            var sourceFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data";
-            var destinationFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data.Short";
+            Logger.AddMessage($"Started");
+
+            ProcessFolder(@"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230221");
+            // ProcessFolder(@"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230222");
+        }
+
+        private static void ProcessFolder(string sourceFolder)
+        {
+            // var sourceFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data";
+            // var sourceFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230227";
+            var destinationFolder = sourceFolder +  @".Short";
+            if (!Directory.Exists(destinationFolder))
+                Directory.CreateDirectory(destinationFolder);
 
             var files = Directory.GetFiles(sourceFolder, "*.html");
+            var count = 0;
             foreach (var file in files)
             {
+                count++;
+                if (count % 10 == 0)
+                    Logger.AddMessage($"Parsed {count:N0} files from {files.Length:N0}. Last file: {Path.GetFileName(file)}");
+
                 var newFileName = Path.Combine(destinationFolder, Path.GetFileName(file));
                 if (!File.Exists(newFileName))
                 {
@@ -36,7 +52,7 @@ namespace Data.Helpers
                     File.SetCreationTime(newFileName, creationTime);
                 }
             }
-            Helpers.Logger.AddMessage($"Finished");
+            Helpers.Logger.AddMessage($"Finished. Proccessed {count:N0} files");
         }
 
         public static string RemoveUselessTags(string htmlContent)
