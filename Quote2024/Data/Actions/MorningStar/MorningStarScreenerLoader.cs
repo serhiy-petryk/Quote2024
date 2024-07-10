@@ -15,6 +15,7 @@ namespace Data.Actions.MorningStar
         private const string UrlTemplate = @"https://www.morningstar.com/api/v2/navigation-list/{0}?sort=ticker&page={1}&limit=50";
         private const string DataFolder = @"E:\Quote\WebData\Screener\MorningStar\Data";
 
+        // Doesn't work from 2024-06: Not found error
         public static void Start()
         {
             Logger.AddMessage($"Started");
@@ -138,7 +139,7 @@ namespace Data.Actions.MorningStar
 
         #region ============  Json classes  ==============
 
-        private class DbItem
+        public class DbItem
         {
             public string Symbol;
             public DateTime Date;
