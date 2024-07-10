@@ -24,7 +24,8 @@ namespace Data.Actions.Yahoo
         {
             Logger.AddMessage($"Started");
 
-            var folder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data.Short";
+            // var folder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data.Short";
+            var folder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230221.Short";
             var files = Directory.GetFiles(folder, "*.html").OrderBy(a=>a).ToArray();
             var cnt = 0;
             var dict = new Dictionary<int, object[]>();
@@ -94,13 +95,22 @@ namespace Data.Actions.Yahoo
                     continue;
                 }
 
+                i1 = content.IndexOf(">Symbols similar to ", StringComparison.InvariantCulture);
+                if (i1 > -1) // Not found
+                    continue;
+
                 throw new Exception("Check YahooProfile parser");
 
 
                 void SaveToDict(int id)
                 {
                     var ss = Path.GetFileNameWithoutExtension(file).Split('_');
-                    var dateKey = DateTime.ParseExact(ss[ss.Length-1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
+                    DateTime dateKey;
+                    if (ss.Length == 2) // web.archive
+                        dateKey = DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
+                    else
+                        dateKey = DateTime.ParseExact(ss[2], "yyyyMMdd", CultureInfo.InvariantCulture);
+
                     if (!dict.ContainsKey(id))
                     {
                         dict.Add(id, new object[]{1, dateKey, dateKey});
@@ -118,10 +128,25 @@ namespace Data.Actions.Yahoo
                 bool CheckSector2020()
                 {
                     var content1 = content.Replace("https://finance.yahoo.com/sectors\" title=\"Sectors\">Sectors", "\">");
-                    var a1 = content1.Length;
-                    var a2 = content.Length;
                     content1 = content1.Replace("sector information, ", "");
                     content1 = content1.Replace("finance.yahoo.com/sector/", "x");
+
+                    /*// Below for YP_20230304.1/YP_HUBCZ_20230304.html (full version)
+                    var a1 = content1.Length;
+                    content1 = content1.Replace("SectorAllocation", "", StringComparison.InvariantCultureIgnoreCase);
+                    var a2 = content1.Length;
+                    content1 = content1.Replace("morningstarSector", "");
+                    var a3 = content1.Length;
+                    content1 = content1.Replace("enableSectorIndustryLabelFix", "");
+                    var a4 = content1.Length;
+                    content1 = content1.Replace("SectorVisitorTrend", "", StringComparison.InvariantCultureIgnoreCase);
+                    var a5 = content1.Length;
+                    content1 = content1.Replace("sectorsList", "");
+                    var a6 = content1.Length;
+
+                    // Below for YP_20230304/YP_CHKEL_20230304.html (full version)
+                    content1 = content1.Replace("ZiP8secTORUqEL", "");
+                    var a7 = content1.Length;*/
                     if (content1.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase) == -1)
                         return false;
 
@@ -236,14 +261,16 @@ namespace Data.Actions.Yahoo
                     if (string.IsNullOrEmpty(sector)) return;
 
                     // Correction of non-standard sectors
-                    if (sector == "Industrial Goods" && (symbol == "EROS" || symbol == "ECOL")) sector = "Industrials";
+                    if (sector == "Industrial Goods" && (symbol == "BLDR" || symbol == "ECOL")) sector = "Industrials";
 
                     if (sector == "Financial" && symbol == "MFA") sector = "Real Estate";
-                    else if (sector == "Financial" && (symbol == "CBSH" || symbol == "ISTR" || symbol == "NAVI" || symbol == "SFE" || symbol == "ZTR")) sector = "Financial Services";
+                    else if (sector == "Financial" && (symbol == "CBSH" || symbol == "ISTR" || symbol == "NAVI" ||
+                                                       symbol == "SFE" ||
+                                                       symbol == "ZTR")) sector = "Financial Services";
 
                     if (sector == "Services" && (symbol == "EAT" || symbol== "PZZA")) sector = "Consumer Cyclical";
                     else if (sector == "Services" && (symbol == "EROS" || symbol == "NFLX")) sector = "Communication Services";
-                    else if (sector == "Services" && symbol == "TTEK") sector = "Industrials";
+                    else if (sector == "Services" && (symbol == "TTEK" || symbol == "ZNH")) sector = "Industrials";
 
                     if (sector == "Consumer Goods" && symbol == "KNDI") sector = "Consumer Cyclical";
 
