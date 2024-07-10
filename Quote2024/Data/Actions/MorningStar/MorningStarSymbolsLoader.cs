@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,18 +14,26 @@ namespace Data.Actions.MorningStar
 {
     public static class MorningStarSymbolsLoader
     {
+        // Server error for: https://www.morningstar.com/stocks/xnas/vbnk/quote, https://www.morningstar.com/stocks/xnas/na/quote
+
         // https://www.morningstar.com/api/v2/stocks/xnas/naaa/quote
-        private const string UrlTemplateJson = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
+        // private const string UrlTemplateJson = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
+        private const string UrlTemplateJson = @"https://www.morningstar.com/stocks/{1}/{0}/quote";
         private const string UrlTemplateHtml = @"https://www.morningstar.com/stocks/{1}/{0}/quote";
         private const string FileTemplateHtml = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_{1}_{0}.html";
-        private const string FileTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240617.3\MSProfile_{1}_{0}.json";
-        private const string FolderTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_{0}";
+        // private const string FileTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_{2}\MSProfile_{1}_{0}.json";
+        private const string FileTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data\MSProfiles_{2}\MSProfile_{1}_{0}.html";
+        // private const string FolderTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_{0}";
+        private const string FolderTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data\MSProfiles_{0}";
 
         public static void Test()
         {
+            var dbItems = new List<MorningStarScreenerLoader.DbItem>();
             var types = new Dictionary<string, int>();
-            var folder = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240617.3";
+            var folder = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240620";
             var files = Directory.GetFiles(folder, "*.json").OrderBy(a=>a).ToArray();
+            var ss2 = Path.GetFileNameWithoutExtension(folder).Split('_');
+            var dateKey = DateTime.ParseExact(ss2[ss2.Length - 1], "yyyyMMdd", CultureInfo.InvariantCulture);
             foreach (var file in files)
             {
                 var ss = Path.GetFileNameWithoutExtension(file).Split('_');
@@ -32,6 +41,23 @@ namespace Data.Actions.MorningStar
                 var exchange = ss[ss.Length - 2];
 
                 var oo = ZipUtils.DeserializeBytes<cRoot>(File.ReadAllBytes(file));
+                if (string.Equals(symbol.Replace('^', 'p'), oo.page.ticker, StringComparison.InvariantCulture))
+                {
+
+                }
+                else if (string.Equals(symbol.Replace("^", ".PR"), oo.page.ticker, StringComparison.InvariantCulture))
+                {
+
+                }
+                else if (symbol.Contains('^') &&
+                         oo.page.name.EndsWith(" Pref Share", StringComparison.InvariantCulture))
+                {
+
+                }
+                else
+                {
+
+                }
                 var type = oo.page?.investmentType ?? "";
                 var oSector = oo.components?.profile?.payload?.dataPoints?.sector;
                 var sector = oo.components?.profile?.payload?.dataPoints?.sector?.value;
@@ -45,6 +71,13 @@ namespace Data.Actions.MorningStar
                 }
                 else
                 {
+                    var dbItem = new MorningStarScreenerLoader.DbItem
+                    {
+                        Symbol = symbol, Exchange = exchange, Name = oo.page?.name, Sector = sector, Date = dateKey,
+                        TimeStamp = File.GetLastWriteTime(file)
+                    };
+                    dbItems.Add(dbItem);
+
                     if (!types.ContainsKey(type))
                         types.Add(type, 0);
                     types[type]++;
@@ -52,6 +85,10 @@ namespace Data.Actions.MorningStar
                         Debug.Print($"Not equity: {exchange}:{symbol}. Type: {type}");
                 }
             }
+
+            // DbHelper.ClearAndSaveToDbTable(dbItems, "dbQ2023Others..Bfr_ScreenerMorningStar", "Symbol", "Date",
+               // "Exchange", "Sector", "Name", "TimeStamp");
+
         }
 
         public static List<MsSymbolItem> CheckFiles(List<MsSymbolItem> originalItems)
@@ -64,12 +101,35 @@ namespace Data.Actions.MorningStar
                     data.Add(item);
                 else if (item.StatusCode == HttpStatusCode.NotFound)
                 {
+                    var secondMsSymbol = MorningStarCommon.GetSecondMorningStarProfileTicker(item.PolygonSymbol);
+                    if (!string.IsNullOrEmpty(secondMsSymbol) && !string.Equals(item.MsSymbol, secondMsSymbol, StringComparison.CurrentCultureIgnoreCase) && 
+                        item.Exchange==item.ExchangeForUrl)
+                    {
+                        item.MsSymbol = secondMsSymbol;
+                        item.StatusCode = null;
+                        data.Add(item);
+                        continue;
+                    }
+
+                    if (item.Exchange == item.ExchangeForUrl && (item.Exchange == "XNAS" || item.Exchange == "XNYS"))
+                    {
+                        item.ExchangeForUrl = item.Exchange == "XNAS" ? "XNYS" : "XNAS";
+                        item.StatusCode = null;
+                        data.Add(item);
+                    }
+                    /*if (!string.IsNullOrEmpty(secondMsSymbol) && item.MsSymbol== secondMsSymbol && item.Exchange != item.ExchangeForUrl && (item.Exchange == "XNAS" || item.Exchange == "XNYS"))
+                    {
+                        item.ExchangeForUrl = item.Exchange == "XNAS" ? "XNYS" : "XNAS";
+                        item.MsSymbol = MorningStarCommon.GetMorningStarProfileTicker(item.PolygonSymbol);
+                        item.StatusCode = null;
+                        data.Add(item);
+                    }*/
                 }
                 else if (File.Exists(item.Filename))
                 {
                     var oo = ZipUtils.DeserializeBytes<cRoot>(File.ReadAllBytes(item.Filename));
-                    var sector = oo.components?.profile?.payload?.dataPoints?.sector?.value;
-                    if (string.IsNullOrEmpty(sector))
+                    var oSector = oo.components?.profile?.payload?.dataPoints?.sector;
+                    if (oSector == null)
                     {
                         File.Delete(item.Filename);
                         data.Add(item);
@@ -87,44 +147,33 @@ namespace Data.Actions.MorningStar
             return data;
         }
 
-        public static List<MsSymbolItem> CheckFilesX(List<MsSymbolItem> originalItems)
-        {
-            var data = new List<MsSymbolItem>();
-            var files = Directory.GetFiles(Path.GetDirectoryName(FileTemplateJson), "*.json");
-            foreach (var file in files)
-            {
-                var oo = ZipUtils.DeserializeBytes<cRoot>(File.ReadAllBytes(file));
-                var sector = oo.components?.profile?.payload?.dataPoints?.sector?.value;
-                if (string.IsNullOrEmpty(sector))
-                {
-                    var ss = Path.GetFileNameWithoutExtension(file).Split('_');
-                    var symbol = ss[ss.Length - 1];
-                    var exchange = ss[ss.Length - 2];
-                    data.AddRange(originalItems.Where(a =>
-                        string.Equals(a.PolygonSymbol, symbol, StringComparison.InvariantCultureIgnoreCase) &&
-                        string.Equals(a.Exchange, exchange, StringComparison.InvariantCultureIgnoreCase)));
-                    Debug.Print($"No sector: {Path.GetFileName(file)}");
-                }
-            }
-            return data;
-        }
-
-        public class MsSymbolItem
+        public class MsSymbolItem : WebClientExt.IDownloadItem
         {
             public string PolygonSymbol;
             public string MsSymbol;
             public string Exchange;
-            public string Url;
-            public string Filename;
-            public HttpStatusCode? StatusCode;
+            public string ExchangeForUrl;
+            public string Url => string.Format(UrlTemplateJson, MsSymbol.ToLower(), ExchangeForUrl.ToLower());
+            public string Filename => string.Format(FileTemplateJson, PolygonSymbol, Exchange, Date.ToString("yyyyMMdd"));
+            public int DownloadAttempts { get; set; }
+            public HttpStatusCode? StatusCode { get; set; }
 
-            public MsSymbolItem(string polygonSymbol, string exchange)
+            public string SymbolType;
+            public cSector oSector;
+            public string Sector => oSector?.value;
+            public DateTime Date;
+            public DateTime TimeStamp;
+
+            public MsSymbolItem(string polygonSymbol, string exchange, DateTime dateKey)
             {
                 PolygonSymbol = polygonSymbol;
                 MsSymbol = MorningStarCommon.GetMorningStarProfileTicker(PolygonSymbol);
                 Exchange = exchange;
-                Url = string.Format(UrlTemplateJson, MsSymbol.ToLower(), Exchange.ToLower());
-                Filename = string.Format(FileTemplateJson, PolygonSymbol, Exchange);
+                ExchangeForUrl = exchange;
+                Date = dateKey;
+                var dataFolder = Path.GetDirectoryName(Filename);
+                if (!Directory.Exists(dataFolder))
+                    Directory.CreateDirectory(dataFolder);
             }
         }
 
@@ -164,23 +213,26 @@ namespace Data.Actions.MorningStar
 
         }
 
-        public static async void StartJson()
+        public static async Task StartJson()
         {
-            WebClientExt.CheckVpnConnection();
-
             Logger.AddMessage($"Started");
-            var symbolItems = GetSymbolsAndExchanges2();
+            var timeStamp = TimeHelper.GetTimeStamp();
+            var symbolItems = GetSymbolsAndExchanges2(timeStamp.Item1.Date).ToList();
             await DownloadItems(symbolItems);
 
-            var checkCount = 0;
+            var checkCount = int.MaxValue;
             while (true)
             {
                 var badItems = CheckFiles(symbolItems);
-                if (badItems.Count == checkCount)
+                Debug.Print($"Bad item count: {badItems.Count}");
+                if (badItems.Count == 0 || badItems.Count >= checkCount)
                     break;
                 await DownloadItems(badItems);
                 checkCount = badItems.Count;
             }
+
+            foreach(var item in symbolItems.Where(a=>a.StatusCode == HttpStatusCode.NotFound))
+                Debug.Print($"Not found:\t{item.Exchange}\t{item.PolygonSymbol}\t{item.MsSymbol}");
 
             var items = symbolItems.Count();
             var notFoundItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.NotFound);
@@ -196,7 +248,6 @@ namespace Data.Actions.MorningStar
             while (needToDownload)
             {
                 needToDownload = false;
-                var doneItems = symbolItems.Count(a => (a.StatusCode == HttpStatusCode.OK || a.StatusCode == HttpStatusCode.NotFound));
 
                 foreach (var symbolItem in symbolItems)
                 {
@@ -212,7 +263,7 @@ namespace Data.Actions.MorningStar
                     else
                         symbolItem.StatusCode = HttpStatusCode.OK;
 
-                    if (tasks.Count >= 100)
+                    if (tasks.Count >= 20)
                     {
                         await Download(tasks);
                         Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
@@ -229,12 +280,6 @@ namespace Data.Actions.MorningStar
                 }
                 Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
             }
-
-            var items = symbolItems.Count();
-            var notFoundItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.NotFound);
-            var badGatewayItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.BadGateway);
-            var serverErrorItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.InternalServerError);
-            Helpers.Logger.AddMessage($"Finished. Items: {items:N0}. Not found: {notFoundItems:N0}. Server errors: {serverErrorItems:N0}. Bad Gateway errors: {badGatewayItems:N0}");
         }
 
         public static async void StartHttp()
@@ -341,7 +386,8 @@ namespace Data.Actions.MorningStar
                 conn.Open();
                 cmd.CommandText = "SELECT exchange, symbol FROM dbQ2024..SymbolsPolygon " +
                                   "WHERE [To] is null and IsTest is null and MyType not like 'ET%' " +
-                                  "and MyType not in ('FUND', 'RIGHT', 'WARRANT') and symbol in ('NA', 'VBNK','BSRR','CLEU','LDWY','LEDS','MGPI','MTRX','RVYL','SLAB','SRTS','TSVT','HGTY','TFPM')";
+                                  // "and MyType not in ('FUND', 'RIGHT', 'WARRANT') and symbol in ('NA', 'VBNK','BSRR','CLEU','LDWY','LEDS','MGPI','MTRX','RVYL','SLAB','SRTS','TSVT','HGTY','TFPM')";
+                                  "and MyType not in ('FUND', 'RIGHT', 'WARRANT')";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
@@ -357,20 +403,20 @@ namespace Data.Actions.MorningStar
             return data;
         }
 
-        private static List<MsSymbolItem> GetSymbolsAndExchanges2()
+        private static List<MsSymbolItem> GetSymbolsAndExchanges2(DateTime dateKey)
         {
             var data = new List<MsSymbolItem>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
-                cmd.CommandText = "SELECT exchange, symbol FROM dbQ2024..SymbolsPolygon " +
-                                  "WHERE [To] is null and IsTest is null and MyType not like 'ET%' " +
-                                  "and MyType not in ('FUND', 'RIGHT', 'WARRANT')";
+                cmd.CommandText = "SELECT DISTINCT exchange, symbol FROM dbQ2024..SymbolsPolygon " +
+                                  "WHERE isnull([To],'2099-12-31')>=dateadd(month, -1, GetDate()) and IsTest is null "+
+                                  "and MyType not like 'ET%' and MyType not in ('FUND', 'RIGHT', 'WARRANT') order by 2";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
-                        var item = new MsSymbolItem((string)rdr["symbol"], (string)rdr["exchange"]);
+                        var item = new MsSymbolItem((string)rdr["symbol"], (string)rdr["exchange"], dateKey);
                         if (!string.IsNullOrEmpty(item.MsSymbol))
                             data.Add(item);
                     }
@@ -410,6 +456,8 @@ namespace Data.Actions.MorningStar
 
         public class cPage
         {
+            public string ticker;
+            public string name;
             public string investmentType;
         }
         public class cComponents

@@ -1,8 +1,14 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Data.Actions.MorningStar;
 
 namespace Data.Helpers
 {
@@ -10,13 +16,16 @@ namespace Data.Helpers
     {
         private enum Method {Get, Post}
 
+        #region =========  IP helpers ============
+
+        
+
         private class cIpCountry
         {
             public string ip;
             public string country;
         }
         #region ====  Static region  ====
-
         public static void CheckVpnConnection()
         {
             var country = WebClientExt.GetMyIpCountry();
@@ -34,6 +43,94 @@ namespace Data.Helpers
             }
             return null;
         }
+        #endregion
+
+        #region ======  BatchDownload  ========
+        public interface IDownloadItem
+        {
+            public string Url { get; }
+            public string Filename { get; }
+            public HttpStatusCode? StatusCode { get; set; }
+            public int DownloadAttempts { get; set; }
+        }
+
+        public static async Task DownloadItems(IList<IDownloadItem> symbolItems, int parallelBatchSize = 20)
+        {
+            var tasks = new ConcurrentDictionary<IDownloadItem, Task<byte[]>>();
+            var needToDownload = true;
+            while (needToDownload)
+            {
+                needToDownload = false;
+
+                foreach (var symbolItem in symbolItems)
+                {
+                    if (!File.Exists(symbolItem.Filename))
+                    {
+                        if (symbolItem.StatusCode != HttpStatusCode.NotFound || symbolItem.DownloadAttempts < 3)
+                        {
+                            var task = WebClientExt.DownloadToBytesAsync(symbolItem.Url);
+                            tasks[symbolItem] = task;
+                            symbolItem.StatusCode = null;
+                        }
+                    }
+                    else
+                        symbolItem.StatusCode = HttpStatusCode.OK;
+
+                    if (tasks.Count >= parallelBatchSize)
+                    {
+                        await Download(tasks);
+                        Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
+                        tasks.Clear();
+                        needToDownload = true;
+                    }
+                }
+
+                if (tasks.Count > 0)
+                {
+                    await Download(tasks);
+                    tasks.Clear();
+                    needToDownload = true;
+                }
+                Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
+            }
+        }
+
+        private static async Task Download(ConcurrentDictionary<IDownloadItem, Task<byte[]>> tasks)
+        {
+            foreach (var kvp in tasks)
+            {
+                kvp.Key.DownloadAttempts++;
+                try
+                {
+                    // release control to the caller until the task is done, which will be near immediate for each task following the first
+                    var data = await kvp.Value;
+                    /*var oo = ZipUtils.DeserializeBytes<cRoot>(data);
+                    var sector = oo.components?.profile?.payload?.dataPoints?.sector?.value;
+                    if (string.IsNullOrEmpty(sector))
+                    {
+                        var data2 = WebClientExt.GetToBytes(kvp.Key.Url, false);
+                        if (data2.Item1 != null) data = data2.Item1;
+                    }*/
+                    File.WriteAllBytes(kvp.Key.Filename, data);
+                    kvp.Key.StatusCode = HttpStatusCode.OK;
+                }
+                catch (Exception ex)
+                {
+                    if (ex is WebException exc && exc.Response is HttpWebResponse response &&
+                        (response.StatusCode == HttpStatusCode.NotFound ||
+                         response.StatusCode == HttpStatusCode.InternalServerError ||
+                         response.StatusCode == HttpStatusCode.BadGateway))
+                    {
+                        kvp.Key.StatusCode = response.StatusCode;
+                        continue;
+                    }
+
+                    throw new Exception($"WebClientExt.Download: Error while download from {kvp.Key}. Error message: {ex.Message}");
+                }
+            }
+
+        }
+        #endregion
 
         public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false, CookieCollection cookies = null)
         {

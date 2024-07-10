@@ -57,6 +57,9 @@ namespace Data.Actions.MorningStar
             return morningStarTicker;
         }
 
+        public static string GetSecondMorningStarProfileTicker(string myTicker) =>
+            myTicker.Contains("^") ? myTicker.Replace("^", ".pr") : null;
+
         public static string GetMyTicker(string morningStarTicker)
             {
             var testSymbol = morningStarTicker;
