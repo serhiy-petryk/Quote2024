@@ -5,10 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Data.Actions.MorningStar;
 
 namespace Data.Helpers
 {
@@ -51,55 +49,43 @@ namespace Data.Helpers
             public string Url { get; }
             public string Filename { get; }
             public HttpStatusCode? StatusCode { get; set; }
-            public int DownloadAttempts { get; set; }
         }
 
-        public static async Task DownloadItems(IList<IDownloadItem> symbolItems, int parallelBatchSize = 20)
+        public static async Task DownloadItemsToFiles(ICollection<IDownloadItem> symbolItems, int parallelBatchSize)
         {
             var tasks = new ConcurrentDictionary<IDownloadItem, Task<byte[]>>();
-            var needToDownload = true;
-            while (needToDownload)
+            foreach (var symbolItem in symbolItems)
             {
-                needToDownload = false;
+                if (File.Exists(symbolItem.Filename) && symbolItem.StatusCode != HttpStatusCode.OK)
+                    symbolItem.StatusCode = HttpStatusCode.OK;
 
-                foreach (var symbolItem in symbolItems)
+                if (!(symbolItem.StatusCode == HttpStatusCode.NotFound || symbolItem.StatusCode == HttpStatusCode.OK))
                 {
-                    if (!File.Exists(symbolItem.Filename))
-                    {
-                        if (symbolItem.StatusCode != HttpStatusCode.NotFound || symbolItem.DownloadAttempts < 3)
-                        {
-                            var task = WebClientExt.DownloadToBytesAsync(symbolItem.Url);
-                            tasks[symbolItem] = task;
-                            symbolItem.StatusCode = null;
-                        }
-                    }
-                    else
-                        symbolItem.StatusCode = HttpStatusCode.OK;
-
-                    if (tasks.Count >= parallelBatchSize)
-                    {
-                        await Download(tasks);
-                        Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
-                        tasks.Clear();
-                        needToDownload = true;
-                    }
+                    var task = WebClientExt.DownloadToBytesAsync(symbolItem.Url);
+                    tasks[symbolItem] = task;
+                    symbolItem.StatusCode = null;
                 }
 
-                if (tasks.Count > 0)
+                if (tasks.Count >= parallelBatchSize)
                 {
                     await Download(tasks);
+                    Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
                     tasks.Clear();
-                    needToDownload = true;
                 }
-                Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
             }
+
+            if (tasks.Count > 0)
+            {
+                await Download(tasks);
+                tasks.Clear();
+            }
+            Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
         }
 
         private static async Task Download(ConcurrentDictionary<IDownloadItem, Task<byte[]>> tasks)
         {
             foreach (var kvp in tasks)
             {
-                kvp.Key.DownloadAttempts++;
                 try
                 {
                     // release control to the caller until the task is done, which will be near immediate for each task following the first
@@ -119,7 +105,8 @@ namespace Data.Helpers
                     if (ex is WebException exc && exc.Response is HttpWebResponse response &&
                         (response.StatusCode == HttpStatusCode.NotFound ||
                          response.StatusCode == HttpStatusCode.InternalServerError ||
-                         response.StatusCode == HttpStatusCode.BadGateway))
+                         response.StatusCode == HttpStatusCode.BadGateway ||
+                         response.StatusCode == HttpStatusCode.ServiceUnavailable))
                     {
                         kvp.Key.StatusCode = response.StatusCode;
                         continue;
