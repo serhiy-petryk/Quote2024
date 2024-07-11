@@ -45,11 +45,11 @@ namespace Data.Actions.MorningStar
 
         public class DbItem
         {
-            public string Symbol;
+            public string PolygonSymbol;
+            public string MsSymbol;
             public DateTime Date;
-            public string Exchange;
-            public string Sector;
             public string Name;
+            public string Sector;
             public DateTime TimeStamp;
         }
         #endregion
@@ -57,7 +57,7 @@ namespace Data.Actions.MorningStar
         public static void TestParse()
         {
             var folder = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_20240710.zip";
-            ParseJsonAndSaveToDb(folder);
+            ParseJsonZipAndSaveToDb(folder);
             Logger.AddMessage($"Finished");
         }
 
@@ -84,7 +84,7 @@ namespace Data.Actions.MorningStar
             ZipUtils.CompressFolder(dataFolder, zipFileName);
             Directory.Delete(dataFolder, true);
 
-            ParseJsonAndSaveToDb(zipFileName);
+            ParseJsonZipAndSaveToDb(zipFileName);
 
             var okItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK);
             var notFoundItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.NotFound);
@@ -92,13 +92,11 @@ namespace Data.Actions.MorningStar
             Helpers.Logger.AddMessage($"Finished. Items: {symbolItems.Count:N0}. Ok: {okItems:N0}. Not found: {notFoundItems:N0}. Server errors: {serverErrorItems:N0}");
         }
 
-        private static void ParseJsonAndSaveToDb(string zipFileName)
+        private static void ParseJsonZipAndSaveToDb(string zipFileName)
         {
-            var nameLen = 0;
             var data = new Dictionary<string, DbItem>();
             var dateKey = DateTime.ParseExact(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1], "yyyyMMdd",
                 CultureInfo.InvariantCulture);
-            // var data = new Dictionary<string, Dictionary<string, DbItem>>();
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
@@ -122,14 +120,14 @@ namespace Data.Actions.MorningStar
 
                     var dbItem = new DbItem
                     {
-                        Symbol = polygonSymbol, Exchange = oo.page.exchange, Date = dateKey, Sector = sector,
-                        Name = oo.page.DbName, TimeStamp = entry.LastWriteTime.DateTime
+                        PolygonSymbol = polygonSymbol, MsSymbol = fileTicker, Date = dateKey, Name = oo.page.DbName,
+                        Sector = sector, TimeStamp = entry.LastWriteTime.DateTime
                     };
                     data.Add(polygonSymbol, dbItem);
                 }
 
-            DbHelper.ClearAndSaveToDbTable(data.Values, "dbQ2024..Bfr_SectorMorningStar", "Symbol", "Date", "Exchange",
-                "Sector", "Name", "TimeStamp");
+            DbHelper.ClearAndSaveToDbTable(data.Values, "dbQ2024..Bfr_SectorMorningStar", "PolygonSymbol", "Date",
+                "Name", "Sector", "TimeStamp", "MsSymbol");
 
         }
 
