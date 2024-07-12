@@ -93,17 +93,17 @@ namespace Data.Actions.Yahoo
 
             await WebClientExt.DownloadItemsToMemory(itemsToDownload, DownloadBatchSize);
 
-            // Save data to zip
-            var virtualFileEntries = itemsToDownload.Where(a => a.StatusCode == HttpStatusCode.OK).Select((a, index) =>
-                    new VirtualFileEntry(
-                        Path.Combine(entryFolder, string.Format(FileNameTemplate, timeStamp.Item2, DownloadBatchSize, index)), a.Data))
-                .ToArray();
-
             foreach (var item in itemsToDownload)
             { // Check on invalid items
                 if (item.Data == null)
                     throw new Exception("Invalid data in YahooSectorLoader");
             }
+
+            // Save data to zip
+            var virtualFileEntries = itemsToDownload.Where(a => a.StatusCode == HttpStatusCode.OK).Select((a, index) =>
+                    new VirtualFileEntry(
+                        Path.Combine(entryFolder, string.Format(FileNameTemplate, timeStamp.Item2, DownloadBatchSize, index)), a.Data))
+                .ToArray();
 
             if (File.Exists(zipFileName))
                 File.Delete(zipFileName);
