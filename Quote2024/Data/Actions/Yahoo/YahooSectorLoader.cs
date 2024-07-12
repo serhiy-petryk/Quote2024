@@ -78,7 +78,7 @@ namespace Data.Actions.Yahoo
             sw.Start();
 
             const int chunkSize = 20;
-            const int DownloadBatchSize = 10; // 20 is faster ~10%
+            const int downloadBatchSize = 10; // 20 is faster ~10%
             
             Logger.AddMessage($"Started");
             var timeStamp = TimeHelper.GetTimeStamp();
@@ -91,7 +91,7 @@ namespace Data.Actions.Yahoo
 
             var itemsToDownload = urls.Select(a => new DownloadItem(a)).ToArray();
 
-            await WebClientExt.DownloadItemsToMemory(itemsToDownload, DownloadBatchSize);
+            await WebClientExt.DownloadItemsToMemory(itemsToDownload, downloadBatchSize);
 
             foreach (var item in itemsToDownload)
             { // Check on invalid items
@@ -102,7 +102,7 @@ namespace Data.Actions.Yahoo
             // Save data to zip
             var virtualFileEntries = itemsToDownload.Where(a => a.StatusCode == HttpStatusCode.OK).Select((a, index) =>
                     new VirtualFileEntry(
-                        Path.Combine(entryFolder, string.Format(FileNameTemplate, timeStamp.Item2, DownloadBatchSize, index)), a.Data))
+                        Path.Combine(entryFolder, string.Format(FileNameTemplate, timeStamp.Item2, downloadBatchSize, index)), a.Data))
                 .ToArray();
 
             if (File.Exists(zipFileName))
