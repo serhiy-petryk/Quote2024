@@ -85,6 +85,28 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
+            // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
+            // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.TestFile);
+
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadList);
+            // await Data.Actions.Yahoo.WA_YahooProfile.DownloadData();
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseHtml);
+
+            await Data.Actions.Yahoo.YahooSectorLoader.Start();
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.xxStart2);
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Parse);
+
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
+
+            // await Data.Actions.Yahoo.YahooProfileLoader.Start();
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooProfileLoader.RemoveNotFound);
+
+            // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarJsonProfileLoader.TestParse);
+
+            // await Data.Actions.MorningStar.MorningStarJsonProfileLoader.Start();
+            // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarSymbolsLoader.Test);
+            // await Data.Actions.MorningStar.MorningStarSymbolsLoader.StartJson();
+            // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarSymbolsLoader.ParseAllJson);
             // await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
 
             // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTradesLoader.Start);
@@ -97,7 +119,7 @@ namespace Quote2024.Forms
 
             // await Task.Factory.StartNew(Data.Actions.Chartmill.ChartmillScreenerLoader.ParseAllZipFiles);
 
-            await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
+            // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
             // await Task.Factory.StartNew(Data.Tests.ScannerIntraday.Test);
             // await Task.Factory.StartNew(Data.Tests.ScannerIntraday.Test2);
             // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
