@@ -19,7 +19,7 @@ namespace Data.Actions.MorningStar
         private const string FolderTemplate = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}";
 
         #region ========  Subclasses  =========
-        public class MsSymbolItem : WebClientExt.IDownloadItem
+        public class MsSymbolToFileItem : WebClientExt.IDownloadToFileItem
         {
             public string PolygonSymbol;
             public string MsSymbol;
@@ -33,7 +33,7 @@ namespace Data.Actions.MorningStar
             public DateTime Date => DateTime.ParseExact(DateKey, "yyyyMMdd", CultureInfo.InvariantCulture);
             public DateTime TimeStamp;
 
-            public MsSymbolItem(string polygonSymbol, string exchange, string dateKey)
+            public MsSymbolToFileItem(string polygonSymbol, string exchange, string dateKey)
             {
                 PolygonSymbol = polygonSymbol;
                 MsSymbol = MorningStarCommon.GetMorningStarProfileTicker(PolygonSymbol);
@@ -70,11 +70,11 @@ namespace Data.Actions.MorningStar
                 Directory.CreateDirectory(dataFolder);
 
             var symbolItems = GetSymbolsAndExchanges(timeStamp.Item2);
-            await WebClientExt.DownloadItemsToFiles(symbolItems.Cast<WebClientExt.IDownloadItem>().ToList(), 50);
+            await WebClientExt.DownloadItemsToFiles(symbolItems.Cast<WebClientExt.IDownloadToFileItem>().ToList(), 50);
 
             CheckFiles(symbolItems);
 
-            await WebClientExt.DownloadItemsToFiles(symbolItems.Cast<WebClientExt.IDownloadItem>().ToList(), 50);
+            await WebClientExt.DownloadItemsToFiles(symbolItems.Cast<WebClientExt.IDownloadToFileItem>().ToList(), 50);
 
             foreach (var item in symbolItems.Where(a => a.StatusCode != HttpStatusCode.OK))
                 Debug.Print($"{item.StatusCode}:\t{item.Exchange}\t{item.PolygonSymbol}\t{item.MsSymbol}");
@@ -131,7 +131,7 @@ namespace Data.Actions.MorningStar
 
         }
 
-        public static void CheckFiles(List<MsSymbolItem> originalItems)
+        public static void CheckFiles(List<MsSymbolToFileItem> originalItems)
         {
             foreach (var item in originalItems)
             {
@@ -208,9 +208,9 @@ namespace Data.Actions.MorningStar
             }
         }
 
-        private static List<MsSymbolItem> GetSymbolsAndExchanges(string dateKey)
+        private static List<MsSymbolToFileItem> GetSymbolsAndExchanges(string dateKey)
         {
-            var data = new List<MsSymbolItem>();
+            var data = new List<MsSymbolToFileItem>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
@@ -221,7 +221,7 @@ namespace Data.Actions.MorningStar
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
-                        var item = new MsSymbolItem((string)rdr["symbol"], (string)rdr["exchange"], dateKey);
+                        var item = new MsSymbolToFileItem((string)rdr["symbol"], (string)rdr["exchange"], dateKey);
                         if (!string.IsNullOrEmpty(item.MsSymbol)) data.Add(item);
                     }
             }

@@ -91,9 +91,9 @@ namespace Data.Actions.MorningStar
 
         }
 
-        public static List<MsSymbolItem> CheckFiles(List<MsSymbolItem> originalItems)
+        public static List<MsSymbolToFileItem> CheckFiles(List<MsSymbolToFileItem> originalItems)
         {
-            var data = new List<MsSymbolItem>();
+            var data = new List<MsSymbolToFileItem>();
             foreach (var item in originalItems)
             {
                 if (item.StatusCode == HttpStatusCode.BadGateway ||
@@ -147,7 +147,7 @@ namespace Data.Actions.MorningStar
             return data;
         }
 
-        public class MsSymbolItem : WebClientExt.IDownloadItem
+        public class MsSymbolToFileItem : WebClientExt.IDownloadToFileItem
         {
             public string PolygonSymbol;
             public string MsSymbol;
@@ -164,7 +164,7 @@ namespace Data.Actions.MorningStar
             public DateTime Date;
             public DateTime TimeStamp;
 
-            public MsSymbolItem(string polygonSymbol, string exchange, DateTime dateKey)
+            public MsSymbolToFileItem(string polygonSymbol, string exchange, DateTime dateKey)
             {
                 PolygonSymbol = polygonSymbol;
                 MsSymbol = MorningStarCommon.GetMorningStarProfileTicker(PolygonSymbol);
@@ -177,7 +177,7 @@ namespace Data.Actions.MorningStar
             }
         }
 
-        private static async Task Download(ConcurrentDictionary<MsSymbolItem, Task<byte[]>> tasks)
+        private static async Task Download(ConcurrentDictionary<MsSymbolToFileItem, Task<byte[]>> tasks)
         {
             foreach (var kvp in tasks)
             {
@@ -241,9 +241,9 @@ namespace Data.Actions.MorningStar
             Helpers.Logger.AddMessage($"Finished. Items: {items:N0}. Not found: {notFoundItems:N0}. Server errors: {serverErrorItems:N0}. Bad Gateway errors: {badGatewayItems:N0}");
         }
 
-        public static async Task DownloadItems(List<MsSymbolItem> symbolItems)
+        public static async Task DownloadItems(List<MsSymbolToFileItem> symbolItems)
         {
-            var tasks = new ConcurrentDictionary<MsSymbolItem, Task<byte[]>>();
+            var tasks = new ConcurrentDictionary<MsSymbolToFileItem, Task<byte[]>>();
             var needToDownload = true;
             while (needToDownload)
             {
@@ -403,9 +403,9 @@ namespace Data.Actions.MorningStar
             return data;
         }
 
-        private static List<MsSymbolItem> GetSymbolsAndExchanges2(DateTime dateKey)
+        private static List<MsSymbolToFileItem> GetSymbolsAndExchanges2(DateTime dateKey)
         {
-            var data = new List<MsSymbolItem>();
+            var data = new List<MsSymbolToFileItem>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
@@ -416,7 +416,7 @@ namespace Data.Actions.MorningStar
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
-                        var item = new MsSymbolItem((string)rdr["symbol"], (string)rdr["exchange"], dateKey);
+                        var item = new MsSymbolToFileItem((string)rdr["symbol"], (string)rdr["exchange"], dateKey);
                         if (!string.IsNullOrEmpty(item.MsSymbol))
                             data.Add(item);
                     }

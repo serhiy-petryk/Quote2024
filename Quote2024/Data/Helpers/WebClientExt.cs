@@ -44,32 +44,41 @@ namespace Data.Helpers
         #endregion
 
         #region ======  BatchDownload  ========
-        public interface IDownloadItem
+        public interface IDownloadToFileItem: IBaseDownloadItem
+        {
+            public string Filename { get; }
+        }
+
+        public interface IDownloadToMemoryItem: IBaseDownloadItem
+        {
+            public byte[] Data { get; set; }
+        }
+
+        public interface IBaseDownloadItem
         {
             public string Url { get; }
-            public string Filename { get; }
             public HttpStatusCode? StatusCode { get; set; }
         }
 
-        public static async Task DownloadItemsToFiles(ICollection<IDownloadItem> symbolItems, int parallelBatchSize)
+        public static async Task DownloadItemsToMemory(ICollection<IDownloadToMemoryItem> downloadItems, int parallelBatchSize)
         {
-            var tasks = new ConcurrentDictionary<IDownloadItem, Task<byte[]>>();
-            foreach (var symbolItem in symbolItems)
+            var tasks = new List<(IBaseDownloadItem, Task<byte[]>)>();
+            foreach (var downloadItem in downloadItems)
             {
-                if (File.Exists(symbolItem.Filename) && symbolItem.StatusCode != HttpStatusCode.OK)
-                    symbolItem.StatusCode = HttpStatusCode.OK;
+                if (downloadItem.Data != null && downloadItem.StatusCode != HttpStatusCode.OK)
+                    downloadItem.StatusCode = HttpStatusCode.OK;
 
-                if (!(symbolItem.StatusCode == HttpStatusCode.NotFound || symbolItem.StatusCode == HttpStatusCode.OK))
+                if (!(downloadItem.StatusCode == HttpStatusCode.NotFound || downloadItem.StatusCode == HttpStatusCode.OK))
                 {
-                    var task = WebClientExt.DownloadToBytesAsync(symbolItem.Url);
-                    tasks[symbolItem] = task;
-                    symbolItem.StatusCode = null;
+                    var task = WebClientExt.DownloadToBytesAsync(downloadItem.Url);
+                    tasks.Add((downloadItem, task));
+                    downloadItem.StatusCode = null;
                 }
 
                 if (tasks.Count >= parallelBatchSize)
                 {
                     await Download(tasks);
-                    Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
+                    Helpers.Logger.AddMessage($"Downloaded {downloadItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {downloadItems.Count:N0}");
                     tasks.Clear();
                 }
             }
@@ -79,26 +88,55 @@ namespace Data.Helpers
                 await Download(tasks);
                 tasks.Clear();
             }
-            Helpers.Logger.AddMessage($"Downloaded {symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {symbolItems.Count:N0}");
+            Helpers.Logger.AddMessage($"Downloaded {downloadItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {downloadItems.Count:N0}");
         }
 
-        private static async Task Download(ConcurrentDictionary<IDownloadItem, Task<byte[]>> tasks)
+        public static async Task DownloadItemsToFiles(ICollection<IDownloadToFileItem> downloadItems, int parallelBatchSize)
         {
-            foreach (var kvp in tasks)
+            // var tasks = new ConcurrentDictionary<IDownloadItem, Task<byte[]>>();
+            var tasks = new List<(IBaseDownloadItem, Task<byte[]>)>();
+            foreach (var downloadItem in downloadItems)
+            {
+                if (File.Exists(downloadItem.Filename) && downloadItem.StatusCode != HttpStatusCode.OK)
+                    downloadItem.StatusCode = HttpStatusCode.OK;
+
+                if (!(downloadItem.StatusCode == HttpStatusCode.NotFound || downloadItem.StatusCode == HttpStatusCode.OK))
+                {
+                    var task = WebClientExt.DownloadToBytesAsync(downloadItem.Url);
+                    tasks.Add((downloadItem, task));
+                    downloadItem.StatusCode = null;
+                }
+
+                if (tasks.Count >= parallelBatchSize)
+                {
+                    await Download(tasks);
+                    Helpers.Logger.AddMessage($"Downloaded {downloadItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {downloadItems.Count:N0}");
+                    tasks.Clear();
+                }
+            }
+
+            if (tasks.Count > 0)
+            {
+                await Download(tasks);
+                tasks.Clear();
+            }
+            Helpers.Logger.AddMessage($"Downloaded {downloadItems.Count(a => a.StatusCode == HttpStatusCode.OK):N0} items from {downloadItems.Count:N0}");
+        }
+
+        private static async Task Download(List<(IBaseDownloadItem, Task<byte[]>)> tasks)
+        {
+            foreach (var item in tasks)
             {
                 try
                 {
                     // release control to the caller until the task is done, which will be near immediate for each task following the first
-                    var data = await kvp.Value;
-                    /*var oo = ZipUtils.DeserializeBytes<cRoot>(data);
-                    var sector = oo.components?.profile?.payload?.dataPoints?.sector?.value;
-                    if (string.IsNullOrEmpty(sector))
-                    {
-                        var data2 = WebClientExt.GetToBytes(kvp.Key.Url, false);
-                        if (data2.Item1 != null) data = data2.Item1;
-                    }*/
-                    File.WriteAllBytes(kvp.Key.Filename, data);
-                    kvp.Key.StatusCode = HttpStatusCode.OK;
+                    var data = await item.Item2;
+                    item.Item1.StatusCode= HttpStatusCode.OK;
+
+                    if (item.Item1 is IDownloadToMemoryItem memoryItem)
+                        memoryItem.Data = data;
+                    else if (item.Item1 is IDownloadToFileItem fileItem)
+                        await File.WriteAllBytesAsync(fileItem.Filename, data);
                 }
                 catch (Exception ex)
                 {
@@ -108,11 +146,11 @@ namespace Data.Helpers
                          response.StatusCode == HttpStatusCode.BadGateway ||
                          response.StatusCode == HttpStatusCode.ServiceUnavailable))
                     {
-                        kvp.Key.StatusCode = response.StatusCode;
+                        item.Item1.StatusCode = response.StatusCode;
                         continue;
                     }
 
-                    throw new Exception($"WebClientExt.Download: Error while download from {kvp.Key}. Error message: {ex.Message}");
+                    throw new Exception($"WebClientExt.Download: Error while download from {item.Item1.Url}. Error message: {ex.Message}");
                 }
             }
 
