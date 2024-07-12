@@ -147,6 +147,8 @@ namespace Data.Helpers
                          response.StatusCode == HttpStatusCode.ServiceUnavailable))
                     {
                         item.Item1.StatusCode = response.StatusCode;
+                        if (response.StatusCode != HttpStatusCode.NotFound)
+                            Debug.Print($"Status code: {response.StatusCode} for {item.Item1.Url}");
                         continue;
                     }
 
