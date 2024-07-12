@@ -78,7 +78,7 @@ namespace Data.Actions.Yahoo
             sw.Start();
 
             const int chunkSize = 20;
-            const int DownloadBatchSize = 10;
+            const int DownloadBatchSize = 10; // 20 is faster ~10%
             
             Logger.AddMessage($"Started");
             var timeStamp = TimeHelper.GetTimeStamp();
@@ -122,6 +122,7 @@ namespace Data.Actions.Yahoo
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
+                // Rights don't have sector info. 'FUND' and 'WARRANT' have.
                 cmd.CommandText = "SELECT DISTINCT YahooSymbol FROM dbQ2024..SymbolsPolygon " +
                                   "WHERE isnull([To],'2099-12-31')>=dateadd(month, -1, GetDate()) and IsTest is null " +
                                   "and MyType not like 'ET%' and MyType not in ('RIGHT') and YahooSymbol is not null";
