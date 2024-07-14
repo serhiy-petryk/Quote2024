@@ -63,6 +63,10 @@ namespace Data.Actions.MorningStar
 
         public static async Task Start()
         {
+            // Duration: 558 016 msecs for parallelBatchSize = 50 (948 348 msecs  for parallelBatchSize = 20)
+            var sw = new Stopwatch();
+            sw.Start();
+
             Logger.AddMessage($"Started");
             var timeStamp = TimeHelper.GetTimeStamp();
             var dataFolder = string.Format(Path.GetDirectoryName(FileTemplate), timeStamp.Item2);
@@ -89,7 +93,10 @@ namespace Data.Actions.MorningStar
             var okItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.OK);
             var notFoundItems = symbolItems.Count(a => a.StatusCode == HttpStatusCode.NotFound);
             var serverErrorItems = symbolItems.Count(a => a.StatusCode != HttpStatusCode.OK && a.StatusCode != HttpStatusCode.NotFound);
-            Helpers.Logger.AddMessage($"Finished. Items: {symbolItems.Count:N0}. Ok: {okItems:N0}. Not found: {notFoundItems:N0}. Server errors: {serverErrorItems:N0}");
+            sw.Stop();
+
+            Debug.Print($"SW: {sw.ElapsedMilliseconds:N0}");
+            Helpers.Logger.AddMessage($"Finished. Items: {symbolItems.Count:N0}. Ok: {okItems:N0}. Not found: {notFoundItems:N0}. Server errors: {serverErrorItems:N0}. Duration: {sw.ElapsedMilliseconds:N0} msecs");
         }
 
         private static void ParseJsonZipAndSaveToDb(string zipFileName)
