@@ -88,12 +88,12 @@ namespace Quote2024.Forms
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.TestFile);
 
+            await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadList);
             // await Data.Actions.Yahoo.WA_YahooProfile.DownloadData();
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseHtml);
 
-            await Data.Actions.Yahoo.YahooSectorLoader.Start();
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.xxStart2);
+            // await Data.Actions.Yahoo.YahooSectorLoader.Start();
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Parse);
 
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
@@ -102,8 +102,8 @@ namespace Quote2024.Forms
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooProfileLoader.RemoveNotFound);
 
             // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarJsonProfileLoader.TestParse);
-
             // await Data.Actions.MorningStar.MorningStarJsonProfileLoader.Start();
+
             // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarSymbolsLoader.Test);
             // await Data.Actions.MorningStar.MorningStarSymbolsLoader.StartJson();
             // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarSymbolsLoader.ParseAllJson);
