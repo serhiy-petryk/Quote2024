@@ -70,26 +70,30 @@ namespace Data.Actions.Yahoo
                     lastDbItem.Sector == sector)
                     name = lastDbItem.Name;
 
-                if (lastDbItem == null || lastDbItem.YahooSymbol != symbol || lastDbItem.Name != name ||
+                if (lastDbItem == null || lastDbItem.YahooSymbol != symbol ||
+                    !string.Equals(lastDbItem.Name, name, StringComparison.InvariantCultureIgnoreCase) ||
                     lastDbItem.Sector != sector)
                 {
-                    if (lastDbItem != null)
-                        dbData.Add(lastDbItem);
-                    lastDbItem = new DbItem()
-                    {
-                        PolygonSymbol = yahooSymbolXref[symbol], YahooSymbol = symbol, Name = name, Sector = sector,
-                        Date = item.Item4.Date, To = item.Item4.Date, Updated = item.Item4
-                    };
-                    if (firstYahooSectorJsonData.ContainsKey(symbol))
+                    var to = (DateTime?)item.Item4;
+
+                    if (lastDbItem == null || (firstYahooSectorJsonData.ContainsKey(symbol) && lastDbItem.YahooSymbol != symbol))
                     {
                         var firstItem = firstYahooSectorJsonData[symbol];
                         if (sector == firstItem.Sector && (string.IsNullOrEmpty(firstItem.Name) ||
                                                            string.IsNullOrEmpty(name) || string.Equals(firstItem.Name,
                                                                name, StringComparison.InvariantCultureIgnoreCase)))
                         {
-                            lastDbItem.To = null;
+                            to = null;
                         }
                     }
+
+                    if (lastDbItem != null)
+                        dbData.Add(lastDbItem);
+                    lastDbItem = new DbItem()
+                    {
+                        PolygonSymbol = yahooSymbolXref[symbol], YahooSymbol = symbol, Name = name, Sector = sector,
+                        Date = item.Item4.Date, To = to, Updated = item.Item4
+                    };
 
                     if (!string.IsNullOrEmpty(lastDbItem.Name) && maxNameLen < lastDbItem.Name.Length)
                         maxNameLen = lastDbItem.Name.Length;
