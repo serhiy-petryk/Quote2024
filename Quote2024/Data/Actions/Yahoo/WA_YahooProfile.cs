@@ -19,6 +19,8 @@ namespace Data.Actions.Yahoo
         private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000&from=2020";
         private const string ListDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_List";
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data";
+        private const string FirstYahooSectorJsonFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
+
 
         private static Dictionary<string, int> _exchanges = new Dictionary<string, int> { { "", 0 } };
 
@@ -28,6 +30,9 @@ namespace Data.Actions.Yahoo
             var maxSectorLen = 0;
 
             Logger.AddMessage($"Started");
+            var firstYahooSectorJsonData = YahooSectorLoader.ParseZip(FirstYahooSectorJsonFileName)
+                .ToDictionary(a => a.YahooSymbol, a => a);
+
             var yahooSymbolXref = GetSymbolXref();
             var polygonSymbolXref = yahooSymbolXref.ToDictionary(a => a.Value, a => a.Key);
 
@@ -47,7 +52,7 @@ namespace Data.Actions.Yahoo
             Logger.AddMessage($"Save data to database");
             var dbData = new List<DbItem>();
             DbItem lastDbItem = null;
-            foreach (var item in data.OrderBy(a => a.Item1).ThenBy(a => a.Item4))
+            foreach (var item in data.OrderBy(a => a.Item1).ThenByDescending(a => a.Item4))
             {
                 var symbol = item.Item1;
                 var name = item.Item2;
@@ -73,19 +78,32 @@ namespace Data.Actions.Yahoo
                     lastDbItem = new DbItem()
                     {
                         PolygonSymbol = yahooSymbolXref[symbol], YahooSymbol = symbol, Name = name, Sector = sector,
-                        StartDate = item.Item4.Date, EndDate = item.Item4.Date
+                        Date = item.Item4.Date, To = item.Item4.Date, Updated = item.Item4
                     };
+                    if (firstYahooSectorJsonData.ContainsKey(symbol))
+                    {
+                        var firstItem = firstYahooSectorJsonData[symbol];
+                        if (sector == firstItem.Sector && (string.IsNullOrEmpty(firstItem.Name) ||
+                                                           string.IsNullOrEmpty(name) || string.Equals(firstItem.Name,
+                                                               name, StringComparison.InvariantCultureIgnoreCase)))
+                        {
+                            lastDbItem.To = null;
+                        }
+                    }
+
                     if (!string.IsNullOrEmpty(lastDbItem.Name) && maxNameLen < lastDbItem.Name.Length)
                         maxNameLen = lastDbItem.Name.Length;
                     if (maxSectorLen < lastDbItem.Sector.Length) maxSectorLen = lastDbItem.Sector.Length;
                 }
                 else
-                    lastDbItem.EndDate = item.Item4.Date;
+                {
+                    lastDbItem.Date = item.Item4.Date;
+                }
             }
             dbData.Add(lastDbItem);
 
-            DbHelper.ClearAndSaveToDbTable(dbData, "dbQ2024..SectorYahoo", "PolygonSymbol", "StartDate", "EndDate",
-                "Name", "Sector", "EndDate", "YahooSymbol");
+            DbHelper.ClearAndSaveToDbTable(dbData, "dbQ2024..SectorYahoo", "PolygonSymbol", "Date", "To",
+                "Name", "Sector", "Updated", "YahooSymbol");
 
             Logger.AddMessage($"Finished");
 
@@ -350,322 +368,6 @@ namespace Data.Actions.Yahoo
             }
         }
 
-        public static void ParseHtml()
-        {
-            Logger.AddMessage($"Started");
-
-            // var folder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data.Short";
-            var folder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230221.Short";
-            var files = Directory.GetFiles(folder, "*.html").OrderBy(a => a).ToArray();
-            var cnt = 0;
-            var dict = new Dictionary<int, object[]>();
-            var sectors = new Dictionary<string, int>();
-            var sectors2 = new Dictionary<string, List<(string, string)>>();
-            foreach (var file in files)
-            {
-                cnt++;
-                if (cnt % 100 == 0)
-                    Logger.AddMessage($"Parsed {cnt:N0} files from {files.Length:N0}. Last file: {Path.GetFileName(file)}");
-
-                if (file.EndsWith("ACT_20230406035606.html") || file.EndsWith("AXP_20230410144059.html") ||
-                    file.EndsWith("OXM_20230429222332.html") || file.EndsWith("SONO_20230422222307.html") ||
-                    file.EndsWith("WAB_20230417233217.html") || file.EndsWith("ILMNV_20240624224841.html"))
-                { // Bad files
-                    continue;
-                }
-
-                var content = File.ReadAllText(file);
-
-                var i1 = content.IndexOf(">Fund Overview<", StringComparison.InvariantCulture);
-                if (i1 > 1)
-                {
-                    SaveToDict(9);
-                    continue;
-                }
-
-                // 2020 year format
-                i1 = content.IndexOf("<h1 class=\"D(ib) Fz(1", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 20652, 2020-01-01, 2024-06-27
-                { // AA_20200512043535.html
-                    var k2 = content.IndexOf("<h1 class=\"D(ib) Fz(1", i1 + 5, StringComparison.InvariantCulture);
-                    if (k2 != -1)
-                        throw new Exception("Check YahooProfile parser");
-
-                    var i2 = content.IndexOf(">Sector<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1) i2 = content.IndexOf(">Sector(s)<", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector2020())
-                        throw new Exception("Check YahooProfile parser");
-
-                    var symbolAndName = GetSymbolAndName2020();
-
-                    var sector = GetSector2020(i2);
-                    AddSector(symbolAndName[0], symbolAndName[1], sector);
-
-                    SaveToDict(1);
-                    continue;
-                }
-
-                // 2024 year format
-                i1 = content.IndexOf("<h1 class=\"svelte-", StringComparison.InvariantCulture);
-                if (i1 > -1) // Count, from, to: 1328, 2023-11-12, 2024-07-05
-                { // AAON_20240503140454.html
-                    var k2 = content.IndexOf("<h1 class=\"svelte-", i1 + 5, StringComparison.InvariantCulture);
-                    if (k2 != -1)
-                        throw new Exception("Check YahooProfile parser");
-
-                    var i2 = content.IndexOf(">Sector: </dt>", i1, StringComparison.InvariantCulture);
-                    if (i2 == -1 && CheckSector2024())
-                        throw new Exception("Check YahooProfile parser");
-
-                    var symbolAndName = GetSymbolAndName2023();
-                    var sector = GetSector2023(i2);
-                    AddSector(symbolAndName[0], symbolAndName[1], sector);
-
-                    SaveToDict(2);
-                    continue;
-                }
-
-                i1 = content.IndexOf(">Symbols similar to ", StringComparison.InvariantCulture);
-                if (i1 > -1) // Not found
-                    continue;
-
-                throw new Exception("Check YahooProfile parser");
-
-
-                void SaveToDict(int id)
-                {
-                    var ss = Path.GetFileNameWithoutExtension(file).Split('_');
-                    DateTime dateKey;
-                    if (ss.Length == 2) // web.archive
-                        dateKey = DateTime.ParseExact(ss[ss.Length - 1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
-                    else
-                        dateKey = DateTime.ParseExact(ss[2], "yyyyMMdd", CultureInfo.InvariantCulture);
-
-                    if (!dict.ContainsKey(id))
-                    {
-                        dict.Add(id, new object[] { 1, dateKey, dateKey });
-                        return;
-                    }
-
-                    var oldData = dict[id];
-                    oldData[0] = (int)oldData[0] + 1;
-                    var from = (DateTime)oldData[1];
-                    if (dateKey < from) oldData[1] = dateKey;
-                    var to = (DateTime)oldData[2];
-                    if (dateKey > to) oldData[2] = dateKey;
-                }
-
-                bool CheckSector2020()
-                {
-                    var content1 = content.Replace("https://finance.yahoo.com/sectors\" title=\"Sectors\">Sectors", "\">");
-                    content1 = content1.Replace("sector information, ", "");
-                    content1 = content1.Replace("finance.yahoo.com/sector/", "x");
-
-                    /*// Below for YP_20230304.1/YP_HUBCZ_20230304.html (full version)
-                    var a1 = content1.Length;
-                    content1 = content1.Replace("SectorAllocation", "", StringComparison.InvariantCultureIgnoreCase);
-                    var a2 = content1.Length;
-                    content1 = content1.Replace("morningstarSector", "");
-                    var a3 = content1.Length;
-                    content1 = content1.Replace("enableSectorIndustryLabelFix", "");
-                    var a4 = content1.Length;
-                    content1 = content1.Replace("SectorVisitorTrend", "", StringComparison.InvariantCultureIgnoreCase);
-                    var a5 = content1.Length;
-                    content1 = content1.Replace("sectorsList", "");
-                    var a6 = content1.Length;
-
-                    // Below for YP_20230304/YP_CHKEL_20230304.html (full version)
-                    content1 = content1.Replace("ZiP8secTORUqEL", "");
-                    var a7 = content1.Length;*/
-                    if (content1.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase) == -1)
-                        return false;
-
-                    return true;
-                }
-
-                bool CheckSector2024()
-                {
-                    var content1 = content;
-                    if (content1.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase) == -1)
-                        return false;
-                    if (content1.IndexOf(">Profile Information Not Available<",
-                            StringComparison.InvariantCulture) != -1)
-                    { // CNH_20240520210256.html
-                        return false;
-                    }
-                    if (content1.IndexOf(">Profile data is currently not available for ", StringComparison.InvariantCulture) != -1)
-                    { // ENERW_20240422165327.html
-                        return false;
-                    }
-
-                    return true;
-                }
-
-                string[] GetSymbolAndName2020()
-                {
-                    var i2 = content.IndexOf(">", i1 + 5, StringComparison.InvariantCulture);
-                    var i3 = content.IndexOf("</h1", i1 + 5, StringComparison.InvariantCulture);
-                    if (i2 == -1 || i3 < i2)
-                        throw new Exception("Check YahooProfile parser (GetSymbolAndName2020 method)");
-
-                    var s1 = content.Substring(i2 + 1, i3 - i2 - 1);
-                    s1 = System.Net.WebUtility.HtmlDecode(s1).Trim();
-                    i2 = s1.LastIndexOf('(');
-                    if (s1.EndsWith(')') && i2 >= 0)
-                    {
-                        var name = s1.Substring(0, i2).Trim();
-                        var symbol = s1.Substring(i2 + 1, s1.Length - i2 - 2).Trim();
-                        return new[] { symbol, name };
-                    }
-
-                    i2 = s1.IndexOf('-');
-                    if (i2 >= 0)
-                    {
-                        var symbol = s1.Substring(0, i2 - 1).Trim();
-                        var name = s1.Substring(i2 + 1).Trim();
-                        return new[] { symbol, name };
-                    }
-
-                    throw new Exception("Check YahooProfile parser (GetSymbolAndName2020 method)");
-                }
-
-                string[] GetSymbolAndName2023()
-                {
-                    var i2 = content.IndexOf(">", i1 + 5, StringComparison.InvariantCulture);
-                    var i3 = content.IndexOf("</h1", i1 + 5, StringComparison.InvariantCulture);
-                    if (i2 == -1 || i3 < i2)
-                        throw new Exception("Check YahooProfile parser (GetSymbolAndName2023 method)");
-
-                    var s1 = content.Substring(i2 + 1, i3 - i2 - 1);
-                    s1 = System.Net.WebUtility.HtmlDecode(s1).Trim();
-                    i2 = s1.LastIndexOf('(');
-                    if (s1.EndsWith(')') && i2 >= 0)
-                    {
-                        var name = s1.Substring(0, i2).Trim();
-                        var symbol = s1.Substring(i2 + 1, s1.Length - i2 - 2).Trim();
-                        return new[] { symbol, name };
-                    }
-
-                    i2 = s1.IndexOf('-');
-                    if (i2 >= 0)
-                    {
-                        var symbol = s1.Substring(0, i2 - 1).Trim();
-                        var name = s1.Substring(i2 + 1).Trim();
-                        return new[] { symbol, name };
-                    }
-
-                    throw new Exception("Check YahooProfile parser (GetSymbolAndName2023 method)");
-                }
-
-                string GetSector2020(int sectorKeyPosition)
-                {
-                    if (sectorKeyPosition == -1) return null;
-                    var i2 = content.IndexOf("<span", sectorKeyPosition, StringComparison.InvariantCulture);
-                    var i3 = content.IndexOf(">", i2, StringComparison.InvariantCulture);
-                    var i4 = content.IndexOf("</span>", i3, StringComparison.InvariantCulture);
-                    if (i4 > i3 && i3 > i2 && i2 > 0)
-                    {
-                        var sector = content.Substring(i3 + 1, i4 - i3 - 1).Trim();
-                        return sector;
-                    }
-
-                    throw new Exception("Check YahooProfile parser (GetSector2020 method)");
-                }
-
-                string GetSector2023(int sectorKeyPosition)
-                {
-                    if (sectorKeyPosition == -1) return null;
-                    var i3 = content.IndexOf("</a>", sectorKeyPosition, StringComparison.InvariantCulture);
-                    var i2 = content.LastIndexOf(">", i3, StringComparison.InvariantCulture);
-                    if (i3 > i2 && i2 > 0)
-                    {
-                        var sector = content.Substring(i2 + 1, i3 - i2 - 1).Trim();
-                        return sector;
-                    }
-
-                    throw new Exception("Check YahooProfile parser (GetSector2020 method)");
-                }
-
-                void AddSector(string symbol, string name, string sector)
-                {
-                    if (string.IsNullOrEmpty(sector)) return;
-
-                    // Correction of non-standard sectors
-                    if (sector == "Industrial Goods" && (symbol == "BLDR" || symbol == "ECOL")) sector = "Industrials";
-
-                    if (sector == "Financial" && symbol == "MFA") sector = "Real Estate";
-                    else if (sector == "Financial" && (symbol == "CBSH" || symbol == "ISTR" || symbol == "NAVI" ||
-                                                       symbol == "SFE" ||
-                                                       symbol == "ZTR")) sector = "Financial Services";
-
-                    if (sector == "Services" && (symbol == "EAT" || symbol == "PZZA")) sector = "Consumer Cyclical";
-                    else if (sector == "Services" && (symbol == "EROS" || symbol == "NFLX")) sector = "Communication Services";
-                    else if (sector == "Services" && (symbol == "TTEK" || symbol == "ZNH")) sector = "Industrials";
-
-                    if (sector == "Consumer Goods" && symbol == "KNDI") sector = "Consumer Cyclical";
-
-                    if (string.IsNullOrEmpty(name)) name = null;
-                    if (string.IsNullOrEmpty(symbol))
-                        throw new Exception("Check YahooProfile parser (AddSector method)");
-
-                    if (!sectors.ContainsKey(sector))
-                    {
-                        sectors.Add(sector, 0);
-                        sectors2.Add(sector, new List<(string, string)>());
-                    }
-
-                    sectors[sector]++;
-                    sectors2[sector].Add((symbol, name));
-                }
-            }
-            Logger.AddMessage($"Finished");
-
-            foreach (var kvp in dict.OrderBy(a => a.Key))
-                Debug.Print($"{kvp.Key}\t{kvp.Value[0]}\t{((DateTime)kvp.Value[1]):yyyy-MM-dd}\t{((DateTime)kvp.Value[2]):yyyy-MM-dd}");
-            /*
-Dict: id, recs, from, to
-1	20652	2020-01-01	2024-06-27 (2020 format)
-2	1328	2023-11-12	2024-07-05 (2024 format)
-9	144	2020-08-14	2024-03-05
-            */
-        }
-
-        public static void ParseHtmlZip()
-        {
-            var zipFileName = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data.Short.zip";
-            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
-                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
-                {
-                    var content = entry.GetContentOfZipEntry();
-                    var timeStamp = entry.LastWriteTime.DateTime;
-                    //                    var items = new List<SplitModel>();
-                    var i1 = content.IndexOf(">Sector(s)<", StringComparison.InvariantCulture);
-                    if (i1 == -1)
-                    {
-                        i1 = content.IndexOf(">Sector: <", StringComparison.InvariantCulture);
-                    }
-
-                    if (i1 == -1)
-                    {
-                        i1 = content.IndexOf(">Sector<", StringComparison.InvariantCulture);
-                    }
-
-                    if (i1 == -1)
-                    {
-                        i1 = content.IndexOf("\"sector\":\"", StringComparison.InvariantCulture);
-                    }
-
-                    if (i1 == -1)
-                    {
-                        i1 = content.IndexOf(">Fund Overview<", StringComparison.InvariantCulture);
-                        if (i1 == -1)
-                        {
-
-                        }
-                    }
-                }
-        }
-
         public static async Task DownloadData()
         {
             // Get url and file list
@@ -809,18 +511,25 @@ Dict: id, recs, from, to
         {
             public string PolygonSymbol;
             public string YahooSymbol;
-            public string Name;
+            private string _name;
+
+            public string Name
+            {
+                get => _name;
+                set
+                {
+                    if (value != null && value.EndsWith("(REIT)", StringComparison.InvariantCulture))
+                        _name = value.Substring(0, value.Length - 6).Trim();
+                    else if (value != null && value.EndsWith("(delisted)", StringComparison.InvariantCulture))
+                        _name = value.Substring(0, value.Length - 10).Trim();
+                    else _name = value;
+                }
+            }
+
             public string Sector;
-            public DateTime StartDate;
-            public DateTime EndDate;
-            /*public string Symbol;
-            public string sDate;
-            public string sLastUpdated;
-            public string Exchange;
-            public string Sector;
-            public string Name;
-            public DateTime Date => DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
-            public DateTime LastUpdated => DateTime.ParseExact(sLastUpdated, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;*/
+            public DateTime Date;
+            public DateTime? To;
+            public DateTime Updated;
         }
 
         private class JsonItem

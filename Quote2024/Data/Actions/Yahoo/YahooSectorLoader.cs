@@ -21,10 +21,15 @@ namespace Data.Actions.Yahoo
         public static void TestParse()
         {
             var zipFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
-            ParseZipAndSaveToDb(zipFileName);
+            var data = ParseZip(zipFileName);
+
+            DbHelper.ClearAndSaveToDbTable(data, "dbQ2024..Bfr_SectorYahoo", "PolygonSymbol", "Date", "Name", "Sector",
+                "TimeStamp", "YahooSymbol");
+            Logger.AddMessage($"Finished");
+
         }
 
-        public static void ParseZipAndSaveToDb(string zipFileName)
+        public static List<DbItem> ParseZip(string zipFileName)
         {
             Logger.AddMessage($"Started");
 
@@ -66,9 +71,7 @@ namespace Data.Actions.Yahoo
 
                 }
 
-            DbHelper.ClearAndSaveToDbTable(data, "dbQ2024..Bfr_SectorYahoo", "PolygonSymbol", "Date", "Name", "Sector",
-                "TimeStamp", "YahooSymbol");
-            Logger.AddMessage($"Finished");
+            return data;
         }
 
         public static async Task Start()
@@ -201,7 +204,7 @@ namespace Data.Actions.Yahoo
             public string companyName;
         }
 
-        private class DbItem
+        public class DbItem
         {
             public string PolygonSymbol;
             public string YahooSymbol;
