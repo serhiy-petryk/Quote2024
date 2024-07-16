@@ -20,13 +20,74 @@ namespace Data.Actions.Yahoo
 
         public static void TestParse()
         {
-            var zipFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
-            var data = ParseZip(zipFileName);
+            var data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip");
+            SaveToDatabase(data);
+            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240711.zip");
+            SaveToDatabase(data);
+            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240712.zip");
+            SaveToDatabase(data);
+            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240714.zip");
+            SaveToDatabase(data);
 
+            Logger.AddMessage($"Finished");
+        }
+
+        public static void Start()
+        {
+            StartAsync().Wait();
+        }
+
+        private static async Task StartAsync()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            const int chunkSize = 20;
+            const int downloadBatchSize = 10; // 20 is faster ~10%
+
+            Logger.AddMessage($"Started");
+            var timeStamp = TimeHelper.GetTimeStamp();
+            var zipFileName = string.Format(ZipFileNameTemplate, timeStamp.Item2);
+            var entryFolder = Path.GetFileNameWithoutExtension(zipFileName);
+
+            var symbolsToDownload = GetSymbolsToDownload();
+            var urls = symbolsToDownload.Select((a, index) => new { Value = a, Index = index }).GroupBy(a => a.Index / chunkSize)
+                .Select(a => string.Format(UrlTemplate, string.Join(",", a.Select(a1 => a1.Value)))).ToArray();
+
+            var itemsToDownload = urls.Select(a => new DownloadItem(a)).ToArray();
+
+            await WebClientExt.DownloadItemsToMemory(itemsToDownload, downloadBatchSize);
+
+            foreach (var item in itemsToDownload)
+            { // Check on invalid items
+                if (item.Data == null)
+                    throw new Exception("Invalid data in YahooSectorLoader");
+            }
+
+            // Save data to zip
+            var virtualFileEntries = itemsToDownload.Where(a => a.StatusCode == HttpStatusCode.OK).Select((a, index) =>
+                    new VirtualFileEntry(
+                        Path.Combine(entryFolder, string.Format(FileNameTemplate, timeStamp.Item2, downloadBatchSize, index)), a.Data))
+                .ToArray();
+
+            if (File.Exists(zipFileName))
+                File.Delete(zipFileName);
+            ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries);
+
+            var data = ParseZip(zipFileName);
+            SaveToDatabase(data);
+
+            sw.Stop();
+            Debug.Print($"SW: {sw.ElapsedMilliseconds:N0}");
+
+            Helpers.Logger.AddMessage($"Finished. Items: {symbolsToDownload.Count:N0}. SW: {sw.ElapsedMilliseconds:N0}");
+        }
+
+        public static void SaveToDatabase(List<DbItem> data)
+        {
             DbHelper.ClearAndSaveToDbTable(data, "dbQ2024..Bfr_SectorYahoo", "PolygonSymbol", "Date", "Name", "Sector",
                 "TimeStamp", "YahooSymbol");
-            Logger.AddMessage($"Finished");
-
+            DbHelper.RunProcedure("dbQ2024..pUpdateSectorYahoo");
         }
 
         public static List<DbItem> ParseZip(string zipFileName)
@@ -91,49 +152,6 @@ namespace Data.Actions.Yahoo
                 }
 
             return data;
-        }
-
-        public static async Task Start()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            const int chunkSize = 20;
-            const int downloadBatchSize = 10; // 20 is faster ~10%
-            
-            Logger.AddMessage($"Started");
-            var timeStamp = TimeHelper.GetTimeStamp();
-            var zipFileName = string.Format(ZipFileNameTemplate, timeStamp.Item2);
-            var entryFolder = Path.GetFileNameWithoutExtension(zipFileName);
-
-            var symbolsToDownload = GetSymbolsToDownload();
-            var urls = symbolsToDownload.Select((a, index) => new { Value = a, Index = index }).GroupBy(a => a.Index / chunkSize)
-                .Select(a => string.Format(UrlTemplate, string.Join(",", a.Select(a1 => a1.Value)))).ToArray();
-
-            var itemsToDownload = urls.Select(a => new DownloadItem(a)).ToArray();
-
-            await WebClientExt.DownloadItemsToMemory(itemsToDownload, downloadBatchSize);
-
-            foreach (var item in itemsToDownload)
-            { // Check on invalid items
-                if (item.Data == null)
-                    throw new Exception("Invalid data in YahooSectorLoader");
-            }
-
-            // Save data to zip
-            var virtualFileEntries = itemsToDownload.Where(a => a.StatusCode == HttpStatusCode.OK).Select((a, index) =>
-                    new VirtualFileEntry(
-                        Path.Combine(entryFolder, string.Format(FileNameTemplate, timeStamp.Item2, downloadBatchSize, index)), a.Data))
-                .ToArray();
-
-            if (File.Exists(zipFileName))
-                File.Delete(zipFileName);
-            ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries);
-
-            sw.Stop();
-            Debug.Print($"SW: {sw.ElapsedMilliseconds:N0}");
-
-            Helpers.Logger.AddMessage($"Finished. Items: {symbolsToDownload.Count:N0}. SW: {sw.ElapsedMilliseconds:N0}");
         }
 
         private static List<string> GetSymbolsToDownload()

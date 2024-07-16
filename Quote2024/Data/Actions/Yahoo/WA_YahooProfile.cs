@@ -99,7 +99,7 @@ namespace Data.Actions.Yahoo
                     lastDbItem = new DbItem()
                     {
                         PolygonSymbol = yahooSymbolXref[symbol], YahooSymbol = symbol, Name = name, Sector = sector,
-                        Date = item.Item4.Date, To = to, Updated = item.Item4
+                        Date = item.Item4.Date, To = to, LastUpdated = item.Item4
                     };
 
                     if (!string.IsNullOrEmpty(lastDbItem.Name) && maxNameLen < lastDbItem.Name.Length)
@@ -114,7 +114,7 @@ namespace Data.Actions.Yahoo
             dbData.Add(lastDbItem);
 
             DbHelper.ClearAndSaveToDbTable(dbData, "dbQ2024..SectorYahoo", "PolygonSymbol", "Date", "To",
-                "Name", "Sector", "Updated", "YahooSymbol");
+                "Name", "Sector", "LastUpdated", "YahooSymbol");
 
             Logger.AddMessage($"Finished");
 
@@ -526,7 +526,7 @@ namespace Data.Actions.Yahoo
             public string Sector;
             public DateTime Date;
             public DateTime? To;
-            public DateTime Updated;
+            public DateTime LastUpdated;
         }
 
         private class JsonItem
