@@ -28,6 +28,8 @@ namespace Data.Actions.Yahoo
             SaveToDatabase(data);
             data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240714.zip");
             SaveToDatabase(data);
+            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240716.zip");
+            SaveToDatabase(data);
 
             Logger.AddMessage($"Finished");
         }
