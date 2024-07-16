@@ -56,6 +56,13 @@ namespace Data.Actions.Yahoo
             {
                 var symbol = item.Item1;
                 var name = item.Item2;
+                if (string.IsNullOrEmpty(name))
+                    name = null;
+                else if (name.EndsWith("(REIT)", StringComparison.InvariantCulture))
+                    name = name.Substring(0, name.Length - 6).Trim();
+                else if (name != null && name.EndsWith("(delisted)", StringComparison.InvariantCulture))
+                    name = name.Substring(0, name.Length - 10).Trim();
+
                 var sector = item.Item3;
                 if (string.IsNullOrEmpty(sector))
                     throw new Exception("Check");
@@ -515,21 +522,7 @@ namespace Data.Actions.Yahoo
         {
             public string PolygonSymbol;
             public string YahooSymbol;
-            private string _name;
-
-            public string Name
-            {
-                get => _name;
-                set
-                {
-                    if (value != null && value.EndsWith("(REIT)", StringComparison.InvariantCulture))
-                        _name = value.Substring(0, value.Length - 6).Trim();
-                    else if (value != null && value.EndsWith("(delisted)", StringComparison.InvariantCulture))
-                        _name = value.Substring(0, value.Length - 10).Trim();
-                    else _name = value;
-                }
-            }
-
+            public string Name;
             public string Sector;
             public DateTime Date;
             public DateTime? To;
