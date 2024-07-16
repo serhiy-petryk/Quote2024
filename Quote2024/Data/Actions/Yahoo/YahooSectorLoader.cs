@@ -47,12 +47,31 @@ namespace Data.Actions.Yahoo
                     {
                         if (symbolXref.ContainsKey(item.symbol))
                         {
+                            var name = item.upsell?.companyName;
+                            if (string.IsNullOrEmpty(name))
+                                name = null;
+                            else if (name.IndexOf('(', StringComparison.InvariantCultureIgnoreCase) != -1 && name.IndexOf(')', StringComparison.InvariantCultureIgnoreCase)==-1)
+                            {
+                                var i1 = name.IndexOf("(", StringComparison.InvariantCultureIgnoreCase);
+                                name = name.Substring(0, i1).Trim();
+                            }
+                            else if (name.IndexOf("(The)", StringComparison.InvariantCultureIgnoreCase) != -1)
+                            {
+                                var i1 = name.IndexOf("(The)", StringComparison.InvariantCultureIgnoreCase);
+                                name = name.Substring(0, i1).Trim();
+                            }
+                            else if (name.IndexOf("(REIT)", StringComparison.InvariantCultureIgnoreCase) != -1)
+                            {
+                                var i1 = name.IndexOf("(REIT)", StringComparison.InvariantCultureIgnoreCase);
+                                name = name.Substring(0, i1).Trim();
+                            }
+
                             var dbItem = new DbItem()
                             {
                                 PolygonSymbol = symbolXref[item.symbol],
                                 Date = dateKey,
                                 YahooSymbol = item.symbol,
-                                Name = item.upsell?.companyName,
+                                Name = name,
                                 Sector = item.instrumentInfo?.technicalEvents.sector ?? item.companySnapshot?.sectorInfo,
                                 TimeStamp = timeStamp
                             };
