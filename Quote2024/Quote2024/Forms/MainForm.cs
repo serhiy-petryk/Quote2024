@@ -88,15 +88,14 @@ namespace Quote2024.Forms
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.TestFile);
 
-            await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
+            await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadList);
             // await Data.Actions.Yahoo.WA_YahooProfile.DownloadData();
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseHtml);
 
             // await Data.Actions.Yahoo.YahooSectorLoader.Start();
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Parse);
-
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
 
             // await Data.Actions.Yahoo.YahooProfileLoader.Start();
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooProfileLoader.RemoveNotFound);
