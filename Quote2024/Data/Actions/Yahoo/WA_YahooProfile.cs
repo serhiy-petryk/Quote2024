@@ -561,6 +561,5 @@ namespace Data.Actions.Yahoo
         }
         #endregion
 
-
     }
 }

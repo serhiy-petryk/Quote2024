@@ -18,7 +18,7 @@ namespace Data.Helpers
         {
             Logger.AddMessage($"Started");
 
-            ProcessFolder(@"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230221");
+            ProcessFolder(@"E:\Quote\WebData\Symbols\MorningStar\Profile\Data\MSProfiles_20240709");
             // ProcessFolder(@"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230222");
         }
 
