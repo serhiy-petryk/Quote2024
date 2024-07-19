@@ -16,9 +16,10 @@ namespace Data.Actions.Yahoo
     public static class WA_YahooProfile
     {
         // private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}&matchType=prefix&limit=100000&from=2024";
-        private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000&from=2020";
-        private const string ListDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_List";
-        private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data";
+        private const string ListUrlTemplate2020 = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000&from=2020";
+        private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000";
+        private const string ListDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_List";
+        private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data";
         private const string FirstYahooSectorJsonFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
 
 
@@ -477,7 +478,7 @@ namespace Data.Actions.Yahoo
         public static void DownloadList()
         {
             Logger.AddMessage($"Started");
-            var symbols = GetSymbolXref();
+            var symbols = GetSymbolXrefForUrlList();
             // var symbols = new Dictionary<string,string>{{"MSFT", "MSFT80"}};
             var count = 0;
             foreach (var symbol in symbols)
@@ -497,6 +498,24 @@ namespace Data.Actions.Yahoo
                 }
             }
             Logger.AddMessage($"Finished");
+        }
+
+        private static Dictionary<string, string> GetSymbolXrefForUrlList()
+        {
+            var data = new Dictionary<string, string>();
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+                cmd.CommandText = "SELECT DISTINCT symbol, YahooSymbol FROM dbQ2024..SymbolsPolygon " +
+                                  "WHERE isnull([To],'2099-12-31')>'2020-01-01' and IsTest is null " +
+                                  "and MyType not like 'ET%' and MyType not in ('RIGHT') and YahooSymbol is not null order by 1";
+                using (var rdr = cmd.ExecuteReader())
+                    while (rdr.Read())
+                        data.Add((string)rdr["YahooSymbol"], (string)rdr["symbol"]);
+            }
+
+            return data;
         }
 
         private static Dictionary<string, string> GetSymbolXref()
