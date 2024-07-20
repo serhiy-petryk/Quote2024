@@ -18,7 +18,9 @@ namespace Data.Actions.Yahoo
         // private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}&matchType=prefix&limit=100000&from=2024";
         private const string ListUrlTemplate2020 = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000&from=2020";
         private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000";
+        private const string ListUrlTemplateByLetter = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}&matchType=prefix&limit=300000&filter=statuscode:200";
         private const string ListDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_List";
+        private const string ListDataFolderByLetter = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_ListByLetter";
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data";
         private const string FirstYahooSectorJsonFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
 
@@ -474,6 +476,43 @@ namespace Data.Actions.Yahoo
                 }
             }
         }
+
+        public static void DownloadListByLetter()
+        {
+            Logger.AddMessage($"Started");
+            var letters = Enumerable.Range('A', 26).Select(a => Convert.ToChar(a).ToString()).ToArray();
+            var count = 0;
+            foreach (var letter in letters)
+            {
+                count++;
+                Logger.AddMessage($"Process urls which start with {letter} letter");
+                var filename = Path.Combine($@"{ListDataFolderByLetter}", $"{letter}.txt");
+                if (!File.Exists(filename))
+                {
+                    byte[] data = null;
+                    var errorCnt = 0;
+                    while (data == null)
+                    {
+                        var url = string.Format(ListUrlTemplateByLetter, letter);
+                        var o = Helpers.WebClientExt.GetToBytes(url, false);
+                        //if (o.Item3 != null)
+                        //  throw new Exception($"WA_YahooProfile: Error while download from {url}. Error message: {o.Item3.Message}");
+                        if (o.Item3 != null)
+                        {
+                            errorCnt++;
+                            Logger.AddMessage($"{errorCnt} errors. Last: {o.Item3}");
+                            System.Threading.Thread.Sleep(200);
+                        }
+                        data = o.Item1;
+                    }
+
+                    File.WriteAllBytes(filename, data);
+                    System.Threading.Thread.Sleep(200);
+                }
+            }
+            Logger.AddMessage($"Finished");
+        }
+
 
         public static void DownloadList()
         {
