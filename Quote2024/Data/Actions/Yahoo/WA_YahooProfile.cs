@@ -488,12 +488,24 @@ namespace Data.Actions.Yahoo
                 var filename = Path.Combine($@"{ListDataFolder}", $"{symbol.Value}.txt");
                 if (!File.Exists(filename))
                 {
-                    var url = string.Format(ListUrlTemplate, symbol.Key);
-                    var o = Helpers.WebClientExt.GetToBytes(url, false);
-                    if (o.Item3 != null)
-                        throw new Exception(
-                            $"WA_YahooProfile: Error while download from {url}. Error message: {o.Item3.Message}");
-                    File.WriteAllBytes(filename, o.Item1);
+                    byte[] data = null;
+                    var errorCnt = 0;
+                    while (data == null)
+                    {
+                        var url = string.Format(ListUrlTemplate, symbol.Key);
+                        var o = Helpers.WebClientExt.GetToBytes(url, false);
+                        //if (o.Item3 != null)
+                          //  throw new Exception($"WA_YahooProfile: Error while download from {url}. Error message: {o.Item3.Message}");
+                          if (o.Item3 != null)
+                          {
+                              errorCnt++;
+                              Logger.AddMessage($"{errorCnt} errors. Last: {o.Item3}");
+                              System.Threading.Thread.Sleep(200);
+                        }
+                        data = o.Item1;
+                    }
+
+                    File.WriteAllBytes(filename, data);
                     System.Threading.Thread.Sleep(200);
                 }
             }
