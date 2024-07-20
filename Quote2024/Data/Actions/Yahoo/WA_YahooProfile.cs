@@ -16,10 +16,10 @@ namespace Data.Actions.Yahoo
     public static class WA_YahooProfile
     {
         // private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}&matchType=prefix&limit=100000&from=2024";
-        private const string ListUrlTemplate2020 = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000&from=2020";
-        private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000";
+        // private const string ListUrlTemplate2020 = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000&from=2020";
+        private const string xxListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}/profile&matchType=prefix&limit=100000";
         private const string ListUrlTemplateByLetter = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}&matchType=prefix&limit=300000&filter=statuscode:200";
-        private const string ListDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_List";
+        private const string xxListDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_List";
         private const string ListDataFolderByLetter = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_ListByLetter";
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data";
         private const string FirstYahooSectorJsonFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
@@ -382,10 +382,78 @@ namespace Data.Actions.Yahoo
             }
         }
 
-        public static async Task DownloadData()
+        public static async Task xxDownloadData()
         {
             // Get url and file list
-            var listFiles = Directory.GetFiles(ListDataFolder, "*.txt");
+            var listFiles = Directory.GetFiles(xxListDataFolder, "*.txt");
+            var toDownload = new List<DownloadItem>();
+            var fileCount = 0;
+            foreach (var listFile in listFiles)
+            {
+                var items = File.ReadAllLines(listFile).Select(a => new JsonItem(a))
+                    .Where(a => a.Type == "text/html" && a.Status == 200).OrderBy(a => a.TimeStamp).ToArray();
+                var polygonSymbol = Path.GetFileNameWithoutExtension(listFile);
+                var lastDateKey = "";
+                foreach (var item in items)
+                {
+                    var dateKey = item.TimeStamp.Substring(0, 8);
+                    if (dateKey == lastDateKey) // skeep the same day
+                        continue;
+
+                    var url = $"https://web.archive.org/web/{item.TimeStamp}/{item.Url}";
+                    var filename = Path.Combine(HtmlDataFolder, $"{polygonSymbol}_{item.TimeStamp}.html");
+                    toDownload.Add(new DownloadItem(url, filename));
+                    fileCount++;
+                    lastDateKey = dateKey;
+                }
+            }
+
+            // Download data
+            var tasks = new ConcurrentDictionary<DownloadItem, Task<byte[]>>();
+            var itemCount = 0;
+            var needToDownload = true;
+            while (needToDownload)
+            {
+                needToDownload = false;
+                foreach (var urlAndFilename in toDownload)
+                {
+                    itemCount++;
+
+                    if (!File.Exists(urlAndFilename.Filename))
+                    {
+                        var task = WebClientExt.DownloadToBytesAsync(urlAndFilename.Url);
+                        tasks[urlAndFilename] = task;
+                        urlAndFilename.StatusCode = null;
+                    }
+                    else
+                        urlAndFilename.StatusCode = HttpStatusCode.OK;
+
+                    if (tasks.Count >= 10)
+                    {
+                        await Download(tasks);
+                        Helpers.Logger.AddMessage($"Downloaded {itemCount} url from {toDownload.Count:N0}");
+                        tasks.Clear();
+                        needToDownload = true;
+                    }
+                }
+
+                if (tasks.Count > 0)
+                {
+                    await Download(tasks);
+                    tasks.Clear();
+                    needToDownload = true;
+                }
+
+                Helpers.Logger.AddMessage($"Downloaded {itemCount} url from {toDownload.Count:N0}");
+            }
+
+            Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items");
+        }
+
+        public static async Task DownloadDataByLetter()
+        {
+            // Get url and file list
+            var listFiles = Directory.GetFiles(xxListDataFolder, "*.txt");
             var toDownload = new List<DownloadItem>();
             var fileCount = 0;
             foreach (var listFile in listFiles)
@@ -514,7 +582,7 @@ namespace Data.Actions.Yahoo
         }
 
 
-        public static void DownloadList()
+        public static void xxDownloadList()
         {
             Logger.AddMessage($"Started");
             var symbols = GetSymbolXrefForUrlList();
@@ -524,14 +592,14 @@ namespace Data.Actions.Yahoo
             {
                 count++;
                     Logger.AddMessage($"Process {count} symbols from {symbols.Count}");
-                var filename = Path.Combine($@"{ListDataFolder}", $"{symbol.Value}.txt");
+                var filename = Path.Combine($@"{xxListDataFolder}", $"{symbol.Value}.txt");
                 if (!File.Exists(filename))
                 {
                     byte[] data = null;
                     var errorCnt = 0;
                     while (data == null)
                     {
-                        var url = string.Format(ListUrlTemplate, symbol.Key);
+                        var url = string.Format(xxListUrlTemplate, symbol.Key);
                         var o = Helpers.WebClientExt.GetToBytes(url, false);
                         //if (o.Item3 != null)
                           //  throw new Exception($"WA_YahooProfile: Error while download from {url}. Error message: {o.Item3.Message}");
