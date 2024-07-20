@@ -16,7 +16,7 @@ namespace Data.Actions.MorningStar
     {
         private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}/{1}/quote&matchType=prefix&limit=100000&from=2019";
         private const string ListDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_List";
-        private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile\WA_Data";
+        private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile";
 
         public static async Task DownloadData()
         {
