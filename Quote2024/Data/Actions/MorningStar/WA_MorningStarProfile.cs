@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Data.Helpers;
@@ -13,6 +16,48 @@ namespace Data.Actions.MorningStar
     {
         private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}/{1}/quote&matchType=prefix&limit=100000&from=2019";
         private const string ListDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_List";
+        private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile\WA_Data";
+
+        public static async Task DownloadData()
+        {
+            Helpers.Logger.AddMessage("Prepare url list");
+            var toDownload = new List<DownloadItem>();
+            var fileCount = 0;
+            var zipFileName = ListDataFolder + ".zip";
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                {
+                    var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
+                    var items = entry.GetLinesOfZipEntry().Select(a => new JsonItem(a))
+                        .Where(a => a.Type == "text/html" && a.Status == 200).OrderBy(a => a.TimeStamp).ToArray();
+                    var exchange = ss[0];
+                    var msSymbol = ss[1];
+                    var lastDateKey = "";
+                    foreach (var item in items)
+                    {
+                        var dateKey = item.TimeStamp.Substring(0, 8);
+                        if (dateKey == lastDateKey) // skip the same day
+                            continue;
+
+                        var url = $"https://web.archive.org/web/{item.TimeStamp}/{item.Url}";
+                        var filename = Path.Combine(HtmlDataFolder, $"{exchange}_{msSymbol}_{item.TimeStamp}.html");
+                        toDownload.Add(new DownloadItem(url, filename));
+                        fileCount++;
+                        lastDateKey = dateKey;
+                    }
+                }
+
+            await WebClientExt.DownloadItemsToFiles(toDownload.Cast<WebClientExt.IDownloadToFileItem>().ToList(), 10);
+
+            var badItems = 0;
+            foreach (var item in toDownload.Where(a => a.StatusCode != HttpStatusCode.OK))
+            {
+                badItems++;
+                Debug.Print($"{item.StatusCode}:\t{Path.GetFileNameWithoutExtension(item.Filename)}");
+            }
+
+            Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items. Bad items (see debug window for details): {badItems:N0}");
+        }
 
         public static void DownloadList()
         {
@@ -39,7 +84,6 @@ namespace Data.Actions.MorningStar
             Logger.AddMessage($"Finished");
         }
 
-        //                    var msSymbol = MorningStarCommon.GetMorningStarProfileTicker(polygonSymbol);
         private static Dictionary<(string, string), object> GetExchangeAndSymbols()
         {
             var data = new Dictionary<(string, string), object>();
@@ -74,6 +118,50 @@ namespace Data.Actions.MorningStar
 
             return data;
         }
+
+        #region =========  SubClasses  ===========
+        public class DbItem
+        {
+            public string PolygonSymbol;
+            public string YahooSymbol;
+            public string Name;
+            public string Sector;
+            public DateTime Date;
+            public DateTime? To;
+            public DateTime LastUpdated;
+        }
+
+        private class JsonItem
+        {
+            public string Url;
+            public string TimeStamp;
+            public string Type;
+            public int Status;
+
+            public JsonItem(string line)
+            {
+                var ss = line.Split(' ');
+                TimeStamp = ss[1];
+                Url = ss[2];
+                Type = ss[3];
+                if (ss[4] != "-")
+                    Status = int.Parse(ss[4]);
+            }
+        }
+
+        public class DownloadItem : WebClientExt.IDownloadToFileItem
+        {
+            public string Url { get; }
+            public string Filename { get; set; }
+            public HttpStatusCode? StatusCode { get; set; }
+
+            public DownloadItem(string url, string filename)
+            {
+                Url = url;
+                Filename = filename;
+            }
+        }
+        #endregion
 
 
     }
