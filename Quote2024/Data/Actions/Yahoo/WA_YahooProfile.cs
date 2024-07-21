@@ -36,7 +36,7 @@ namespace Data.Actions.Yahoo
             var firstYahooSectorJsonData = YahooSectorLoader.ParseZip(FirstYahooSectorJsonFileName)
                 .ToDictionary(a => a.YahooSymbol, a => a);
 
-            var yahooSymbolXref = GetSymbolXref();
+            var yahooSymbolXref = GetSymbolXref(false);
             var polygonSymbolXref = yahooSymbolXref.ToDictionary(a => a.Value, a => a.Key);
 
             var data = new List<(string, string, string, DateTime)>();
@@ -453,67 +453,48 @@ namespace Data.Actions.Yahoo
         public static async Task DownloadDataByLetter()
         {
             // Get url and file list
-            var listFiles = Directory.GetFiles(xxListDataFolder, "*.txt");
+            var symbolXref = GetSymbolXref(true);
+            var zipFileName = ListDataFolderByLetter + ".zip";
+            var lastSymbol = "";
+            var lastDateKey = "";
             var toDownload = new List<DownloadItem>();
-            var fileCount = 0;
-            foreach (var listFile in listFiles)
-            {
-                var items = File.ReadAllLines(listFile).Select(a => new JsonItem(a))
-                    .Where(a => a.Type == "text/html" && a.Status == 200).OrderBy(a => a.TimeStamp).ToArray();
-                var polygonSymbol = Path.GetFileNameWithoutExtension(listFile);
-                var lastDateKey = "";
-                foreach (var item in items)
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
-                    var dateKey = item.TimeStamp.Substring(0, 8);
-                    if (dateKey == lastDateKey) // skeep the same day
-                        continue;
+                    var lines = entry.GetLinesOfZipEntry().ToArray();
+                    var items = entry.GetLinesOfZipEntry().Select(a => new JsonItem(a))
+                        .Where(a => a.Url.Contains("profile", StringComparison.InvariantCultureIgnoreCase) &&
+                                    a.Type == "text/html" && a.Status == 200 && a.IsOk).OrderBy(a => a.Symbol)
+                        .ThenBy(a => a.TimeStamp).ToArray();
+                    foreach (var item in items)
+                    {
+                        if (!symbolXref.ContainsKey(item.Symbol))
+                            continue;
 
-                    var url = $"https://web.archive.org/web/{item.TimeStamp}/{item.Url}";
-                    var filename = Path.Combine(HtmlDataFolder, $"{polygonSymbol}_{item.TimeStamp}.html");
-                    toDownload.Add(new DownloadItem(url, filename));
-                    fileCount++;
-                    lastDateKey = dateKey;
+                        var dateKey = item.TimeStamp.Substring(0, 8);
+                        if (dateKey == lastDateKey && string.Equals(lastSymbol, item.Symbol)) // skip the same symbol/day
+                            continue;
+
+                        var date = DateTime.ParseExact(item.TimeStamp, "yyyyMMddHHmmss", CultureInfo.InvariantCulture).Date;
+                        if (date >= new DateTime(2017, 5, 1) && date <= new DateTime(2024, 7, 5))
+                        {
+                            var url = $"https://web.archive.org/web/{item.TimeStamp}/{item.Url}";
+                            var polygonSymbol = symbolXref[item.Symbol];
+                            var filename = Path.Combine(HtmlDataFolder, $"{polygonSymbol}_{item.TimeStamp}.html");
+                            var checkFilename =
+                                Path.Combine(@"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short.2020",
+                                    $"{polygonSymbol}_{item.TimeStamp}.html");
+                            if (!File.Exists(checkFilename))
+                                toDownload.Add(new DownloadItem(url, filename));
+                        }
+
+                        lastSymbol = item.Symbol;
+                        lastDateKey = dateKey;
+                    }
                 }
-            }
 
             // Download data
-            var tasks = new ConcurrentDictionary<DownloadItem, Task<byte[]>>();
-            var itemCount = 0;
-            var needToDownload = true;
-            while (needToDownload)
-            {
-                needToDownload = false;
-                foreach (var urlAndFilename in toDownload)
-                {
-                    itemCount++;
-
-                    if (!File.Exists(urlAndFilename.Filename))
-                    {
-                        var task = WebClientExt.DownloadToBytesAsync(urlAndFilename.Url);
-                        tasks[urlAndFilename] = task;
-                        urlAndFilename.StatusCode = null;
-                    }
-                    else
-                        urlAndFilename.StatusCode = HttpStatusCode.OK;
-
-                    if (tasks.Count >= 10)
-                    {
-                        await Download(tasks);
-                        Helpers.Logger.AddMessage($"Downloaded {itemCount} url from {toDownload.Count:N0}");
-                        tasks.Clear();
-                        needToDownload = true;
-                    }
-                }
-
-                if (tasks.Count > 0)
-                {
-                    await Download(tasks);
-                    tasks.Clear();
-                    needToDownload = true;
-                }
-
-                Helpers.Logger.AddMessage($"Downloaded {itemCount} url from {toDownload.Count:N0}");
-            }
+            await WebClientExt.DownloadItemsToFiles(toDownload.Cast<WebClientExt.IDownloadToFileItem>().ToList(), 10);
 
             Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items");
         }
@@ -637,16 +618,17 @@ namespace Data.Actions.Yahoo
             return data;
         }
 
-        private static Dictionary<string, string> GetSymbolXref()
+        private static Dictionary<string, string> GetSymbolXref(bool notEtf)
         {
             var data = new Dictionary<string, string>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
+                var etfPart = notEtf ? "and MyType not like 'ET%'" : "";
                 cmd.CommandText = "SELECT DISTINCT symbol, YahooSymbol FROM dbQ2024..SymbolsPolygon " +
                                   "WHERE isnull([To],'2099-12-31')>'2020-01-01' and IsTest is null " +
-                                  "and YahooSymbol is not null order by 1";
+                                  $"and YahooSymbol is not null {etfPart} order by 1";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                         data.Add((string)rdr["YahooSymbol"], (string)rdr["symbol"]);
@@ -673,6 +655,8 @@ namespace Data.Actions.Yahoo
             public string TimeStamp;
             public string Type;
             public int Status;
+            public bool IsOk;
+            public string Symbol;
 
             public JsonItem(string line)
             {
@@ -682,20 +666,33 @@ namespace Data.Actions.Yahoo
                 Type = ss[3];
                 if (ss[4] != "-")
                     Status = int.Parse(ss[4]);
+                IsOk = Url.EndsWith("/profile/", StringComparison.CurrentCultureIgnoreCase) ||
+                              Url.EndsWith("/profile", StringComparison.InvariantCultureIgnoreCase) ||
+                              Url.Contains("/profile/?", StringComparison.InvariantCultureIgnoreCase) ||
+                              Url.Contains("/profile?", StringComparison.InvariantCultureIgnoreCase);
+
+                if (IsOk)
+                {
+                    var i2 = Url.IndexOf("/profile", StringComparison.InvariantCultureIgnoreCase);
+                    var i1 = Url.LastIndexOf("/", i2 - 1, StringComparison.InvariantCulture);
+                    Symbol = Url.Substring(i1 + 1, i2 - i1 - 1).Trim().ToUpper();
+                }
             }
         }
 
-        public class DownloadItem
+        public class DownloadItem: WebClientExt.IDownloadToFileItem
         {
-            public string Url;
-            public string Filename;
-            public HttpStatusCode? StatusCode;
+            public string Url { get; }
+            public string Filename { get; }
+            public HttpStatusCode? StatusCode { get; set; }
 
             public DownloadItem(string url, string filename)
             {
                 Url = url;
                 Filename = filename;
             }
+
+            public override string ToString() => Path.GetFileNameWithoutExtension(Filename);
         }
         #endregion
 
