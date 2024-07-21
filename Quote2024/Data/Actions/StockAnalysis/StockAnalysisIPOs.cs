@@ -47,7 +47,7 @@ namespace Data.Actions.StockAnalysis
                     if (oo.data.data.Length > 0)
                     {
                         DbHelper.ClearAndSaveToDbTable(oo.data.data, "dbQ2023Others..Bfr_IpoStockAnalysis", "pSymbol", "pDate", "pExchange",
-                            "pName", "pIpoPrice", "pCurrentPrice", "pSector", "pIndustry", "employees", "TimeStamp");
+                            "pName", "pIpoPrice", "pCurrentPrice", "pSector", "pIndustry", "IEmployees", "TimeStamp");
 
                         DbHelper.RunProcedure("dbQ2023Others..pUpdateIpoStockAnalysis");
                     }
@@ -78,7 +78,8 @@ namespace Data.Actions.StockAnalysis
             public float ippc;
             public string sector;
             public string industry;
-            public int? employees;
+            public float? employees;
+            public int IEmployees => Convert.ToInt32(employees);
 
             public string pSymbol => s;
             public DateTime pDate => ipoDate;
