@@ -20,8 +20,30 @@ namespace Data.Actions.Yahoo
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data";
         private const string FirstYahooSectorJsonFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
 
+        private static Dictionary<string, object> _validSectors = new Dictionary<string, object>
+        {
+            { "Basic Materials", null }, { "Communication Services", null }, { "Consumer Cyclical", null },
+            { "Consumer Defensive", null }, { "Energy", null }, { "Financial Services", null }, { "Healthcare", null },
+            { "Industrials", null }, { "Real Estate", null }, { "Technology", null }, { "Utilities", null }
+        };
 
         private static Dictionary<string, int> _exchanges = new Dictionary<string, int> { { "", 0 } };
+
+        public static void TestWAFiles()
+        {
+            var symbolXref = GetSymbolXref(false).ToDictionary(a=>a.Value, a=>a.Key);
+            var folder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short";
+            var files = Directory.GetFiles(folder, "*.html");
+            foreach (var file in files)
+            {
+                var ss = Path.GetFileNameWithoutExtension(file).Split('_');
+                var yahooSymbol = ss[0];
+                if (!symbolXref.ContainsKey(yahooSymbol))
+                {
+                    Debug.Print($"Bad file: {yahooSymbol}\t{Path.GetFileName(file)}");
+                }
+            }
+        }
 
         public static void ParseAndSaveToDb()
         {
@@ -46,7 +68,7 @@ namespace Data.Actions.Yahoo
 
             var wa_zipFileName = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short.zip";
             Logger.AddMessage($"Parse data from {Path.GetFileName(wa_zipFileName)}");
-            ParseZip(wa_zipFileName, polygonSymbolXref);
+            ParseZip(wa_zipFileName, polygonSymbolXref, true);
 
             Logger.AddMessage($"Save data to database");
             var dbData = new List<DbItem>();
@@ -93,13 +115,29 @@ namespace Data.Actions.Yahoo
                         }
                     }
 
-                    if (lastDbItem != null)
-                        dbData.Add(lastDbItem);
-                    lastDbItem = new DbItem()
+                    if (lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
+                        _validSectors.ContainsKey(lastDbItem.Sector) && !_validSectors.ContainsKey(sector) &&
+                        CsUtils.CalculateSimilarity(name, lastDbItem.Name, false)>=0.7)
                     {
-                        PolygonSymbol = yahooSymbolXref[symbol], YahooSymbol = symbol, Name = name, Sector = sector,
-                        Date = item.Item4.Date, To = to, LastUpdated = item.Item4
-                    };
+                        lastDbItem.Date = item.Item4.Date;
+                    }
+                    else if (lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
+                        !_validSectors.ContainsKey(lastDbItem.Sector) && _validSectors.ContainsKey(sector) &&
+                        CsUtils.CalculateSimilarity(name, lastDbItem.Name, false) >= 0.7)
+                    {
+                        lastDbItem.Sector = sector;
+                        lastDbItem.Date = item.Item4.Date;
+                    }
+                    else
+                    {
+                        if (lastDbItem != null)
+                            dbData.Add(lastDbItem);
+                        lastDbItem = new DbItem()
+                        {
+                            PolygonSymbol = yahooSymbolXref[symbol], YahooSymbol = symbol, Name = name, Sector = sector,
+                            Date = item.Item4.Date, To = to, LastUpdated = item.Item4
+                        };
+                    }
 
                     if (!string.IsNullOrEmpty(lastDbItem.Name) && maxNameLen < lastDbItem.Name.Length)
                         maxNameLen = lastDbItem.Name.Length;
@@ -117,7 +155,8 @@ namespace Data.Actions.Yahoo
 
             Logger.AddMessage($"Finished");
 
-            void ParseZip(string zipFileName, Dictionary<string, string> symbolXref)
+
+            void ParseZip(string zipFileName, Dictionary<string, string> symbolXref, bool ignoreIfNotExistsInSymbolXref = false)
             {
                 var cnt = 0;
                 using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
@@ -128,14 +167,18 @@ namespace Data.Actions.Yahoo
 
                         if (entry.Name.EndsWith("ACT_20230406035606.html") || entry.Name.EndsWith("AXP_20230410144059.html") ||
                             entry.Name.EndsWith("OXM_20230429222332.html") || entry.Name.EndsWith("SONO_20230422222307.html") ||
-                            entry.Name.EndsWith("WAB_20230417233217.html") || entry.Name.EndsWith("ILMNV_20240624224841.html"))
+                            entry.Name.EndsWith("WAB_20230417233217.html") || entry.Name.EndsWith("ILMNV_20240624224841.html") ||
+                            entry.Name.EndsWith("THRX_20170509210723.html"))
                         { // Bad files
                             continue;
                         }
 
                         var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
-                        var symbol = ss[ss.Length - 2];
-                        var yahooSymbol = symbolXref == null ? symbol : symbolXref[symbol];
+                        var polygonSymbol = ss[ss.Length - 2];
+                        if (ignoreIfNotExistsInSymbolXref && !symbolXref.ContainsKey(polygonSymbol))
+                            continue;
+
+                        var yahooSymbol = symbolXref == null ? polygonSymbol : symbolXref[polygonSymbol];
                         var dateKey = DateTime.ParseExact(ss[ss.Length - 1],
                             ss[ss.Length - 1].Length == 14 ? "yyyyMMddHHmmss" : "yyyyMMdd",
                             CultureInfo.InvariantCulture);
@@ -246,10 +289,11 @@ namespace Data.Actions.Yahoo
                     var name = s1.Substring(0, i2).Trim();
                     var symbol = s1.Substring(i2 + 1, s1.Length - i2 - 2).Trim();
                     var exchange = GetExchange2020(i3);
-                    if (symbol != "REIT")
-                        return new[] { symbol, name, exchange };
-                    else
+                    if (symbol == "REIT")
                         s1 = s1.Substring(0, s1.Length - 6).Trim(); // format: symbol - name (REIT)
+                    else if (symbol.Contains(',')) {} // Format: symbol - name (xxx,xx)
+                    else
+                        return new[] { symbol, name, exchange };
                 }
 
                 i2 = s1.IndexOf('-');
@@ -356,19 +400,20 @@ namespace Data.Actions.Yahoo
             {
                 if (string.IsNullOrEmpty(sector)) return (null, null, null, null);
 
-                // Correction of non-standard sectors
-                if (sector == "Industrial Goods" && (symbol == "BLDR" || symbol == "ECOL")) sector = "Industrials";
+                /*// Correction of non-standard sectors
+                if (sector == "Industrial Goods" && (symbol == "BLDR" || symbol == "ECOL" || symbol == "GE" || symbol == "UTX")) sector = "Industrials";
 
                 if (sector == "Financial" && symbol == "MFA") sector = "Real Estate";
-                else if (sector == "Financial" && (symbol == "CBSH" || symbol == "ISTR" || symbol == "NAVI" ||
-                                                   symbol == "SFE" ||
+                else if (sector == "Financial" && (symbol == "ALL" || symbol == "CBSH" || symbol == "ISTR" ||
+                                                   symbol == "NAVI" || symbol == "SFE" ||
                                                    symbol == "ZTR")) sector = "Financial Services";
 
                 if (sector == "Services" && (symbol == "EAT" || symbol == "PZZA")) sector = "Consumer Cyclical";
                 else if (sector == "Services" && (symbol == "EROS" || symbol == "NFLX")) sector = "Communication Services";
-                else if (sector == "Services" && (symbol == "TTEK" || symbol == "ZNH")) sector = "Industrials";
-
-                if (sector == "Consumer Goods" && symbol == "KNDI") sector = "Consumer Cyclical";
+                else if (sector == "Services" && (symbol == "NSC" || symbol == "TTEK" || symbol == "ZNH")) sector = "Industrials";
+                else if (sector == "Consumer Goods" && symbol == "KNDI") sector = "Consumer Cyclical";
+                else if (sector == "Consumer Goods" && symbol == "AAPL") sector = "Technology";
+                else if (sector == "Consumer Goods" && (symbol == "BGS" || symbol == "HSY")) sector = "Consumer Defensive";*/
 
                 if (string.IsNullOrEmpty(name)) name = null;
                 if (string.IsNullOrEmpty(symbol))
