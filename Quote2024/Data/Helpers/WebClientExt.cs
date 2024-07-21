@@ -14,15 +14,11 @@ namespace Data.Helpers
         private enum Method {Get, Post}
 
         #region =========  IP helpers ============
-
-        
-
         private class cIpCountry
         {
             public string ip;
             public string country;
         }
-        #region ====  Static region  ====
         public static void CheckVpnConnection()
         {
             var country = WebClientExt.GetMyIpCountry();
@@ -158,6 +154,7 @@ namespace Data.Helpers
         }
         #endregion
 
+        #region ====  Static region  ====
         public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false, CookieCollection cookies = null)
         {
             using (var wc = new WebClientExt())
