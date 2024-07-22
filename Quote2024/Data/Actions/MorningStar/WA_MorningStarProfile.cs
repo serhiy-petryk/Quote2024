@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -15,10 +16,77 @@ namespace Data.Actions.MorningStar
     public static class WA_MorningStarProfile
     {
         private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}/{1}/quote&matchType=prefix&limit=100000&from=2019";
+        private const string ListUrlTemplateByExchange = "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}&matchType=prefix&limit=300000";
         private const string ListDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_List";
+        private const string ListDataFolderByExchange = @"E:\Quote\WebData\Symbols\MorningStar\WA_ListByExchange";
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile";
 
-        public static async Task DownloadData()
+        private static string[] _exchanges = new[] { "arcx", "bats", "xase", "xnas", "xnys" };
+
+        public static async Task DownloadDataByExchange()
+        {
+            Helpers.Logger.AddMessage("Prepare url list");
+
+            var zipFileName = ListDataFolderByExchange + ".zip";
+            var exchangeAndSymbols = GetExchangeAndSymbols(true);
+            var toDownload = new List<DownloadItem>();
+            /*var existingItems = new Dictionary<string, object>();
+            var existingFiles = Directory.GetFiles(HtmlDataFolder, "*.html");
+            foreach (var file in existingFiles)
+            {
+                var ss = Path.GetFileNameWithoutExtension(file).Split('_');
+                var key = $"{ss[0]}_{ss[1]}_{ss[2].Substring(0, 8)}";
+                if (!existingItems.con)
+            }*/
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                {
+                    var items = entry.GetLinesOfZipEntry().Select(a => new JsonItem(a))
+                        .Where(a => a.Type == "text/html" && a.Status == 200).OrderBy(a => a.TimeStamp).ToArray();
+                    foreach (var item in items)
+                    {
+                        var itemUrl = item.Url;
+                        var i1 = itemUrl.IndexOf('?', StringComparison.InvariantCulture);
+                        if (i1 > 0)
+                            itemUrl = itemUrl.Substring(0, i1);
+
+                        if (itemUrl.EndsWith("/quote"))
+                        {
+                            var ss = itemUrl.Split('/');
+                            var exchange = ss[ss.Length - 3].ToLower();
+                            var msSymbol = ss[ss.Length - 2].ToLower();
+                            var url = $"https://web.archive.org/web/{item.TimeStamp}/{item.Url}";
+                            var shortFileName = $"{exchange}_{msSymbol}_{item.TimeStamp}.html";
+                            var filename = Path.Combine(HtmlDataFolder, shortFileName);
+                            if (!File.Exists(filename))
+                                toDownload.Add(new DownloadItem(url, filename));
+                            /*if (!existingItems.ContainsKey(shortFileName))
+                            {
+                                existingItems.Add(shortFileName, null);
+                                var filename = Path.Combine(HtmlDataFolder, shortFileName);
+                                if (!File.Exists(filename))
+                                    toDownload.Add(new DownloadItem(url, filename));
+                            }*/
+                        }
+                        else if (itemUrl.EndsWith("/quote.html")) { }
+                        else if (item.Url.EndsWith("/quoteprint.html")) {}
+                        else {}
+                    }
+                }
+
+            await WebClientExt.DownloadItemsToFiles(toDownload.Cast<WebClientExt.IDownloadToFileItem>().ToList(), 10);
+
+            var badItems = 0;
+            foreach (var item in toDownload.Where(a => a.StatusCode != HttpStatusCode.OK))
+            {
+                badItems++;
+                Debug.Print($"{item.StatusCode}:\t{Path.GetFileNameWithoutExtension(item.Filename)}");
+            }
+
+            Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items. Bad items (see debug window for details): {badItems:N0}");
+        }
+
+        public static async Task xxDownloadData()
         {
             Helpers.Logger.AddMessage("Prepare url list");
             var toDownload = new List<DownloadItem>();
@@ -59,10 +127,31 @@ namespace Data.Actions.MorningStar
             Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items. Bad items (see debug window for details): {badItems:N0}");
         }
 
-        public static void DownloadList()
+        public static void DownloadListByExchange()
         {
             Logger.AddMessage($"Started");
-            var exchangeAndSymbols = GetExchangeAndSymbols();
+            foreach (var exchange in _exchanges)
+            {
+                Logger.AddMessage($"Download url list for {exchange}");
+                var filename = Path.Combine($@"{ListDataFolderByExchange}", $"{exchange}.txt");
+                if (!File.Exists(filename))
+                {
+                    var url = string.Format(ListUrlTemplateByExchange, exchange);
+                    var o = Helpers.WebClientExt.GetToBytes(url, false);
+                    if (o.Item3 != null)
+                        throw new Exception(
+                            $"WA_MorningStarProfile: Error while download from {url}. Error message: {o.Item3.Message}");
+                    File.WriteAllBytes(filename, o.Item1);
+                    System.Threading.Thread.Sleep(200);
+                }
+            }
+            Logger.AddMessage($"Finished");
+        }
+
+        public static void xxDownloadList()
+        {
+            Logger.AddMessage($"Started");
+            var exchangeAndSymbols = GetExchangeAndSymbols(false);
             // var symbols = new Dictionary<string,string>{{"MSFT", "MSFT80"}};
             var count = 0;
             foreach (var exchangeAndSymbol in exchangeAndSymbols)
@@ -84,16 +173,16 @@ namespace Data.Actions.MorningStar
             Logger.AddMessage($"Finished");
         }
 
-        private static Dictionary<(string, string), object> GetExchangeAndSymbols()
+        private static Dictionary<(string, string), object> GetExchangeAndSymbols(bool allTickers)
         {
             var data = new Dictionary<(string, string), object>();
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
+                var filter = allTickers ? "" : " and MyType not like 'ET%' and MyType not in ('FUND', 'RIGHT', 'WARRANT') ";
                 cmd.CommandText = "SELECT DISTINCT exchange, symbol FROM dbQ2024..SymbolsPolygon " +
-                                  "WHERE isnull([To],'2099-12-31')>'2020-01-01' and IsTest is null " +
-                                  "and MyType not like 'ET%' and MyType not in ('FUND', 'RIGHT', 'WARRANT') order by 2";
+                                  $"WHERE isnull([To],'2099-12-31')>'2020-01-01' and IsTest is null {filter} order by 2";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                     {
