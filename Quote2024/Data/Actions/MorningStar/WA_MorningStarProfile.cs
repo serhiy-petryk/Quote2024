@@ -86,6 +86,27 @@ namespace Data.Actions.MorningStar
             Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items. Bad items (see debug window for details): {badItems:N0}");
         }
 
+        public static void DownloadListByExchange()
+        {
+            Logger.AddMessage($"Started");
+            foreach (var exchange in _exchanges)
+            {
+                Logger.AddMessage($"Download url list for {exchange}");
+                var filename = Path.Combine($@"{ListDataFolderByExchange}", $"{exchange}.txt");
+                if (!File.Exists(filename))
+                {
+                    var url = string.Format(ListUrlTemplateByExchange, exchange);
+                    var o = Helpers.WebClientExt.GetToBytes(url, false);
+                    if (o.Item3 != null)
+                        throw new Exception(
+                            $"WA_MorningStarProfile: Error while download from {url}. Error message: {o.Item3.Message}");
+                    File.WriteAllBytes(filename, o.Item1);
+                    System.Threading.Thread.Sleep(200);
+                }
+            }
+            Logger.AddMessage($"Finished");
+        }
+
         public static async Task xxDownloadData()
         {
             Helpers.Logger.AddMessage("Prepare url list");
@@ -125,27 +146,6 @@ namespace Data.Actions.MorningStar
             }
 
             Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items. Bad items (see debug window for details): {badItems:N0}");
-        }
-
-        public static void DownloadListByExchange()
-        {
-            Logger.AddMessage($"Started");
-            foreach (var exchange in _exchanges)
-            {
-                Logger.AddMessage($"Download url list for {exchange}");
-                var filename = Path.Combine($@"{ListDataFolderByExchange}", $"{exchange}.txt");
-                if (!File.Exists(filename))
-                {
-                    var url = string.Format(ListUrlTemplateByExchange, exchange);
-                    var o = Helpers.WebClientExt.GetToBytes(url, false);
-                    if (o.Item3 != null)
-                        throw new Exception(
-                            $"WA_MorningStarProfile: Error while download from {url}. Error message: {o.Item3.Message}");
-                    File.WriteAllBytes(filename, o.Item1);
-                    System.Threading.Thread.Sleep(200);
-                }
-            }
-            Logger.AddMessage($"Finished");
         }
 
         public static void xxDownloadList()
