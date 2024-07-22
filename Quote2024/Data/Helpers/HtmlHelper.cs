@@ -17,15 +17,12 @@ namespace Data.Helpers
         public static void ProcessFolder()
         {
             Logger.AddMessage($"Started");
-
-            ProcessFolder(@"E:\Quote\WebData\Symbols\MorningStar\Profile\Data\MSProfiles_20240709");
-            // ProcessFolder(@"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230222");
+            ProcessFolder(@"E:\Quote\WebData\Symbols\MorningStar\WA_Profile");
+            Logger.AddMessage($"Finished");
         }
 
         private static void ProcessFolder(string sourceFolder)
         {
-            // var sourceFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\WA_Data";
-            // var sourceFolder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\Data\YP_20230227";
             var destinationFolder = sourceFolder +  @".Short";
             if (!Directory.Exists(destinationFolder))
                 Directory.CreateDirectory(destinationFolder);
