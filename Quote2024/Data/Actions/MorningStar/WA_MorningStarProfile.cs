@@ -26,8 +26,23 @@ namespace Data.Actions.MorningStar
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile";
 
         private static string[] _exchanges = new[] { "arcx", "bats", "xase", "xnas", "xnys" };
+        private static Dictionary<string, object> _validSectors = Yahoo.WA_YahooProfile._validSectors;
 
-        public static void ParseFiles()
+
+        public static void ParseAndSaveToDb()
+        {
+            var dbData = ParseFiles();
+
+            var badTickers = MorningStarCommon.BadTickers;
+
+            DbHelper.ClearAndSaveToDbTable(dbData, "dbQ2024..ProfileMorningStar_WA", "PolygonSymbol", "Date", "To",
+                "Exchange", "Name", "Sector", "LastUpdated", "MsSymbol");
+
+            Logger.AddMessage($"Finished. Bad tickers: {badTickers.Count}");
+
+        }
+
+        public static List<DbItem> ParseFiles()
         {
             var badFiles = new Dictionary<string, object>
             {
@@ -35,10 +50,16 @@ namespace Data.Actions.MorningStar
                 { "xnas_tsla_20230404202431.html", null }
             };
 
+            var dbData = new List<DbItem>();
+            DbItem lastDbItem = null;
+            string lastTicker = null;
+            string lastDateKey = null;
+
             var zipFileName = HtmlDataFolder + ".Short.zip";
             var cnt = 0;
+            var cnt1 = 0;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
-                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0).OrderByDescending(a=>a.Name))
                 {
                     if (++cnt % 100 == 0)
                         Logger.AddMessage(
@@ -47,58 +68,122 @@ namespace Data.Actions.MorningStar
                     if (badFiles.ContainsKey(entry.Name.ToLower()))
                         continue;
 
-                    var content1 = entry.GetContentOfZipEntry().Replace("\n", "").Replace("\t", "")
-                        .Replace(" <!---->", "");
+                    var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
+                    var exchange = ss[0].ToUpper();
+                    var timestamp = DateTime.ParseExact(ss[2], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                    //if (timestamp > new DateTime(2024, 7, 1))
+                    //  continue;
+                    cnt1++;
+
+                    var content = entry.GetContentOfZipEntry().Replace("\n", "").Replace("\t", "")
+                        /*.Replace(" <!---->", "")*/;
 
                     // Remove footer
-                    var i21 = content1.IndexOf(">Related</h2>", StringComparison.InvariantCulture);
+                    var i21 = content.IndexOf(">Related</h2>", StringComparison.InvariantCulture);
+                    if (i21 == -1) i21 = content.IndexOf(">Stocks by Morningstar Classification</", StringComparison.InvariantCulture);
+                    if (i21 == -1) i21 = content.IndexOf(">Sponsor Center</", StringComparison.InvariantCulture);
                     if (i21 == -1)
-                        i21 = content1.IndexOf(">Stocks by Morningstar Classification</",
-                            StringComparison.InvariantCulture);
-                    if (i21 == -1) i21 = content1.IndexOf(">Sponsor Center</", StringComparison.InvariantCulture);
-                    string content;
-                    if (i21 == -1)
-                    {
-                        content = content1;
-                        Debug.Print($"No footer:\t{entry.Name}");
-                    }
-                    else
-                    {
-                        content = content1.Substring(0, i21);
-                        var i11 = content1.IndexOf(">Sector<", i21, StringComparison.InvariantCultureIgnoreCase);
-                        if (i11 != -1)
-                            Debug.Print($"There is '>Sector<' in footer:\t{entry.Name}");
-                    }
+                        throw new Exception($"No footer:\t{entry.Name}");
 
-                    var i1 = content.IndexOf(">Company Profile</h2>", StringComparison.InvariantCulture);
-                    if (i1 == -1) i1 = content.IndexOf(" Company Profile</h2>", StringComparison.InvariantCulture);
-                    if (i1 == -1) i1 = content.IndexOf(">Company Profile<", StringComparison.InvariantCulture);
-                    if (i1 == -1) i1 = content.IndexOf(">Company Profile <", StringComparison.InvariantCulture);
+                    var contentNoFooter = content.Substring(0, i21);
+                        var i22 = content.IndexOf(">Sector<", i21, StringComparison.InvariantCultureIgnoreCase);
+                        if (i22 != -1)
+                            throw new Exception($"There is '>Sector<' in footer:\t{entry.Name}");
+
+                    var i1 = contentNoFooter.IndexOf(">Company Profile</h2>", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = contentNoFooter.IndexOf(" Company Profile</h2>", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = contentNoFooter.IndexOf(">Company Profile<", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = contentNoFooter.IndexOf(">Company Profile <", StringComparison.InvariantCulture);
                     if (i1 == -1)
-                        i1 = content.IndexOf(">Company Profile -" /*plus symbol*/, StringComparison.InvariantCulture);
+                        i1 = contentNoFooter.IndexOf(">Company Profile -" /*plus symbol*/, StringComparison.InvariantCulture);
                     if (i1 == -1)
                     {
-                        var i12 = content.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase);
+                        var i12 = contentNoFooter.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase);
                         if (i12 != -1)
-                        {
-                            Debug.Print($"No 'Company Profile' but is 'sector':\t{entry.Name}");
-                        }
+                            throw new Exception($"No 'Company Profile' but is 'sector':\t{entry.Name}");
 
-                        var i11 = content1.IndexOf(">Sector<", StringComparison.InvariantCultureIgnoreCase);
+                        var i11 = content.IndexOf(">Sector<", StringComparison.InvariantCultureIgnoreCase);
                         if (i11 != -1)
-                        {
-                            Debug.Print($"No 'Company Profile' but is '>Sector<' in footer:\t{entry.Name}");
-                        }
+                            throw new Exception($"No 'Company Profile' but is '>Sector<' in footer:\t{entry.Name}");
                     }
                     else
                     {
-                        var i11 = content.IndexOf(">Sector<", i1 + 10, StringComparison.InvariantCultureIgnoreCase);
+                        string ticker=null, name=null, sector = null;
+
+                        // Define sector
+                        var profileContent = contentNoFooter.Substring(i1 + 15);
+                        var i11 = profileContent.IndexOf(">Sector<", StringComparison.InvariantCultureIgnoreCase);
                         if (i11 == -1)
+                            throw new Exception($"There is 'Company Profile' but no '>Sector<':\t{entry.Name}");
+                        else
                         {
-                            Debug.Print($"There is 'Company Profile' but no '>Sector<':\t{entry.Name}");
+                            var i112 = profileContent.IndexOf("</span>", i11 + 8, StringComparison.InvariantCulture);
+                            var i111 = profileContent.LastIndexOf('>', i112);
+                            sector = profileContent.Substring(i111 + 1, i112 - i111 - 1);
                         }
+
+                        if (!_validSectors.ContainsKey(sector))
+                            continue;
+
+                        // Define name
+                        var beforeProfileContent = contentNoFooter.Substring(0, i1);
+                        var i12 = beforeProfileContent.IndexOf("mdc-security-header__name ", StringComparison.InvariantCulture);
+                        if (i12 == -1) i12 = beforeProfileContent.IndexOf("stock__title-heading__mdc", StringComparison.InvariantCulture);
+                        if (i12 == -1)
+                            throw new Exception($"There is 'Company Profile' but no 'Name':\t{entry.Name}");
+                        else
+                        {
+                            var i121 = beforeProfileContent.IndexOf("<abbr", i12 + 25, StringComparison.InvariantCulture);
+                            var s1 = beforeProfileContent.Substring(i12 + 25, i121 - i12 - 25).Trim().Replace("</span>", "");
+                            i121 = s1.LastIndexOf('>');
+                            name = s1.Substring(i121+1).Trim();
+                        }
+
+                        // Define ticker
+                        var i13 = beforeProfileContent.IndexOf("mdc-security-header__name-ticker", i12+10, StringComparison.InvariantCulture);
+                        if (i13 == -1) i13 = beforeProfileContent.IndexOf("mdc-security-header__ticker", i12 + 10, StringComparison.InvariantCulture);
+                        if (i13 == -1) i13 = beforeProfileContent.IndexOf("stock__ticker__mdc", i12 + 10, StringComparison.InvariantCulture);
+                        if (i13 == -1)
+                            throw new Exception($"There is 'Company Profile' but no 'Ticker':\t{entry.Name}");
+                        else
+                        {
+                            var i132 = beforeProfileContent.IndexOf("</", i13 + 18, StringComparison.InvariantCulture);
+                            var i131 = beforeProfileContent.Substring(0, i132).LastIndexOf('>');
+                            ticker = beforeProfileContent.Substring(i131 + 1, i132 - i131 - 1);
+                        }
+
+                        if (string.Equals(ticker, lastTicker) && string.Equals(ss[2].Substring(0,8), lastDateKey))
+                            continue;
+
+                        // Adjust name property
+                        name = System.Net.WebUtility.HtmlDecode(name).Trim();
+                        if (string.IsNullOrEmpty(name))
+                            name = null;
+                        else if (name.EndsWith("- Stock Quote", StringComparison.InvariantCulture))
+                            name = name.Substring(0, name.Length - 13).Trim();
+                        else if (name.EndsWith(" Stock Quote", StringComparison.InvariantCulture))
+                            name = name.Substring(0, name.Length - 12).Trim();
+
+                        if (lastDbItem == null || ticker != lastDbItem.MsSymbol || exchange != lastDbItem.Exchange ||
+                            CsUtils.MyCalculateSimilarity(name, lastDbItem.Name) < 0.7 || sector != lastDbItem.Sector)
+                        {
+                            lastDbItem = new DbItem(entry.Name, ticker, name, sector);
+                            dbData.Add(lastDbItem);
+                        }
+                        else
+                        {
+                            lastDbItem.Date = timestamp.Date;
+                        }
+
+                        lastTicker = ticker;
+                        lastDateKey = ss[2].Substring(0, 8);
                     }
                 }
+
+            Logger.AddMessage(
+                $"Parse data from {Path.GetFileName(zipFileName)} finished. Parsed {cnt:N0} items.");
+
+            return dbData;
         }
 
         public static async Task DownloadDataByExchange()
@@ -289,13 +374,26 @@ namespace Data.Actions.MorningStar
         #region =========  SubClasses  ===========
         public class DbItem
         {
-            public string PolygonSymbol;
-            public string YahooSymbol;
+            public string PolygonSymbol => MorningStarCommon.GetMyTicker(MsSymbol);
+            public string MsSymbol;
+            public string Exchange;
             public string Name;
             public string Sector;
             public DateTime Date;
             public DateTime? To;
             public DateTime LastUpdated;
+
+            public DbItem(string filename, string symbol, string name, string sector)
+            {
+                var ss = Path.GetFileNameWithoutExtension(filename).Split('_');
+                Exchange = ss[0].ToUpper();
+                MsSymbol = symbol;
+                Name = name;
+                Sector = sector;
+                LastUpdated = DateTime.ParseExact(ss[2], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                Date = LastUpdated.Date;
+                To = LastUpdated.Date;
+            }
         }
 
         private class JsonItem

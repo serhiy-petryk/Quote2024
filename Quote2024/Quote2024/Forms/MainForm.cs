@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -77,6 +78,14 @@ namespace Quote2024.Forms
 
         private async void btnTest_Click(object sender, EventArgs e)
         {
+            /*var folder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short.2020";
+            var files = Directory.GetFiles(folder, "*.html");
+            foreach (var file in files)
+            {
+                var newFN = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short\" + Path.GetFileName(file);
+                File.Move(file, newFN);
+            }*/
+
             btnTest.Enabled = false;
 
             // Data.Helpers.StatMethods.Tests();
@@ -85,14 +94,19 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
+            await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
+            // await Data.Actions.MorningStar.WA_MorningStarProfile.DownloadDataByExchange();
+            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.DownloadList);
+
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.TestFile);
 
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Start);
-            await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadList);
-            // await Data.Actions.Yahoo.WA_YahooProfile.DownloadData();
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.TestWAFiles);
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadListByLetter);
+            // await Data.Actions.Yahoo.WA_YahooProfile.DownloadDataByLetter();
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseHtml);
 
             // await Data.Actions.Yahoo.YahooSectorLoader.Start();
