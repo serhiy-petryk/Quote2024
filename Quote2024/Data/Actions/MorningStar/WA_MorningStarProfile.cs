@@ -15,13 +15,91 @@ namespace Data.Actions.MorningStar
 {
     public static class WA_MorningStarProfile
     {
-        private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}/{1}/quote&matchType=prefix&limit=100000&from=2019";
-        private const string ListUrlTemplateByExchange = "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}&matchType=prefix&limit=300000";
+        private const string ListUrlTemplate =
+            "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}/{1}/quote&matchType=prefix&limit=100000&from=2019";
+
+        private const string ListUrlTemplateByExchange =
+            "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}&matchType=prefix&limit=300000";
+
         private const string ListDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_List";
         private const string ListDataFolderByExchange = @"E:\Quote\WebData\Symbols\MorningStar\WA_ListByExchange";
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile";
 
         private static string[] _exchanges = new[] { "arcx", "bats", "xase", "xnas", "xnys" };
+
+        public static void ParseFiles()
+        {
+            var badFiles = new Dictionary<string, object>
+            {
+                { "xnas_tsla_20230404182642.html", null }, { "xnas_tsla_20230404190240.html", null },
+                { "xnas_tsla_20230404202431.html", null }
+            };
+
+            var zipFileName = HtmlDataFolder + ".Short.zip";
+            var cnt = 0;
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                {
+                    if (++cnt % 100 == 0)
+                        Logger.AddMessage(
+                            $"Parse data from {Path.GetFileName(zipFileName)}. Parsed {cnt:N0} from {zip.Entries.Count:N0} items.");
+
+                    if (badFiles.ContainsKey(entry.Name.ToLower()))
+                        continue;
+
+                    var content1 = entry.GetContentOfZipEntry().Replace("\n", "").Replace("\t", "")
+                        .Replace(" <!---->", "");
+
+                    // Remove footer
+                    var i21 = content1.IndexOf(">Related</h2>", StringComparison.InvariantCulture);
+                    if (i21 == -1)
+                        i21 = content1.IndexOf(">Stocks by Morningstar Classification</",
+                            StringComparison.InvariantCulture);
+                    if (i21 == -1) i21 = content1.IndexOf(">Sponsor Center</", StringComparison.InvariantCulture);
+                    string content;
+                    if (i21 == -1)
+                    {
+                        content = content1;
+                        Debug.Print($"No footer:\t{entry.Name}");
+                    }
+                    else
+                    {
+                        content = content1.Substring(0, i21);
+                        var i11 = content1.IndexOf(">Sector<", i21, StringComparison.InvariantCultureIgnoreCase);
+                        if (i11 != -1)
+                            Debug.Print($"There is '>Sector<' in footer:\t{entry.Name}");
+                    }
+
+                    var i1 = content.IndexOf(">Company Profile</h2>", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = content.IndexOf(" Company Profile</h2>", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = content.IndexOf(">Company Profile<", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = content.IndexOf(">Company Profile <", StringComparison.InvariantCulture);
+                    if (i1 == -1)
+                        i1 = content.IndexOf(">Company Profile -" /*plus symbol*/, StringComparison.InvariantCulture);
+                    if (i1 == -1)
+                    {
+                        var i12 = content.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase);
+                        if (i12 != -1)
+                        {
+                            Debug.Print($"No 'Company Profile' but is 'sector':\t{entry.Name}");
+                        }
+
+                        var i11 = content1.IndexOf(">Sector<", StringComparison.InvariantCultureIgnoreCase);
+                        if (i11 != -1)
+                        {
+                            Debug.Print($"No 'Company Profile' but is '>Sector<' in footer:\t{entry.Name}");
+                        }
+                    }
+                    else
+                    {
+                        var i11 = content.IndexOf(">Sector<", i1 + 10, StringComparison.InvariantCultureIgnoreCase);
+                        if (i11 == -1)
+                        {
+                            Debug.Print($"There is 'Company Profile' but no '>Sector<':\t{entry.Name}");
+                        }
+                    }
+                }
+        }
 
         public static async Task DownloadDataByExchange()
         {
