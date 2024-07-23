@@ -12,22 +12,33 @@ namespace Data.Helpers
         // see Ben Gripka comment in https://stackoverflow.com/questions/2344320/comparing-strings-with-tolerance
         //      https://en.wikipedia.org/wiki/Levenshtein_distance
 
+        public static double MyCalculateSimilarity(string source, string target)
+        {
+            source = source?.Replace(".", "").Replace(",", "").ToUpper();
+            target = target?.Replace(".", "").Replace(",", "").ToUpper();
+
+            // Substring
+            if (source != null && target != null && source.Length > 5 && target.Length > source.Length &&
+                target.Substring(0, source.Length) == source)
+                return 1.0;
+            if (source != null && target != null && source.Length > target.Length && target.Length > 5 &&
+                source.Substring(0, target.Length) == target)
+                return 1.0;
+            
+            return CalculateSimilarity(source, target);
+        }
+
         /// <summary>
         /// Calculate percentage similarity of two strings
         /// <param name="source">Source String to Compare with</param>
         /// <param name="target">Targeted String to Compare</param>
         /// <returns>Return Similarity between two strings from 0 to 1.0</returns>
         /// </summary>
-        public static double CalculateSimilarity(string source, string target, bool caseSensitive)
+        public static double CalculateSimilarity(string source, string target)
         {
             if (string.IsNullOrEmpty(source) && string.IsNullOrEmpty(target)) return 1.0;
             if ((source == null) || (target == null)) return 0.0;
             if ((source.Length == 0) || (target.Length == 0)) return 0.0;
-            if (!caseSensitive)
-            {
-                source = source.ToUpper();
-                target = target.ToUpper();
-            }
             if (source == target) return 1.0;
 
 

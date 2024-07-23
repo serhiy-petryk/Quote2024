@@ -20,7 +20,7 @@ namespace Data.Actions.Yahoo
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data";
         private const string FirstYahooSectorJsonFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
 
-        private static Dictionary<string, object> _validSectors = new Dictionary<string, object>
+        public static Dictionary<string, object> _validSectors = new Dictionary<string, object>
         {
             { "Basic Materials", null }, { "Communication Services", null }, { "Consumer Cyclical", null },
             { "Consumer Defensive", null }, { "Energy", null }, { "Financial Services", null }, { "Healthcare", null },
@@ -117,13 +117,13 @@ namespace Data.Actions.Yahoo
 
                     if (lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
                         _validSectors.ContainsKey(lastDbItem.Sector) && !_validSectors.ContainsKey(sector) &&
-                        CsUtils.CalculateSimilarity(name, lastDbItem.Name, false)>=0.7)
+                        CsUtils.MyCalculateSimilarity(name, lastDbItem.Name)>=0.7)
                     {
                         lastDbItem.Date = item.Item4.Date;
                     }
                     else if (lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
                         !_validSectors.ContainsKey(lastDbItem.Sector) && _validSectors.ContainsKey(sector) &&
-                        CsUtils.CalculateSimilarity(name, lastDbItem.Name, false) >= 0.7)
+                        CsUtils.MyCalculateSimilarity(name, lastDbItem.Name) >= 0.7)
                     {
                         lastDbItem.Sector = sector;
                         lastDbItem.Date = item.Item4.Date;
