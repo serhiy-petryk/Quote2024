@@ -68,6 +68,11 @@ namespace Data.Actions.MorningStar
                 morningStarTicker = "PSA^G";
                 testSymbol = morningStarTicker;
             }
+            else if (morningStarTicker == "PRIFPB" || morningStarTicker == "MTLPR" || morningStarTicker == "PPLPRU")
+            {
+                morningStarTicker = morningStarTicker.Replace("PR", "^");
+                testSymbol = morningStarTicker;
+            }
             else if (morningStarTicker.Contains('p'))
             {
                 morningStarTicker = morningStarTicker.Replace('p', '^');
@@ -93,7 +98,8 @@ namespace Data.Actions.MorningStar
             }
             else if (morningStarTicker.Contains(".PR"))
             {
-                testSymbol = morningStarTicker.Replace(".PR", "");
+                morningStarTicker = morningStarTicker.Replace(".PR", "^");
+                testSymbol = morningStarTicker;
             }
 
             var ok = testSymbol.All(c => (c >= 'A' && c <= 'Z') || c=='^');
