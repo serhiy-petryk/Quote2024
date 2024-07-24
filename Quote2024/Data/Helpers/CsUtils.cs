@@ -14,8 +14,8 @@ namespace Data.Helpers
 
         public static double MyCalculateSimilarity(string source, string target)
         {
-            source = source?.Replace(".", "").Replace(",", "").ToUpper();
-            target = target?.Replace(".", "").Replace(",", "").ToUpper();
+            source = source?.Replace(".", "").Replace(",", "").Replace("  ", " ").ToUpper();
+            target = target?.Replace(".", "").Replace(",", "").Replace("  ", " ").ToUpper();
 
             // Substring
             if (source != null && target != null && source.Length > 5 && target.Length > source.Length &&
@@ -24,7 +24,7 @@ namespace Data.Helpers
             if (source != null && target != null && source.Length > target.Length && target.Length > 5 &&
                 source.Substring(0, target.Length) == target)
                 return 1.0;
-            
+
             return CalculateSimilarity(source, target);
         }
 

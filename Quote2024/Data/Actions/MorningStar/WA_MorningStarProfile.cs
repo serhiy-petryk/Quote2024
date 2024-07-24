@@ -51,9 +51,9 @@ namespace Data.Actions.MorningStar
             };
 
             var dbData = new List<DbItem>();
-            DbItem lastDbItem = null;
+            /*DbItem lastDbItem = null;
             string lastTicker = null;
-            string lastDateKey = null;
+            string lastDateKey = null;*/
 
             var zipFileName = HtmlDataFolder + ".Short.zip";
             var cnt = 0;
@@ -133,10 +133,16 @@ namespace Data.Actions.MorningStar
                             throw new Exception($"There is 'Company Profile' but no 'Name':\t{entry.Name}");
                         else
                         {
-                            var i121 = beforeProfileContent.IndexOf("<abbr", i12 + 25, StringComparison.InvariantCulture);
+                            var i121A = beforeProfileContent.IndexOf("<abbr", i12 + 25, StringComparison.InvariantCulture);
+                            var i121H = beforeProfileContent.IndexOf("</h1>", i12 + 25, StringComparison.InvariantCulture);
+                            var i121 = Math.Min(i121A, i121H);
                             var s1 = beforeProfileContent.Substring(i12 + 25, i121 - i12 - 25).Trim().Replace("</span>", "");
                             i121 = s1.LastIndexOf('>');
                             name = s1.Substring(i121+1).Trim();
+                            if (string.IsNullOrEmpty(name))
+                            {
+
+                            }
                         }
 
                         // Define ticker
@@ -152,8 +158,7 @@ namespace Data.Actions.MorningStar
                             ticker = beforeProfileContent.Substring(i131 + 1, i132 - i131 - 1);
                         }
 
-                        if (string.Equals(ticker, lastTicker) && string.Equals(ss[2].Substring(0,8), lastDateKey))
-                            continue;
+                        var lastDbItem = dbData.Count == 0 ? null : dbData[dbData.Count - 1];
 
                         // Adjust name property
                         name = System.Net.WebUtility.HtmlDecode(name).Trim();
@@ -163,6 +168,42 @@ namespace Data.Actions.MorningStar
                             name = name.Substring(0, name.Length - 13).Trim();
                         else if (name.EndsWith(" Stock Quote", StringComparison.InvariantCulture))
                             name = name.Substring(0, name.Length - 12).Trim();
+
+                        // The same day for same ticker
+                        if (lastDbItem != null && string.Equals(ticker, lastDbItem.MsSymbol) &&
+                            string.Equals(ss[2].Substring(0, 8),
+                                lastDbItem.Date.ToString("yyyyMMdd", CultureInfo.InvariantCulture)))
+                        {
+                            if (string.IsNullOrEmpty(lastDbItem.Name) && !string.IsNullOrEmpty(name))
+                                lastDbItem.Name = name;
+                            continue;
+                        }
+
+                        // Set blank name in LastDbItem
+                        if (lastDbItem != null && string.IsNullOrEmpty(lastDbItem.Name) && !string.IsNullOrEmpty(name) && ticker == lastDbItem.MsSymbol)
+                        {
+                            if (exchange == lastDbItem.Exchange && sector == lastDbItem.Sector)
+                            {
+                                lastDbItem.Name = name;
+                            }
+                            else
+                            {
+
+                            }
+                        }
+
+                        // Set blank name variable
+                        if (lastDbItem != null && !string.IsNullOrEmpty(lastDbItem.Name) && string.IsNullOrEmpty(name) && ticker == lastDbItem.MsSymbol)
+                        {
+                            if (exchange == lastDbItem.Exchange && sector == lastDbItem.Sector)
+                            {
+                                name = lastDbItem.Name;
+                            }
+                            else
+                            {
+
+                            }
+                        }
 
                         if (lastDbItem == null || ticker != lastDbItem.MsSymbol || exchange != lastDbItem.Exchange ||
                             CsUtils.MyCalculateSimilarity(name, lastDbItem.Name) < 0.7 || sector != lastDbItem.Sector)
@@ -174,9 +215,6 @@ namespace Data.Actions.MorningStar
                         {
                             lastDbItem.Date = timestamp.Date;
                         }
-
-                        lastTicker = ticker;
-                        lastDateKey = ss[2].Substring(0, 8);
                     }
                 }
 
