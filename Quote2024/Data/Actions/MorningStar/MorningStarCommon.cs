@@ -68,6 +68,11 @@ namespace Data.Actions.MorningStar
                 morningStarTicker = "PSA^G";
                 testSymbol = morningStarTicker;
             }
+            else if (morningStarTicker == "PRIFPB")
+            {
+                morningStarTicker = "PRIF^B";
+                testSymbol = morningStarTicker;
+            }
             else if (morningStarTicker == "PRIFPB" || morningStarTicker == "MTLPR" || morningStarTicker == "PPLPRU")
             {
                 morningStarTicker = morningStarTicker.Replace("PR", "^");
