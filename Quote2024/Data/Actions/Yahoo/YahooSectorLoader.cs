@@ -20,16 +20,13 @@ namespace Data.Actions.Yahoo
 
         public static void TestParse()
         {
-            var data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip");
-            SaveToDatabase(data);
-            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240711.zip");
-            SaveToDatabase(data);
-            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240712.zip");
-            SaveToDatabase(data);
-            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240714.zip");
-            SaveToDatabase(data);
-            data = ParseZip(@"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240716.zip");
-            SaveToDatabase(data);
+            var files = Directory.GetFiles(Path.GetDirectoryName(ZipFileNameTemplate), "*.zip").OrderBy(a => a).ToArray();
+            foreach (var file in files)
+            {
+                Logger.AddMessage($"Parse and save to database data from {Path.GetFileName(file)}");
+                var data = ParseZip(file);
+                SaveToDatabase(data);
+            }
 
             Logger.AddMessage($"Finished");
         }

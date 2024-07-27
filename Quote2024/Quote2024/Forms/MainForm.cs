@@ -94,16 +94,17 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
+            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
             // await Data.Actions.MorningStar.WA_MorningStarProfile.DownloadDataByExchange();
             // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.DownloadList);
 
-            // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
+            await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.TestFile);
 
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Start);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.TestWAFiles);
+            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDbNew);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadListByLetter);
             // await Data.Actions.Yahoo.WA_YahooProfile.DownloadDataByLetter();

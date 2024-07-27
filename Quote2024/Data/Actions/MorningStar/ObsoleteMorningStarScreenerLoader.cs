@@ -8,7 +8,7 @@ using Data.Helpers;
 
 namespace Data.Actions.MorningStar
 {
-    public static class MorningStarScreenerLoader
+    public static class ObsoleteMorningStarScreenerLoader
     {
         // page numeration from 1
         // private const string UrlTemplate = @"https://www.morningstar.com/api/v2/navigation-list/{0}?sort=marketCap:desc&page={1}&limit=50";

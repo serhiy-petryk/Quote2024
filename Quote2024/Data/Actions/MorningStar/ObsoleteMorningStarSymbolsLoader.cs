@@ -12,7 +12,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Data.Actions.MorningStar
 {
-    public static class MorningStarSymbolsLoader
+    public static class ObsoleteMorningStarSymbolsLoader
     {
         // Server error for: https://www.morningstar.com/stocks/xnas/vbnk/quote, https://www.morningstar.com/stocks/xnas/na/quote
 
@@ -28,7 +28,7 @@ namespace Data.Actions.MorningStar
 
         public static void Test()
         {
-            var dbItems = new List<MorningStarScreenerLoader.DbItem>();
+            var dbItems = new List<ObsoleteMorningStarScreenerLoader.DbItem>();
             var types = new Dictionary<string, int>();
             var folder = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240620";
             var files = Directory.GetFiles(folder, "*.json").OrderBy(a=>a).ToArray();
@@ -71,7 +71,7 @@ namespace Data.Actions.MorningStar
                 }
                 else
                 {
-                    var dbItem = new MorningStarScreenerLoader.DbItem
+                    var dbItem = new ObsoleteMorningStarScreenerLoader.DbItem
                     {
                         Symbol = symbol, Exchange = exchange, Name = oo.page?.name, Sector = sector, Date = dateKey,
                         TimeStamp = File.GetLastWriteTime(file)

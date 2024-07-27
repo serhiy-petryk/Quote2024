@@ -12,7 +12,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Data.Actions.MorningStar
 {
-    public class MorningStarJsonProfileLoader
+    public class ObsoleteMorningStarJsonProfileLoader
     {
         private const string UrlTemplate = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
         private const string FileTemplate = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}\MSProfile_{1}_{2}.json";

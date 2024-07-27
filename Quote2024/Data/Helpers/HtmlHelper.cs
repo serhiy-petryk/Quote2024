@@ -17,7 +17,7 @@ namespace Data.Helpers
         public static void ProcessFolder()
         {
             Logger.AddMessage($"Started");
-            ProcessFolder(@"E:\Quote\WebData\Symbols\MorningStar\WA_Profile");
+            ProcessFolder(@"E:\Quote\WebData\Screener\MorningStar\WA_Data");
             Logger.AddMessage($"Finished");
         }
 
