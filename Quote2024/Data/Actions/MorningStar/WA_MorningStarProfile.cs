@@ -123,7 +123,7 @@ namespace Data.Actions.MorningStar
                         }
 
                         if (!_validSectors.ContainsKey(sector))
-                            continue;
+                           continue;
 
                         // Define name
                         var beforeProfileContent = contentNoFooter.Substring(0, i1);
