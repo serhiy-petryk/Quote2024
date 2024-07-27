@@ -23,7 +23,6 @@ namespace Data.Models
             // new LoaderItem {Name = "Nasdaq Stock Screeners from Github", Action = Actions.Nasdaq.NasdaqScreenerGithubLoader.Start, Checked = false},
             // new LoaderItem {Name = "MorningStar Screener", Action = Actions.MorningStar.MorningStarScreenerLoader.Start, Checked = false},
             // new LoaderItem {Name = "Chartmill Screener", Action = Actions.Chartmill.ChartmillScreenerLoader.Start, Checked = false},
-            new LoaderItem {Name = "Yahoo sectors", Action = Actions.Yahoo.YahooSectorLoader.Start, Checked = false},
             new LoaderItem {Name = "Index components from Wikipedia", Action = Actions.Wikipedia.WikipediaIndexLoader.Start, Checked = false},
             new LoaderItem {Name = "StockAnalysis Corporate Actions", Action = Actions.StockAnalysis.StockAnalysisActions.Start, Checked = false},
             new LoaderItem {Name = "StockAnalysis IPOs", Action = Actions.StockAnalysis.StockAnalysisIPOs.Start, Checked=false},
@@ -33,6 +32,8 @@ namespace Data.Models
             new LoaderItem {Name = "Polygon Symbols (~4 minutes)", Action = Actions.Polygon.PolygonSymbolsLoader.Start, Checked = false},
             new LoaderItem {Name = "Polygon Daily Quotes", Action = Actions.Polygon.PolygonDailyLoader.Start, Checked = false},
             new LoaderItem {Name = "Synchronize Polygon Day and Symbols (~4 minutes)", Action = Actions.Polygon.PolygonSynchronizeDayAndSymbols.Start, Checked = false},
+            new LoaderItem {Name = "Yahoo sectors (need fresh data of SymbolsPolygon)", Action = Actions.Yahoo.YahooSectorLoader.Start, Checked = false}, // After SymbolsPolygon
+            new LoaderItem {Name = "Update Symbols Xref and Sectors", Action = Actions.UpdateSymbolsXrefAndSectors.Start, Checked = false},
             new LoaderItem {Name = "Eoddata Daily Quotes", Action = Actions.Eoddata.EoddataDailyLoader.Start, Checked = false},
             new LoaderItem {Name = "Eoddata Splits", Action = Actions.Eoddata.EoddataSplitsLoader.Start, Checked = false},
             new LoaderItem {Name = "Investing Splits", Action = Actions.Investing.InvestingSplitsLoader.Start, Checked = false},
