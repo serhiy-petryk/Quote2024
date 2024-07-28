@@ -94,7 +94,7 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
+            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
             // await Data.Actions.MorningStar.WA_MorningStarProfile.DownloadDataByExchange();
             // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.DownloadList);
 
@@ -190,7 +190,7 @@ namespace Quote2024.Forms
 
             if (CsUtils.OpenFileDialogMultiselect(Data.Actions.Yahoo.YahooCommon.MinuteYahooDataFolder,
                     @"zip files (*.zip)|*.zip") is string[] files && files.Length > 0)
-                Data.Actions.Yahoo.YahooMinuteChecks.CheckOnBadQuoteAndsplit(files, ShowStatus);
+                Data.Actions.Yahoo.YahooMinuteChecks.CheckOnBadQuoteAndSplit(files, ShowStatus);
             
             btnMinuteYahooErrorCheck.Enabled = true;
         }

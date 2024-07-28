@@ -9,7 +9,7 @@ namespace Data.Actions.Yahoo
 {
     public static class YahooMinuteChecks
     {
-        public static void CheckOnBadQuoteAndsplit(string[] zipFileNames, Action<string> showStatusAction)
+        public static void CheckOnBadQuoteAndSplit(string[] zipFileNames, Action<string> showStatusAction)
         {
             Array.Sort(zipFileNames);
 
