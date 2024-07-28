@@ -51,15 +51,12 @@ namespace Data.Actions.MorningStar
             };
 
             var dbData = new List<DbItem>();
-            /*DbItem lastDbItem = null;
-            string lastTicker = null;
-            string lastDateKey = null;*/
 
             var zipFileName = HtmlDataFolder + ".Short.zip";
             var cnt = 0;
             var cnt1 = 0;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
-                foreach (var entry in zip.Entries.Where(a => a.Length > 0).OrderByDescending(a=>a.Name))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0).OrderByDescending(a => a.Name))
                 {
                     if (++cnt % 100 == 0)
                         Logger.AddMessage(
@@ -86,9 +83,9 @@ namespace Data.Actions.MorningStar
                         throw new Exception($"No footer:\t{entry.Name}");
 
                     var contentNoFooter = content.Substring(0, i21);
-                        var i22 = content.IndexOf(">Sector<", i21, StringComparison.InvariantCultureIgnoreCase);
-                        if (i22 != -1)
-                            throw new Exception($"There is '>Sector<' in footer:\t{entry.Name}");
+                    var i22 = content.IndexOf(">Sector<", i21, StringComparison.InvariantCultureIgnoreCase);
+                    if (i22 != -1)
+                        throw new Exception($"There is '>Sector<' in footer:\t{entry.Name}");
 
                     var i1 = contentNoFooter.IndexOf(">Company Profile</h2>", StringComparison.InvariantCulture);
                     if (i1 == -1) i1 = contentNoFooter.IndexOf(" Company Profile</h2>", StringComparison.InvariantCulture);
@@ -108,7 +105,7 @@ namespace Data.Actions.MorningStar
                     }
                     else
                     {
-                        string ticker=null, name=null, sector = null;
+                        string ticker = null, name = null, sector = null;
 
                         // Define sector
                         var profileContent = contentNoFooter.Substring(i1 + 15);
@@ -123,7 +120,7 @@ namespace Data.Actions.MorningStar
                         }
 
                         if (!_validSectors.ContainsKey(sector))
-                           continue;
+                            continue;
 
                         // Define name
                         var beforeProfileContent = contentNoFooter.Substring(0, i1);
@@ -138,7 +135,7 @@ namespace Data.Actions.MorningStar
                             var i121 = Math.Min(i121A, i121H);
                             var s1 = beforeProfileContent.Substring(i12 + 25, i121 - i12 - 25).Trim().Replace("</span>", "");
                             i121 = s1.LastIndexOf('>');
-                            name = s1.Substring(i121+1).Trim();
+                            name = s1.Substring(i121 + 1).Trim();
                             if (string.IsNullOrEmpty(name))
                             {
 
@@ -146,7 +143,7 @@ namespace Data.Actions.MorningStar
                         }
 
                         // Define ticker
-                        var i13 = beforeProfileContent.IndexOf("mdc-security-header__name-ticker", i12+10, StringComparison.InvariantCulture);
+                        var i13 = beforeProfileContent.IndexOf("mdc-security-header__name-ticker", i12 + 10, StringComparison.InvariantCulture);
                         if (i13 == -1) i13 = beforeProfileContent.IndexOf("mdc-security-header__ticker", i12 + 10, StringComparison.InvariantCulture);
                         if (i13 == -1) i13 = beforeProfileContent.IndexOf("stock__ticker__mdc", i12 + 10, StringComparison.InvariantCulture);
                         if (i13 == -1)
@@ -222,6 +219,127 @@ namespace Data.Actions.MorningStar
                 $"Parse data from {Path.GetFileName(zipFileName)} finished. Parsed {cnt:N0} items.");
 
             return dbData;
+        }
+
+        public static void ParseHtmlFiles(List<WA_MorningStarSector.DbItem> data)
+        {
+            var badFiles = new Dictionary<string, object>
+            {
+                { "xnas_tsla_20230404182642.html", null }, { "xnas_tsla_20230404190240.html", null },
+                { "xnas_tsla_20230404202431.html", null }
+            };
+
+            var zipFileName = HtmlDataFolder + ".Short.zip";
+            var cnt = 0;
+            var cnt1 = 0;
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                {
+                    if (++cnt % 100 == 0)
+                        Logger.AddMessage(
+                            $"Parse data from {Path.GetFileName(zipFileName)}. Parsed {cnt:N0} from {zip.Entries.Count:N0} items.");
+
+                    if (badFiles.ContainsKey(entry.Name.ToLower()))
+                        continue;
+
+                    var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
+                    var exchange = ss[0].ToUpper();
+                    var timestamp = DateTime.ParseExact(ss[2], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                    //if (timestamp > new DateTime(2024, 7, 1))
+                    //  continue;
+                    cnt1++;
+
+                    var content = entry.GetContentOfZipEntry().Replace("\n", "").Replace("\t", "")
+                        /*.Replace(" <!---->", "")*/;
+
+                    // Remove footer
+                    var i21 = content.IndexOf(">Related</h2>", StringComparison.InvariantCulture);
+                    if (i21 == -1) i21 = content.IndexOf(">Stocks by Morningstar Classification</", StringComparison.InvariantCulture);
+                    if (i21 == -1) i21 = content.IndexOf(">Sponsor Center</", StringComparison.InvariantCulture);
+                    if (i21 == -1)
+                        throw new Exception($"No footer:\t{entry.Name}");
+
+                    var contentNoFooter = content.Substring(0, i21);
+                    var i22 = content.IndexOf(">Sector<", i21, StringComparison.InvariantCultureIgnoreCase);
+                    if (i22 != -1)
+                        throw new Exception($"There is '>Sector<' in footer:\t{entry.Name}");
+
+                    var i1 = contentNoFooter.IndexOf(">Company Profile</h2>", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = contentNoFooter.IndexOf(" Company Profile</h2>", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = contentNoFooter.IndexOf(">Company Profile<", StringComparison.InvariantCulture);
+                    if (i1 == -1) i1 = contentNoFooter.IndexOf(">Company Profile <", StringComparison.InvariantCulture);
+                    if (i1 == -1)
+                        i1 = contentNoFooter.IndexOf(">Company Profile -" /*plus symbol*/, StringComparison.InvariantCulture);
+                    if (i1 == -1)
+                    {
+                        var i12 = contentNoFooter.IndexOf("sector", StringComparison.InvariantCultureIgnoreCase);
+                        if (i12 != -1)
+                            throw new Exception($"No 'Company Profile' but is 'sector':\t{entry.Name}");
+
+                        var i11 = content.IndexOf(">Sector<", StringComparison.InvariantCultureIgnoreCase);
+                        if (i11 != -1)
+                            throw new Exception($"No 'Company Profile' but is '>Sector<' in footer:\t{entry.Name}");
+                    }
+                    else
+                    {
+                        string ticker = null, name = null, sector = null;
+
+                        // Define sector
+                        var profileContent = contentNoFooter.Substring(i1 + 15);
+                        var i11 = profileContent.IndexOf(">Sector<", StringComparison.InvariantCultureIgnoreCase);
+                        if (i11 == -1)
+                            throw new Exception($"There is 'Company Profile' but no '>Sector<':\t{entry.Name}");
+                        else
+                        {
+                            var i112 = profileContent.IndexOf("</span>", i11 + 8, StringComparison.InvariantCulture);
+                            var i111 = profileContent.LastIndexOf('>', i112);
+                            sector = profileContent.Substring(i111 + 1, i112 - i111 - 1);
+                        }
+
+                        if (!_validSectors.ContainsKey(sector))
+                            continue;
+
+                        // Define name
+                        var beforeProfileContent = contentNoFooter.Substring(0, i1);
+                        var i12 = beforeProfileContent.IndexOf("mdc-security-header__name ", StringComparison.InvariantCulture);
+                        if (i12 == -1) i12 = beforeProfileContent.IndexOf("stock__title-heading__mdc", StringComparison.InvariantCulture);
+                        if (i12 == -1)
+                            throw new Exception($"There is 'Company Profile' but no 'Name':\t{entry.Name}");
+                        else
+                        {
+                            var i121A = beforeProfileContent.IndexOf("<abbr", i12 + 25, StringComparison.InvariantCulture);
+                            var i121H = beforeProfileContent.IndexOf("</h1>", i12 + 25, StringComparison.InvariantCulture);
+                            var i121 = Math.Min(i121A, i121H);
+                            var s1 = beforeProfileContent.Substring(i12 + 25, i121 - i12 - 25).Trim().Replace("</span>", "");
+                            i121 = s1.LastIndexOf('>');
+                            name = s1.Substring(i121 + 1).Trim();
+                            if (string.IsNullOrEmpty(name))
+                            {
+
+                            }
+                        }
+
+                        // Define ticker
+                        var i13 = beforeProfileContent.IndexOf("mdc-security-header__name-ticker", i12 + 10, StringComparison.InvariantCulture);
+                        if (i13 == -1) i13 = beforeProfileContent.IndexOf("mdc-security-header__ticker", i12 + 10, StringComparison.InvariantCulture);
+                        if (i13 == -1) i13 = beforeProfileContent.IndexOf("stock__ticker__mdc", i12 + 10, StringComparison.InvariantCulture);
+                        if (i13 == -1)
+                            throw new Exception($"There is 'Company Profile' but no 'Ticker':\t{entry.Name}");
+                        else
+                        {
+                            var i132 = beforeProfileContent.IndexOf("</", i13 + 18, StringComparison.InvariantCulture);
+                            var i131 = beforeProfileContent.Substring(0, i132).LastIndexOf('>');
+                            ticker = beforeProfileContent.Substring(i131 + 1, i132 - i131 - 1);
+                        }
+
+                        name = System.Net.WebUtility.HtmlDecode(name).Trim();
+                        var item = new WA_MorningStarSector.DbItem(ticker, name, sector, timestamp);
+                        data.Add(item);
+                    }
+                }
+
+            Logger.AddMessage(
+                $"Parse data from {Path.GetFileName(zipFileName)} finished. Parsed {cnt:N0} items.");
         }
 
         public static async Task DownloadDataByExchange()
@@ -418,7 +536,7 @@ namespace Data.Actions.MorningStar
             public string Name;
             public string Sector;
             public DateTime Date;
-            public DateTime? To;
+            public DateTime To;
             public DateTime LastUpdated;
 
             public DbItem(string filename, string symbol, string name, string sector)

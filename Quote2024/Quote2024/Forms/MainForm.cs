@@ -94,11 +94,11 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
+            await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
             // await Data.Actions.MorningStar.WA_MorningStarProfile.DownloadDataByExchange();
             // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.DownloadList);
 
-            await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
+            // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
             // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.TestFile);
 
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
@@ -150,6 +150,8 @@ namespace Quote2024.Forms
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
             // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);
+            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarSector.Start);
+
 
             // await Task.Factory.StartNew(()=>Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\WebArchive.Wikipedia.Indices.zip"));
 
