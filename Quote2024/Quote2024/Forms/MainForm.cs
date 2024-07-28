@@ -104,7 +104,6 @@ namespace Quote2024.Forms
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Start);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.TestWAFiles);
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDbNew);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
             // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadListByLetter);
             // await Data.Actions.Yahoo.WA_YahooProfile.DownloadDataByLetter();

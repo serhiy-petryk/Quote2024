@@ -19,7 +19,7 @@ namespace Data.Actions.MorningStar
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile";
 
         private static readonly string[] Exchanges = new[] { "arcx", "bats", "xase", "xnas", "xnys" };
-        private static readonly Dictionary<string, object> ValidSectors = Yahoo.WA_YahooProfile._validSectors;
+        private static readonly Dictionary<string, object> ValidSectors = Yahoo.WA_YahooProfile.ValidSectors;
 
         public static void ParseHtmlFiles(List<WA_MorningStarSector.DbItem> data)
         {

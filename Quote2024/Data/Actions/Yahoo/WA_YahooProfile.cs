@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -18,9 +17,8 @@ namespace Data.Actions.Yahoo
         private const string ListUrlTemplateByLetter = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}&matchType=prefix&limit=300000&filter=statuscode:200";
         private const string ListDataFolderByLetter = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_ListByLetter";
         private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data";
-        private const string FirstYahooSectorJsonFileName = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_20240704.zip";
 
-        public static Dictionary<string, object> _validSectors = new Dictionary<string, object>
+        public static Dictionary<string, object> ValidSectors = new Dictionary<string, object>
         {
             { "Basic Materials", null }, { "Communication Services", null }, { "Consumer Cyclical", null },
             { "Consumer Defensive", null }, { "Energy", null }, { "Financial Services", null }, { "Healthcare", null },
@@ -45,7 +43,7 @@ namespace Data.Actions.Yahoo
             }
         }
 
-        public static void ParseAndSaveToDbNew()
+        public static void ParseAndSaveToDb()
         {
             Logger.AddMessage($"Started");
 
@@ -81,7 +79,7 @@ namespace Data.Actions.Yahoo
                 var sector = item.Item3;
                 if (string.IsNullOrEmpty(sector))
                     throw new Exception("Check");
-                if (!_validSectors.ContainsKey(sector))
+                if (!ValidSectors.ContainsKey(sector))
                 {
                     if (sector == "Industrial Goods") sector = "Industrials";
                     else if (sector == "Financial" && symbol == "MFA") sector = "Real Estate";
@@ -90,21 +88,8 @@ namespace Data.Actions.Yahoo
                 }
 
                 var lastDbItem = dbData.Count == 0 ? null : dbData[dbData.Count - 1];
-
-                /*// Set blank name in lastDbItem
-                if (lastDbItem != null && string.IsNullOrEmpty(lastDbItem.Name) && lastDbItem.YahooSymbol == symbol &&
-                    lastDbItem.Sector == sector)
-                    lastDbItem.Name = name;
-
-                // Set blank name from lastDbItem value
-                if (string.IsNullOrEmpty(name) && lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
-                    lastDbItem.Sector == sector)
-                    name = lastDbItem.Name;*/
-
                 if (lastDbItem == null || lastDbItem.YahooSymbol != symbol ||
-                    // !string.Equals(lastDbItem.Name, name, StringComparison.InvariantCultureIgnoreCase) ||
-                    CsUtils.MyCalculateSimilarity(name, lastDbItem.Name) < 0.7 ||
-                    lastDbItem.Sector != sector)
+                    CsUtils.MyCalculateSimilarity(name, lastDbItem.Name) < 0.7 || lastDbItem.Sector != sector)
                 {
                     lastDbItem = new DbItem()
                     {
@@ -125,156 +110,6 @@ namespace Data.Actions.Yahoo
             }
 
             DbHelper.ClearAndSaveToDbTable(dbData, "dbQ2024..ProfileYahoo_WA", "PolygonSymbol", "Date", "To",
-                "Name", "Sector", "LastUpdated", "YahooSymbol");
-
-            Logger.AddMessage($"Finished");
-
-
-            void ParseZip(string zipFileName, Dictionary<string, string> symbolXref, bool ignoreIfNotExistsInSymbolXref = false)
-            {
-                var cnt = 0;
-                using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
-                    foreach (var entry in zip.Entries.Where(a => a.Length > 0))
-                    {
-                        if (++cnt % 100 == 0)
-                            Logger.AddMessage($"Parse data from {Path.GetFileName(zipFileName)}. Parsed {cnt:N0} from {zip.Entries.Count:N0} items.");
-
-                        if (entry.Name.EndsWith("ACT_20230406035606.html") || entry.Name.EndsWith("AXP_20230410144059.html") ||
-                            entry.Name.EndsWith("OXM_20230429222332.html") || entry.Name.EndsWith("SONO_20230422222307.html") ||
-                            entry.Name.EndsWith("WAB_20230417233217.html") || entry.Name.EndsWith("ILMNV_20240624224841.html") ||
-                            entry.Name.EndsWith("THRX_20170509210723.html"))
-                        { // Bad files
-                            continue;
-                        }
-
-                        var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
-                        var polygonSymbol = ss[ss.Length - 2];
-                        if (ignoreIfNotExistsInSymbolXref && !symbolXref.ContainsKey(polygonSymbol))
-                            continue;
-
-                        var yahooSymbol = symbolXref == null ? polygonSymbol : symbolXref[polygonSymbol];
-                        var dateKey = DateTime.ParseExact(ss[ss.Length - 1],
-                            ss[ss.Length - 1].Length == 14 ? "yyyyMMddHHmmss" : "yyyyMMdd",
-                            CultureInfo.InvariantCulture);
-                        var content = entry.GetContentOfZipEntry();
-                        var tempItem = ParseHtmlContent(content, yahooSymbol);
-                        if (!string.IsNullOrEmpty(tempItem.Item4) && !(tempItem.Item3 ?? "").StartsWith("Other"))
-                            data.Add((tempItem.Item1, tempItem.Item2, tempItem.Item4, dateKey));
-                    }
-            }
-        }
-
-        public static void ParseAndSaveToDb()
-        {
-            var maxNameLen = 0;
-            var maxSectorLen = 0;
-
-            Logger.AddMessage($"Started");
-            var firstYahooSectorJsonData = YahooSectorLoader.ParseZip(FirstYahooSectorJsonFileName)
-                .ToDictionary(a => a.YahooSymbol, a => a);
-
-            var yahooSymbolXref = GetSymbolXref(false);
-            var polygonSymbolXref = yahooSymbolXref.ToDictionary(a => a.Value, a => a.Key);
-
-            var data = new List<(string, string, string, DateTime)>();
-            var folder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\Data";
-            var zipFiles = Directory.GetFiles(folder, "*.zip");
-            foreach (var zipFileName in zipFiles)
-            {
-                Logger.AddMessage($"Parse data from {Path.GetFileName(zipFileName)}");
-                ParseZip(zipFileName, null);
-            }
-
-            var wa_zipFileName = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short.zip";
-            Logger.AddMessage($"Parse data from {Path.GetFileName(wa_zipFileName)}");
-            ParseZip(wa_zipFileName, polygonSymbolXref, true);
-
-            Logger.AddMessage($"Save data to database");
-            var dbData = new List<DbItem>();
-            DbItem lastDbItem = null;
-            foreach (var item in data.OrderBy(a => a.Item1).ThenByDescending(a => a.Item4))
-            {
-                var symbol = item.Item1;
-                var name = item.Item2;
-                if (string.IsNullOrEmpty(name))
-                    name = null;
-                else if (name.EndsWith("(REIT)", StringComparison.InvariantCulture))
-                    name = name.Substring(0, name.Length - 6).Trim();
-                else if (name != null && name.EndsWith("(delisted)", StringComparison.InvariantCulture))
-                    name = name.Substring(0, name.Length - 10).Trim();
-
-                var sector = item.Item3;
-                if (string.IsNullOrEmpty(sector))
-                    throw new Exception("Check");
-
-                // Set blank name in lastDbItem
-                if (lastDbItem != null && string.IsNullOrEmpty(lastDbItem.Name) && lastDbItem.YahooSymbol == symbol &&
-                    lastDbItem.Sector == sector)
-                    lastDbItem.Name = name;
-
-                // Set blank name from lastDbItem value
-                if (string.IsNullOrEmpty(name) && lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
-                    lastDbItem.Sector == sector)
-                    name = lastDbItem.Name;
-
-                if (lastDbItem == null || lastDbItem.YahooSymbol != symbol ||
-                    !string.Equals(lastDbItem.Name, name, StringComparison.InvariantCultureIgnoreCase) ||
-                    lastDbItem.Sector != sector)
-                {
-                    var to = (DateTime?)item.Item4;
-
-                    if (lastDbItem == null || (firstYahooSectorJsonData.ContainsKey(symbol) && lastDbItem.YahooSymbol != symbol))
-                    {
-                        var firstItem = firstYahooSectorJsonData[symbol];
-                        if (sector == firstItem.Sector && (string.IsNullOrEmpty(firstItem.Name) ||
-                                                           string.IsNullOrEmpty(name) || string.Equals(firstItem.Name,
-                                                               name, StringComparison.InvariantCultureIgnoreCase)))
-                        {
-                            to = null;
-                        }
-                    }
-
-                    if (lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
-                        _validSectors.ContainsKey(lastDbItem.Sector) && !_validSectors.ContainsKey(sector) &&
-                        CsUtils.MyCalculateSimilarity(name, lastDbItem.Name) >= 0.7)
-                    {
-                        lastDbItem.Date = item.Item4.Date;
-                    }
-                    else if (lastDbItem != null && lastDbItem.YahooSymbol == symbol &&
-                        !_validSectors.ContainsKey(lastDbItem.Sector) && _validSectors.ContainsKey(sector) &&
-                        CsUtils.MyCalculateSimilarity(name, lastDbItem.Name) >= 0.7)
-                    {
-                        lastDbItem.Sector = sector;
-                        lastDbItem.Date = item.Item4.Date;
-                    }
-                    else
-                    {
-                        if (lastDbItem != null)
-                            dbData.Add(lastDbItem);
-                        lastDbItem = new DbItem()
-                        {
-                            PolygonSymbol = yahooSymbolXref[symbol],
-                            YahooSymbol = symbol,
-                            Name = name,
-                            Sector = sector,
-                            Date = item.Item4.Date,
-                            To = to,
-                            LastUpdated = item.Item4
-                        };
-                    }
-
-                    if (!string.IsNullOrEmpty(lastDbItem.Name) && maxNameLen < lastDbItem.Name.Length)
-                        maxNameLen = lastDbItem.Name.Length;
-                    if (maxSectorLen < lastDbItem.Sector.Length) maxSectorLen = lastDbItem.Sector.Length;
-                }
-                else
-                {
-                    lastDbItem.Date = item.Item4.Date;
-                }
-            }
-            dbData.Add(lastDbItem);
-
-            DbHelper.ClearAndSaveToDbTable(dbData, "dbQ2024..SectorYahoo", "PolygonSymbol", "Date", "To",
                 "Name", "Sector", "LastUpdated", "YahooSymbol");
 
             Logger.AddMessage($"Finished");
@@ -524,21 +359,6 @@ namespace Data.Actions.Yahoo
             {
                 if (string.IsNullOrEmpty(sector)) return (null, null, null, null);
 
-                /*// Correction of non-standard sectors
-                if (sector == "Industrial Goods" && (symbol == "BLDR" || symbol == "ECOL" || symbol == "GE" || symbol == "UTX")) sector = "Industrials";
-
-                if (sector == "Financial" && symbol == "MFA") sector = "Real Estate";
-                else if (sector == "Financial" && (symbol == "ALL" || symbol == "CBSH" || symbol == "ISTR" ||
-                                                   symbol == "NAVI" || symbol == "SFE" ||
-                                                   symbol == "ZTR")) sector = "Financial Services";
-
-                if (sector == "Services" && (symbol == "EAT" || symbol == "PZZA")) sector = "Consumer Cyclical";
-                else if (sector == "Services" && (symbol == "EROS" || symbol == "NFLX")) sector = "Communication Services";
-                else if (sector == "Services" && (symbol == "NSC" || symbol == "TTEK" || symbol == "ZNH")) sector = "Industrials";
-                else if (sector == "Consumer Goods" && symbol == "KNDI") sector = "Consumer Cyclical";
-                else if (sector == "Consumer Goods" && symbol == "AAPL") sector = "Technology";
-                else if (sector == "Consumer Goods" && (symbol == "BGS" || symbol == "HSY")) sector = "Consumer Defensive";*/
-
                 if (string.IsNullOrEmpty(name)) name = null;
                 if (string.IsNullOrEmpty(symbol))
                     throw new Exception("Check YahooProfile parser (AddSector method)");
@@ -596,33 +416,6 @@ namespace Data.Actions.Yahoo
             Helpers.Logger.AddMessage($"Downloaded {toDownload.Count:N0} items");
         }
 
-        private static async Task Download(ConcurrentDictionary<DownloadItem, Task<byte[]>> tasks)
-        {
-            foreach (var kvp in tasks)
-            {
-                try
-                {
-                    var data = await kvp.Value;
-                    // var htmlContent = HtmlHelper.RemoveUselessTags(System.Text.Encoding.UTF8.GetString(data));
-                    // File.WriteAllText(kvp.Key.Filename, htmlContent);
-                    File.WriteAllText(kvp.Key.Filename, System.Text.Encoding.UTF8.GetString(data));
-                    kvp.Key.StatusCode = HttpStatusCode.OK;
-                }
-                catch (Exception ex)
-                {
-                    if (ex is WebException exc && exc.Response is HttpWebResponse response &&
-                        (response.StatusCode == HttpStatusCode.InternalServerError ||
-                         response.StatusCode == HttpStatusCode.BadGateway))
-                    {
-                        kvp.Key.StatusCode = response.StatusCode;
-                        continue;
-                    }
-
-                    throw new Exception($"YahooSectorLoader: Error while download from {kvp.Key}. Error message: {ex.Message}");
-                }
-            }
-        }
-
         public static void DownloadListByLetter()
         {
             Logger.AddMessage($"Started");
@@ -657,24 +450,6 @@ namespace Data.Actions.Yahoo
                 }
             }
             Logger.AddMessage($"Finished");
-        }
-
-        private static Dictionary<string, string> GetSymbolXrefForUrlList()
-        {
-            var data = new Dictionary<string, string>();
-            using (var conn = new SqlConnection(Settings.DbConnectionString))
-            using (var cmd = conn.CreateCommand())
-            {
-                conn.Open();
-                cmd.CommandText = "SELECT DISTINCT symbol, YahooSymbol FROM dbQ2024..SymbolsPolygon " +
-                                  "WHERE isnull([To],'2099-12-31')>'2020-01-01' and IsTest is null " +
-                                  "and MyType not like 'ET%' and MyType not in ('RIGHT') and YahooSymbol is not null order by 1";
-                using (var rdr = cmd.ExecuteReader())
-                    while (rdr.Read())
-                        data.Add((string)rdr["YahooSymbol"], (string)rdr["symbol"]);
-            }
-
-            return data;
         }
 
         private static Dictionary<string, string> GetSymbolXref(bool notEtf)
