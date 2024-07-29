@@ -70,7 +70,6 @@ namespace Data.Actions.MorningStar
                 throw new Exception($"There are {badTickers.Count} bad morning star tickers. Please, check MorningStarMethod.GetMyTicker");
         }
 
-
         public static void ParseHtmlFiles(List<WA_MorningStarSector.DbItem> data)
         {
             var zipFileName = HtmlDataFolder + ".Short.zip";

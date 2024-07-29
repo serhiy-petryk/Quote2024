@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Data.Helpers;
-using Microsoft.Data.SqlClient;
 
 namespace Data.Actions.MorningStar
 {
@@ -61,6 +57,7 @@ namespace Data.Actions.MorningStar
                 }
         }
 
+        /* =====  OBSOOLETE  =======
         #region ========  Subclasses  =========
         public class MsSymbolToFileItem : WebClientExt.IDownloadToFileItem
         {
@@ -205,13 +202,13 @@ namespace Data.Actions.MorningStar
                         item.ExchangeForUrl = item.Exchange == "XNAS" ? "XNYS" : "XNAS";
                         item.StatusCode = null;
                     }
-                    /*if (!string.IsNullOrEmpty(secondMsSymbol) && item.MsSymbol== secondMsSymbol && item.Exchange != item.ExchangeForUrl && (item.Exchange == "XNAS" || item.Exchange == "XNYS"))
-                    {
-                        item.ExchangeForUrl = item.Exchange == "XNAS" ? "XNYS" : "XNAS";
-                        item.MsSymbol = MorningStarCommon.GetMorningStarProfileTicker(item.PolygonSymbol);
-                        item.StatusCode = null;
-                        data.Add(item);
-                    }*/
+                    //if (!string.IsNullOrEmpty(secondMsSymbol) && item.MsSymbol== secondMsSymbol && item.Exchange != item.ExchangeForUrl && (item.Exchange == "XNAS" || item.Exchange == "XNYS"))
+                    //{
+                      //  item.ExchangeForUrl = item.Exchange == "XNAS" ? "XNYS" : "XNAS";
+                        //item.MsSymbol = MorningStarCommon.GetMorningStarProfileTicker(item.PolygonSymbol);
+//                        item.StatusCode = null;
+  //                      data.Add(item);
+    //                }
                 }
                 else if (File.Exists(item.Filename))
                 {
@@ -282,6 +279,7 @@ namespace Data.Actions.MorningStar
 
             return data;
         }
+        */
 
         #region ===========  Json SubClasses  ===========
         public class cRoot
@@ -320,7 +318,5 @@ namespace Data.Actions.MorningStar
             public string value;
         }
         #endregion
-
-
     }
 }
