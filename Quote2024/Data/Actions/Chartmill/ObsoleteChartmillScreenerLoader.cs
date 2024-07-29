@@ -9,7 +9,7 @@ using Data.Helpers;
 
 namespace Data.Actions.Chartmill
 {
-    public class ChartmillScreenerLoader
+    public class ObsoleteChartmillScreenerLoader
     {
         private static CookieCollection cookies;
 

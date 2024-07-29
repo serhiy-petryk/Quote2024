@@ -149,7 +149,7 @@ namespace Quote2024.Forms
 
             // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
             // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarSector.Start);
+            await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarSector.Start);
 
 
             // await Task.Factory.StartNew(()=>Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\WebArchive.Wikipedia.Indices.zip"));

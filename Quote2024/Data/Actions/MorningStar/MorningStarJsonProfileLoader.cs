@@ -12,11 +12,54 @@ using Microsoft.Data.SqlClient;
 
 namespace Data.Actions.MorningStar
 {
-    public class ObsoleteMorningStarJsonProfileLoader
+    public class MorningStarJsonProfileLoader
     {
         private const string UrlTemplate = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
         private const string FileTemplate = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}\MSProfile_{1}_{2}.json";
         private const string FolderTemplate = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}";
+
+        public static void ParseJsonZipAll(List<WA_MorningStarSector.DbItem> data)
+        {
+            var folder = @"E:\Quote\WebData\Symbols\MorningStar\Data";
+            var files = Directory.GetFiles(folder, "*json_*.zip");
+            foreach (var file in files)
+                ParseJsonZip(file, data);
+        }
+
+        private static void ParseJsonZip(string zipFileName, List<WA_MorningStarSector.DbItem> data)
+        {
+            var cnt = 0;
+            var dateKey = DateTime.ParseExact(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1], "yyyyMMdd",
+                CultureInfo.InvariantCulture);
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                {
+                    if (++cnt % 100 == 0)
+                        Logger.AddMessage(
+                            $"Parse data from {Path.GetFileName(zipFileName)}. Parsed {cnt:N0} from {zip.Entries.Count:N0} items.");
+
+                    var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
+                    var polygonSymbol = ss[ss.Length - 1];
+                    // if (data.ContainsKey(polygonSymbol)) // May be the same tickers if exchanges are different
+                       // continue;
+
+                    var msSymbol = MorningStarCommon.GetMorningStarProfileTicker(polygonSymbol);
+                    var oo = ZipUtils.DeserializeZipEntry<cRoot>(entry);
+                    var sector = oo.components?.profile?.payload?.dataPoints?.sector?.value;
+                    var fileTicker = oo.page?.ticker;
+                    if (string.IsNullOrEmpty(fileTicker) || string.IsNullOrEmpty(sector))
+                        continue;
+
+                    var item = new WA_MorningStarSector.DbItem(fileTicker, oo.page.DbName, sector, entry.LastWriteTime.DateTime);
+                    if (item.PolygonSymbol.Contains('^'))
+                    {
+
+                    }
+                    if (string.IsNullOrEmpty(item.Name))
+                        throw new Exception("Check MorningStar profile json parser");
+                    data.Add(item);
+                }
+        }
 
         #region ========  Subclasses  =========
         public class MsSymbolToFileItem : WebClientExt.IDownloadToFileItem
@@ -127,8 +170,12 @@ namespace Data.Actions.MorningStar
 
                     var dbItem = new DbItem
                     {
-                        PolygonSymbol = polygonSymbol, MsSymbol = fileTicker, Date = dateKey, Name = oo.page.DbName,
-                        Sector = sector, TimeStamp = entry.LastWriteTime.DateTime
+                        PolygonSymbol = polygonSymbol,
+                        MsSymbol = fileTicker,
+                        Date = dateKey,
+                        Name = oo.page.DbName,
+                        Sector = sector,
+                        TimeStamp = entry.LastWriteTime.DateTime
                     };
                     data.Add(polygonSymbol, dbItem);
                 }

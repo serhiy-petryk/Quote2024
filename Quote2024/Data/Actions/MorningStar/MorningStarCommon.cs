@@ -17,8 +17,14 @@ namespace Data.Actions.MorningStar
 
         public static string[] Exchanges = new[] { "ARCX", "BATS", "XASE", "XNAS", "XNYS" };
 
-        public static string GetSectorName(string sectorId) =>
-            CultureInfo.InvariantCulture.TextInfo.ToTitleCase(sectorId.Replace("-stocks", "").Replace("-", " "));
+        public static string GetSectorName(string sectorId)
+        {
+            var sector = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(sectorId.Replace("-stocks", "").Replace("-", " "));
+            if (sector == "Industrial") sector = "Industrials";
+            else if (sector == "Utility") sector = "Utilities";
+
+            return sector;
+        }
 
         /* Need to adjust
          public static string GetWebMorningStarTicker(string myTicker, string exchange)

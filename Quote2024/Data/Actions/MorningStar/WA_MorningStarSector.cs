@@ -12,7 +12,17 @@ namespace Data.Actions.MorningStar
             Logger.AddMessage($"Started");
 
             var data = new List<DbItem>();
+
+            // MorningStar screener json files (period: 2024-02/2024-06) (Screener\MorningStar\Data) (https://www.morningstar.com/stocks/<Sector>)
+            WA_MorningStarScreenerLoader.ParseJson2024AllFiles(data);
+
+            // MorningStar profile json files (period: 2024-06/2024-07) (Symbols\MorningStar\Data) (https://www.morningstar.com/stocks/<Exchange>/<Ticker>)
+            MorningStarJsonProfileLoader.ParseJsonZipAll(data);
+
+            // MorningStar screener web archive files (Screener\MorningStar\WA_Data.Short.zip) (https://www.morningstar.com/stocks/<Sector>)
             WA_MorningStarScreenerLoader.ParseHtmlFiles(data);
+
+            // MorningStar profile web archive files (Symbols\MorningStar\WA_Profile.Short.zip) (https://www.morningstar.com/stocks/<Exchange>/<Ticker>)
             WA_MorningStarProfile.ParseHtmlFiles(data);
 
             var dbData = new List<DbItem>();
@@ -57,7 +67,6 @@ namespace Data.Actions.MorningStar
             public DateTime Date;
             public DateTime To;
             public DateTime LastUpdated;
-            public string source;
 
             public DbItem(string symbol, string name, string sector, DateTime timestamp)
             {

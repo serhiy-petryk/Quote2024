@@ -16,6 +16,60 @@ namespace Data.Actions.MorningStar
         private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=morningstar.com/{0}&matchType=prefix&limit=100000";
         private const string ListDataFolder = @"E:\Quote\WebData\Screener\MorningStar\WA_List.2024-07";
         private const string HtmlDataFolder = @"E:\Quote\WebData\Screener\MorningStar\WA_Data";
+        private const string JsonDataFolder2024 = @"E:\Quote\WebData\Screener\MorningStar\Data";
+
+        public static void ParseJson2024AllFiles(List<WA_MorningStarSector.DbItem> data)
+        {
+            var files = Directory.GetFiles(JsonDataFolder2024, "*.zip").OrderBy(a => a).ToArray();
+            foreach (var file in files)
+                ParseJson2024Files(file, data);
+        }
+
+        private static void ParseJson2024Files(string zipFileName, List<WA_MorningStarSector.DbItem> data)
+        {
+            var cnt = 0;
+            var dateKey = DateTime.ParseExact(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1], "yyyyMMdd",
+                CultureInfo.InvariantCulture);
+            // var data = new Dictionary<string, Dictionary<string, WA_MorningStarSector.DbItem>>();
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                {
+                    if (++cnt % 100 == 0)
+                        Logger.AddMessage(
+                            $"Parse data from {Path.GetFileName(zipFileName)}. Parsed {cnt:N0} from {zip.Entries.Count:N0} items.");
+
+                    var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
+                    var sector = MorningStarCommon.GetSectorName(ss[ss.Length - 2]);
+
+                    var oo = ZipUtils.DeserializeZipEntry<cRoot>(entry);
+                    foreach (var item in oo.results)
+                    {
+                        var exchange = item.meta.exchange;
+                        var originalSymbol = item.meta.ticker;
+                        var name = item.fields.name.value;
+
+                        var symbol = originalSymbol;
+                        if (string.IsNullOrWhiteSpace(symbol) && name == "Nano Labs Ltd Ordinary Shares - Class A")
+                            symbol = "NA";
+
+                        if (!MorningStarCommon.Exchanges.Any(exchange.Contains)) continue;
+                        if (symbol == "SANP1") continue;
+
+                        if (string.IsNullOrWhiteSpace(symbol))
+                            throw new Exception($"No ticker code. Please, check. Security name is {name}. File: {entry.Name}");
+                        if (string.IsNullOrWhiteSpace(name))
+                            throw new Exception($"Name of '{originalSymbol}' ticker is blank. Please, adjust structure (Bfr_)ScreenerMorningStar tables in database. File: {entry.Name}");
+
+                        var dbItem = new WA_MorningStarSector.DbItem(symbol, name, sector, entry.LastWriteTime.DateTime);
+                        data.Add(dbItem);
+                    }
+                }
+
+            var badTickers = MorningStarCommon.BadTickers;
+            if (badTickers.Count > 0)
+                throw new Exception($"There are {badTickers.Count} bad morning star tickers. Please, check MorningStarMethod.GetMyTicker");
+        }
+
 
         public static void ParseHtmlFiles(List<WA_MorningStarSector.DbItem> data)
         {
@@ -33,11 +87,7 @@ namespace Data.Actions.MorningStar
                     var ss = Path.GetFileNameWithoutExtension(entry.Name).Split('_');
                     var timeKey = ss[1];
                     var timestamp = DateTime.ParseExact(timeKey, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
-                    var sector =
-                        CultureInfo.InvariantCulture.TextInfo.ToTitleCase(
-                            ss[0].Replace("-stocks", "").Replace('-', ' '));
-                    if (sector == "Industrial") sector = "Industrials";
-                    else if (sector == "Utility") sector = "Utilities";
+                    var sector = MorningStarCommon.GetSectorName(ss[0]);
 
                     var rows = 0;
                     var ss1 = content.Split("<a href=\"/web/" + timeKey + "/https://www.morningstar.com/stocks/");
@@ -172,5 +222,58 @@ namespace Data.Actions.MorningStar
         }
         #endregion
 
+        #region ============  Json classes  ==============
+
+        private class DbItem
+        {
+            public string Symbol;
+            public DateTime Date;
+            public string Exchange;
+            public string Sector;
+            public string Name;
+            public DateTime TimeStamp;
+        }
+
+        private class cRoot
+        {
+            public cPagination pagination;
+            public cResult[] results;
+        }
+
+        private class cPagination
+        {
+            public int count;
+            public string page;
+            public int totalCount;
+            public int totalPages;
+        }
+
+        private class cResult
+        {
+            public cMeta meta;
+            public cFields fields;
+        }
+
+        private class cMeta
+        {
+            public string securityID;
+            public string performanceID;
+            public string companyID;
+            public string universe;
+            public string exchange;
+            public string ticker;
+        }
+
+        private class cFields
+        {
+            public cStringValue name;
+            public cStringValue ticker;
+        }
+
+        private class cStringValue
+        {
+            public string value;
+        }
+        #endregion
     }
 }
