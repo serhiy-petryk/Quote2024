@@ -206,7 +206,7 @@ namespace Data.Actions.Yahoo
             Volume = long.Parse(ss[6].Trim(), CultureInfo.InvariantCulture);
             AdjClose = Decimal.Parse(ss[5].Trim(), CultureInfo.InvariantCulture);
         }
-        internal DayYahoo(string symbol, cRow row)
+        internal DayYahoo(string symbol, cNasdaqRow row)
         {
             Symbol = symbol;
             Date = DateTime.Parse(row.date.Trim(), CultureInfo.InvariantCulture);
@@ -226,31 +226,31 @@ namespace Data.Actions.Yahoo
     #region =========  Nasdaq Json classes  ============
     internal class cNasdaqRoot
     {
-        public cData data;
+        public cNasdaqData data;
         public object message;
-        public cStatus status;
+        public cNasdaqStatus status;
     }
 
-    internal class cStatus
+    internal class cNasdaqStatus
     {
         public int rCode;
         public object bCodeMessage;
         public string developerMessage;
     }
 
-    internal class cData
+    internal class cNasdaqData
     {
         public string symbol;
         public int totalRecords;
-        public cTradesTable tradesTable;
+        public cMasdaqTradesTable tradesTable;
     }
 
-    internal class cTradesTable
+    internal class cMasdaqTradesTable
     {
-        public cRow[] rows;
+        public cNasdaqRow[] rows;
     }
 
-    internal class cRow
+    internal class cNasdaqRow
     {
         public string close;
         public string date;
