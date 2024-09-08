@@ -19,6 +19,10 @@ namespace Data.Actions.Yahoo
         private const string UrlTemplateForTradingDaysOnly = "https://query2.finance.yahoo.com/v8/finance/chart/{2}?period1={0}&period2={1}&interval=1d&events=history&includePrePost=false";
         private static readonly string[] Symbols = new[] { "^DJI", "^GSPC" };
 
+        // https://api.nasdaq.com/api/quote/INDU/historical?assetclass=index&fromdate=2024-08-08&limit=9999&todate=2024-09-08
+        private static readonly string NasdaqUrlTemplate = @"https://api.nasdaq.com/api/quote/{0}/historical?assetclass=index&fromdate={1}&limit=9999&todate={2}";
+        private static readonly Dictionary<string, string> NasdaqSymbols = new Dictionary<string, string> { { "INDU", "^DJI" }, { "SPX", "^GSPC" } };
+
         public static DateTime[] GetTradingDays(Action<string> fnShowStatus, DateTime toDate, int days)
         {
             Logger.AddMessage($"Started", fnShowStatus);
@@ -31,6 +35,60 @@ namespace Data.Actions.Yahoo
             Logger.AddMessage($"!Finished", fnShowStatus);
 
             return dates.Select(a => a.Date).OrderByDescending(a => a).ToArray();
+        }
+
+        public static void NasdaqStart()
+        {
+            Logger.AddMessage($"Started");
+
+            var fromDate = new DateTime(2000, 1, 1);
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+                cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
+                var o = cmd.ExecuteScalar();
+                if (o is DateTime) fromDate = (DateTime)o;
+            }
+
+            var data = new List<DayYahoo>();
+            foreach (var symbol in NasdaqSymbols.Keys)
+                NasdaqDownloadData(symbol, fromDate, DateTime.Today.AddDays(-1),  data);
+
+            if (data.Count > 0)
+            {
+                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
+                    "Close", "Volume", "AdjClose");
+                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
+                                   "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
+                                   "from dbQ2023Others..Bfr_DayYahooIndexes a " +
+                                   "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
+                                   "where b.Symbol is null");
+
+                Logger.AddMessage($"Update trading days in dbQ2024 database");
+                DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
+            }
+
+            Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
+        }
+
+        private static void NasdaqDownloadData(string symbol, DateTime fromDate, DateTime toDate, List<DayYahoo> data)
+        {
+            // Download data
+            Logger.AddMessage($"Download data for {symbol}");
+            var url = string.Format(NasdaqUrlTemplate, symbol, fromDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                toDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+            var o = WebClientExt.GetToBytes(url, false, true);
+            if (o.Item3 != null)
+                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
+
+            var oo = ZipUtils.DeserializeBytes<cNasdaqRoot>(o.Item1);
+
+            foreach (var row in oo.data.tradesTable.rows)
+            {
+                var item = new DayYahoo(NasdaqSymbols[symbol], row);
+                data.Add(item);
+            }
         }
 
         public static void Start()
@@ -47,7 +105,7 @@ namespace Data.Actions.Yahoo
                 if (o is DateTime) maxDate = (DateTime)o;
             }
 
-            var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30))/1000;
+            var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30)) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1;
             var data = new List<DayYahoo>();
             foreach (var symbol in Symbols)
@@ -65,7 +123,7 @@ namespace Data.Actions.Yahoo
 
                 // Logger.AddMessage($"Update trading days in dbQ2023Others database");
                 // DbHelper.RunProcedure("dbQ2023Others..pRefreshTradingDays");
-                
+
                 Logger.AddMessage($"Update trading days in dbQ2024 database");
                 DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
             }
@@ -148,8 +206,61 @@ namespace Data.Actions.Yahoo
             Volume = long.Parse(ss[6].Trim(), CultureInfo.InvariantCulture);
             AdjClose = Decimal.Parse(ss[5].Trim(), CultureInfo.InvariantCulture);
         }
+        internal DayYahoo(string symbol, cRow row)
+        {
+            Symbol = symbol;
+            Date = DateTime.Parse(row.date.Trim(), CultureInfo.InvariantCulture);
+            Open = Decimal.Parse(row.open, CultureInfo.InvariantCulture);
+            High = Decimal.Parse(row.high, CultureInfo.InvariantCulture);
+            Low = Decimal.Parse(row.low, CultureInfo.InvariantCulture);
+            Close = Decimal.Parse(row.close, CultureInfo.InvariantCulture);
+            AdjClose = Decimal.Parse(row.close, CultureInfo.InvariantCulture);
+
+            if (row.volume != "--")
+                Volume = long.Parse(row.volume, NumberStyles.AllowThousands, CultureInfo.InvariantCulture);
+        }
     }
 
     #endregion
+
+    #region =========  Nasdaq Json classes  ============
+    internal class cNasdaqRoot
+    {
+        public cData data;
+        public object message;
+        public cStatus status;
+    }
+
+    internal class cStatus
+    {
+        public int rCode;
+        public object bCodeMessage;
+        public string developerMessage;
+    }
+
+    internal class cData
+    {
+        public string symbol;
+        public int totalRecords;
+        public cTradesTable tradesTable;
+    }
+
+    internal class cTradesTable
+    {
+        public cRow[] rows;
+    }
+
+    internal class cRow
+    {
+        public string close;
+        public string date;
+        public string high;
+        public string low;
+        public string open;
+        public string volume;
+    }
+
+    #endregion
+
 }
 
