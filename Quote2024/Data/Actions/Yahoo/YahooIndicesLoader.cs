@@ -26,6 +26,7 @@ namespace Data.Actions.Yahoo
         // https://query2.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=1725321600&period2=1725667200&interval=1d&events=history
         private const string YahooMinuteUrlTemplate = "https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1d&events=history";
 
+        #region  =========  RealTime  ==========
         public static DateTime[] GetTradingDays(Action<string> fnShowStatus, DateTime toDate, int days)
         {
             Logger.AddMessage($"Started", fnShowStatus);
@@ -33,49 +34,42 @@ namespace Data.Actions.Yahoo
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddDays(-days + 1)) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(toDate.Date.AddHours(23)) / 1000;
             var dates = new List<DateTime>();
-            DownloadData(Symbols[0], fromUnixSeconds, toUnixSeconds, dates);
+            RealTimeDownloadData(Symbols[0], fromUnixSeconds, toUnixSeconds, dates);
 
             Logger.AddMessage($"!Finished", fnShowStatus);
 
             return dates.Select(a => a.Date).OrderByDescending(a => a).ToArray();
         }
 
+        private static void RealTimeDownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DateTime> dates)
+        {
+            // Download data
+            Logger.AddMessage($"Download data for {symbol}");
+            var url = string.Format(UrlTemplateForTradingDaysOnly, fromUnixSeconds, toUnixSeconds, symbol);
+            var o = WebClientExt.GetToBytes(url, false);
+            if (o.Item3 != null)
+                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
+
+            var content = Encoding.UTF8.GetString(o.Item1).Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
+            var oo = ZipUtils.DeserializeString<Models.MinuteYahoo>(content);
+
+            var aa1 = oo.chart.result[0].timestamp.Select(a => TimeHelper.GetEstDateTimeFromUnixMilliseconds(a * 1000));
+            dates.AddRange(aa1);
+        }
+        #endregion
+
+        #region ========  Yahoo Minute  ========
         public static void YahooMinuteStart()
         {
-            Logger.AddMessage($"Started");
 
-            var maxDate = new DateTime(2000, 1, 1);
-            using (var conn = new SqlConnection(Settings.DbConnectionString))
-            using (var cmd = conn.CreateCommand())
-            {
-                conn.Open();
-                cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
-                var o = cmd.ExecuteScalar();
-                if (o is DateTime) maxDate = (DateTime)o;
-            }
-
+            var maxDate = GetStartDate();
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today.AddDays(-1)) / 1000 +
                                 Convert.ToInt64(Settings.MarketStart.TotalSeconds);
             var data = new List<DayYahoo>();
             foreach (var symbol in Symbols)
                 YahooMinuteDownloadData(symbol, fromUnixSeconds, toUnixSeconds, data);
-
-            if (data.Count > 0)
-            {
-                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
-                    "Close", "Volume", "AdjClose");
-                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
-                                   "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
-                                   "from dbQ2023Others..Bfr_DayYahooIndexes a " +
-                                   "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
-                                   "where b.Symbol is null");
-
-                Logger.AddMessage($"Update trading days in dbQ2024 database");
-                DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
-            }
-
-            Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
+            SaveData(data);
         }
 
         private static void YahooMinuteDownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DayYahoo> data)
@@ -103,40 +97,16 @@ namespace Data.Actions.Yahoo
                 data.Add(item);
             }
         }
+        #endregion
 
+        #region =========  Nasdaq =========
         public static void NasdaqStart()
         {
-            Logger.AddMessage($"Started");
-
-            var fromDate = new DateTime(2000, 1, 1);
-            using (var conn = new SqlConnection(Settings.DbConnectionString))
-            using (var cmd = conn.CreateCommand())
-            {
-                conn.Open();
-                cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
-                var o = cmd.ExecuteScalar();
-                if (o is DateTime) fromDate = (DateTime)o;
-            }
-
+            var fromDate = GetStartDate();
             var data = new List<DayYahoo>();
             foreach (var symbol in NasdaqSymbols.Keys)
                 NasdaqDownloadData(symbol, fromDate, DateTime.Today.AddDays(-1),  data);
-
-            if (data.Count > 0)
-            {
-                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
-                    "Close", "Volume", "AdjClose");
-                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
-                                   "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
-                                   "from dbQ2023Others..Bfr_DayYahooIndexes a " +
-                                   "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
-                                   "where b.Symbol is null");
-
-                Logger.AddMessage($"Update trading days in dbQ2024 database");
-                DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
-            }
-
-            Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
+            SaveData(data);
         }
 
         private static void NasdaqDownloadData(string symbol, DateTime fromDate, DateTime toDate, List<DayYahoo> data)
@@ -157,45 +127,19 @@ namespace Data.Actions.Yahoo
                 data.Add(item);
             }
         }
+        #endregion
 
         public static void Start()
         {
             Logger.AddMessage($"Started");
 
-            var maxDate = new DateTime(2000, 1, 1);
-            using (var conn = new SqlConnection(Settings.DbConnectionString))
-            using (var cmd = conn.CreateCommand())
-            {
-                conn.Open();
-                cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
-                var o = cmd.ExecuteScalar();
-                if (o is DateTime) maxDate = (DateTime)o;
-            }
-
+            var maxDate = GetStartDate();
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30)) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1;
             var data = new List<DayYahoo>();
             foreach (var symbol in Symbols)
                 DownloadData(symbol, fromUnixSeconds, toUnixSeconds, data);
-
-            if (data.Count > 0)
-            {
-                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
-                    "Close", "Volume", "AdjClose");
-                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
-                                   "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
-                                   "from dbQ2023Others..Bfr_DayYahooIndexes a " +
-                                   "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
-                                   "where b.Symbol is null");
-
-                // Logger.AddMessage($"Update trading days in dbQ2023Others database");
-                // DbHelper.RunProcedure("dbQ2023Others..pRefreshTradingDays");
-
-                Logger.AddMessage($"Update trading days in dbQ2024 database");
-                DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
-            }
-
-            Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
+            SaveData(data);
         }
 
         private static void DownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DayYahoo> data)
@@ -233,20 +177,41 @@ namespace Data.Actions.Yahoo
             }
         }
 
-        private static void DownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DateTime> dates)
+        private static DateTime GetStartDate()
         {
-            // Download data
-            Logger.AddMessage($"Download data for {symbol}");
-            var url = string.Format(UrlTemplateForTradingDaysOnly, fromUnixSeconds, toUnixSeconds, symbol);
-            var o = WebClientExt.GetToBytes(url, false);
-            if (o.Item3 != null)
-                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
+            Logger.AddMessage($"Started");
 
-            var content = Encoding.UTF8.GetString(o.Item1).Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
-            var oo = ZipUtils.DeserializeString<Models.MinuteYahoo>(content);
+            var maxDate = new DateTime(2000, 1, 1);
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+                cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
+                var o = cmd.ExecuteScalar();
+                if (o is DateTime) maxDate = (DateTime)o;
+            }
 
-            var aa1 = oo.chart.result[0].timestamp.Select(a=>TimeHelper.GetEstDateTimeFromUnixMilliseconds(a*1000));
-            dates.AddRange(aa1);
+            return maxDate;
+        }
+
+        private static void SaveData(List<DayYahoo> data)
+        {
+            if (data.Count > 0)
+            {
+                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
+                    "Close", "Volume", "AdjClose");
+                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
+                                    "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
+                                    "from dbQ2023Others..Bfr_DayYahooIndexes a " +
+                                    "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
+                                    "where b.Symbol is null");
+
+                Logger.AddMessage($"Update trading days in dbQ2024 database");
+                DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
+            }
+
+            Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
+
         }
     }
 
