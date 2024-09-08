@@ -23,6 +23,9 @@ namespace Data.Actions.Yahoo
         private static readonly string NasdaqUrlTemplate = @"https://api.nasdaq.com/api/quote/{0}/historical?assetclass=index&fromdate={1}&limit=9999&todate={2}";
         private static readonly Dictionary<string, string> NasdaqSymbols = new Dictionary<string, string> { { "INDU", "^DJI" }, { "SPX", "^GSPC" } };
 
+        // https://query2.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=1725321600&period2=1725667200&interval=1d&events=history
+        private const string YahooMinuteUrlTemplate = "https://query2.finance.yahoo.com/v8/finance/chart/{0}?period1={1}&period2={2}&interval=1d&events=history";
+
         public static DateTime[] GetTradingDays(Action<string> fnShowStatus, DateTime toDate, int days)
         {
             Logger.AddMessage($"Started", fnShowStatus);
@@ -35,6 +38,70 @@ namespace Data.Actions.Yahoo
             Logger.AddMessage($"!Finished", fnShowStatus);
 
             return dates.Select(a => a.Date).OrderByDescending(a => a).ToArray();
+        }
+
+        public static void YahooMinuteStart()
+        {
+            Logger.AddMessage($"Started");
+
+            var maxDate = new DateTime(2000, 1, 1);
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+                cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
+                var o = cmd.ExecuteScalar();
+                if (o is DateTime) maxDate = (DateTime)o;
+            }
+
+            var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate) / 1000;
+            var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today.AddDays(-1)) / 1000 +
+                                Convert.ToInt64(Settings.MarketStart.TotalSeconds);
+            var data = new List<DayYahoo>();
+            foreach (var symbol in Symbols)
+                YahooMinuteDownloadData(symbol, fromUnixSeconds, toUnixSeconds, data);
+
+            if (data.Count > 0)
+            {
+                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
+                    "Close", "Volume", "AdjClose");
+                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
+                                   "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
+                                   "from dbQ2023Others..Bfr_DayYahooIndexes a " +
+                                   "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
+                                   "where b.Symbol is null");
+
+                Logger.AddMessage($"Update trading days in dbQ2024 database");
+                DbHelper.RunProcedure("dbQ2024..pRefreshTradingDays");
+            }
+
+            Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
+        }
+
+        private static void YahooMinuteDownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DayYahoo> data)
+        {
+            // Download data
+            Logger.AddMessage($"Download data for {symbol}");
+            var url = string.Format(YahooMinuteUrlTemplate, symbol, fromUnixSeconds, toUnixSeconds);
+            var o = WebClientExt.GetToBytes(url, false);
+            if (o.Item3 != null)
+                throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
+
+            var oo = ZipUtils.DeserializeBytes<cYahooMinuteRoot>(o.Item1);
+
+            var quotes = oo.chart.result[0].indicators.quote[0];
+            for (var k = 0; k < oo.chart.result[0].timestamp.Length; k++)
+            {
+                var dataSymbol = oo.chart.result[0].meta.symbol;
+                var date = TimeHelper.GetEstDateTimeFromUnixMilliseconds(oo.chart.result[0].timestamp[k] * 1000).Date;
+                var open = quotes.open[k];
+                var high = quotes.high[k];
+                var low = quotes.low[k];
+                var close = quotes.close[k];
+                var volume = quotes.volume[k];
+                var item = new DayYahoo(symbol, date, open, high, low, close, volume);
+                data.Add(item);
+            }
         }
 
         public static void NasdaqStart()
@@ -188,33 +255,43 @@ namespace Data.Actions.Yahoo
     {
         public string Symbol;
         public DateTime Date;
-        public decimal Open;
-        public decimal High;
-        public decimal Low;
-        public decimal Close;
+        public float Open;
+        public float High;
+        public float Low;
+        public float Close;
         public long Volume;
-        public decimal AdjClose;
+        public float AdjClose => Close;
+
+        public DayYahoo(string symbol, DateTime date, float open, float high, float low, float close, long volume)
+        {
+            Symbol = symbol;
+            Date = date;
+            Open = open;
+            High = high;
+            Low = low;
+            Close = close;
+            Volume = volume;
+        }
 
         public DayYahoo(string symbol, string[] ss)
         {
             Symbol = symbol;
             Date = DateTime.Parse(ss[0].Trim(), CultureInfo.InvariantCulture);
-            Open = Decimal.Parse(ss[1].Trim(), CultureInfo.InvariantCulture);
-            High = Decimal.Parse(ss[2].Trim(), CultureInfo.InvariantCulture);
-            Low = Decimal.Parse(ss[3].Trim(), CultureInfo.InvariantCulture);
-            Close = Decimal.Parse(ss[4].Trim(), CultureInfo.InvariantCulture);
+            Open = Single.Parse(ss[1].Trim(), CultureInfo.InvariantCulture);
+            High = Single.Parse(ss[2].Trim(), CultureInfo.InvariantCulture);
+            Low = Single.Parse(ss[3].Trim(), CultureInfo.InvariantCulture);
+            Close = Single.Parse(ss[4].Trim(), CultureInfo.InvariantCulture);
             Volume = long.Parse(ss[6].Trim(), CultureInfo.InvariantCulture);
-            AdjClose = Decimal.Parse(ss[5].Trim(), CultureInfo.InvariantCulture);
         }
         internal DayYahoo(string symbol, cNasdaqRow row)
         {
             Symbol = symbol;
             Date = DateTime.Parse(row.date.Trim(), CultureInfo.InvariantCulture);
-            Open = Decimal.Parse(row.open, CultureInfo.InvariantCulture);
-            High = Decimal.Parse(row.high, CultureInfo.InvariantCulture);
-            Low = Decimal.Parse(row.low, CultureInfo.InvariantCulture);
-            Close = Decimal.Parse(row.close, CultureInfo.InvariantCulture);
-            AdjClose = Decimal.Parse(row.close, CultureInfo.InvariantCulture);
+            Open = Single.Parse(row.open, CultureInfo.InvariantCulture);
+            High = Single.Parse(row.high, CultureInfo.InvariantCulture);
+            Low = Single.Parse(row.low, CultureInfo.InvariantCulture);
+            Close = Single.Parse(row.close, CultureInfo.InvariantCulture);
+            // AdjClose = Decimal.Parse(row.close, CultureInfo.InvariantCulture);
 
             if (row.volume != "--")
                 Volume = long.Parse(row.volume, NumberStyles.AllowThousands, CultureInfo.InvariantCulture);
@@ -262,5 +339,54 @@ namespace Data.Actions.Yahoo
 
     #endregion
 
+    #region ===============  YahooMinute json classes  ==================
+    public class cYahooMinuteRoot
+    {
+        public cYahooMinuteChart chart { get; set; }
+    }
+
+    public class cYahooMinuteChart
+    {
+        public cYahooMinuteResult[] result { get; set; }
+    }
+
+    public class cYahooMinuteResult
+    {
+        public cYahooMinuteMeta meta { get; set; }
+        public long[] timestamp { get; set; }
+        public cYahooMinuteIndicators indicators { get; set; }
+    }
+
+    public class cYahooMinuteMeta
+    {
+        public string currency { get; set; }
+        public string symbol { get; set; }
+        public string exchangeName { get; set; }
+        public string instrumentType { get; set; }
+        // public cTradingPeriod[,] tradingPeriods { get; set; }
+    }
+
+    public class cYahooMinuteIndicators
+    {
+        public cYahooMinuteQuote[] quote { get; set; }
+    }
+
+    public class cYahooMinuteQuote
+    {
+        public float[] open { get; set; }
+        public float[] high { get; set; }
+        public float[] low { get; set; }
+        public float[] close { get; set; }
+        public long[] volume { get; set; }
+    }
+
+    public class cTradingPeriod
+    {
+        public string TimeZone { get; set; }
+        public long Start { get; set; }
+        public long End { get; set; }
+        public long GmtOffset { get; set; }
+    }
+    #endregion
 }
 
