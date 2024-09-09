@@ -61,11 +61,9 @@ namespace Data.Actions.Yahoo
         #region ========  Yahoo Minute  ========
         public static void YahooMinuteStart()
         {
-
             var maxDate = GetStartDate();
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate) / 1000;
-            var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today.AddDays(-1)) / 1000 +
-                                Convert.ToInt64(Settings.MarketStart.TotalSeconds);
+            var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1; // last second of previous day
             var data = new List<DayYahoo>();
             foreach (var symbol in Symbols)
                 YahooMinuteDownloadData(symbol, fromUnixSeconds, toUnixSeconds, data);
@@ -74,7 +72,6 @@ namespace Data.Actions.Yahoo
 
         private static void YahooMinuteDownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DayYahoo> data)
         {
-            // Download data
             Logger.AddMessage($"Download data for {symbol}");
             var url = string.Format(YahooMinuteUrlTemplate, symbol, fromUnixSeconds, toUnixSeconds);
             var o = WebClientExt.GetToBytes(url, false);
@@ -111,7 +108,6 @@ namespace Data.Actions.Yahoo
 
         private static void NasdaqDownloadData(string symbol, DateTime fromDate, DateTime toDate, List<DayYahoo> data)
         {
-            // Download data
             Logger.AddMessage($"Download data for {symbol}");
             var url = string.Format(NasdaqUrlTemplate, symbol, fromDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 toDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
@@ -131,8 +127,6 @@ namespace Data.Actions.Yahoo
 
         public static void Start()
         {
-            Logger.AddMessage($"Started");
-
             var maxDate = GetStartDate();
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate.AddDays(-30)) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1;
@@ -144,16 +138,11 @@ namespace Data.Actions.Yahoo
 
         private static void DownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DayYahoo> data)
         {
-            // Download data
             Logger.AddMessage($"Download data for {symbol}");
             var url = string.Format(UrlTemplate, fromUnixSeconds, toUnixSeconds, symbol);
             var o = WebClientExt.GetToBytes(url, false);
             if (o.Item3 != null)
                 throw new Exception($"YahooIndicesLoader: Error while download from {url}. Error message: {o.Item3.Message}");
-
-            /*var content = Encoding.UTF8.GetString(o.Item1).Replace("{\"T\":\"", "{\"TT\":\""); // remove AmbiguousMatchException for original 't' and 'T' property names
-            var oo = ZipUtils.DeserializeString<Models.MinuteYahoo>(content);*/
-
 
             var lines = Encoding.UTF8.GetString(o.Item1).Split('\n');
             if (lines.Length == 0)
@@ -211,7 +200,6 @@ namespace Data.Actions.Yahoo
             }
 
             Logger.AddMessage($"!Finished. Last trade date: {data.Max(a => a.Date):yyyy-MM-dd}");
-
         }
     }
 
@@ -343,14 +331,6 @@ namespace Data.Actions.Yahoo
         public float[] low { get; set; }
         public float[] close { get; set; }
         public long[] volume { get; set; }
-    }
-
-    public class cTradingPeriod
-    {
-        public string TimeZone { get; set; }
-        public long Start { get; set; }
-        public long End { get; set; }
-        public long GmtOffset { get; set; }
     }
     #endregion
 }
