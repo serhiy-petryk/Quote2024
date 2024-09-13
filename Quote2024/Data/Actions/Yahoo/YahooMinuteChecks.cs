@@ -229,7 +229,7 @@ namespace Data.Actions.Yahoo
                 using (var cmd = conn.CreateCommand())
                 {
                     conn.Open();
-                    cmd.CommandText = $"SELECT Ratio, K from dbQ2023Others..Splits WHERE symbol='{symbol}' and  date >='{fromDate:yyyy-MM-dd}' and date<'{fromDate.AddDays(7):yyyy-MM-dd}'";
+                    cmd.CommandText = $"SELECT Ratio, K from dbQ2024..Splits WHERE symbol='{symbol}' and  date >='{fromDate:yyyy-MM-dd}' and date<'{fromDate.AddDays(7):yyyy-MM-dd}'";
                     using (var rdr = cmd.ExecuteReader())
                         while (rdr.Read())
                             return Tuple.Create((string)rdr["Ratio"], Convert.ToSingle(rdr["K"]));

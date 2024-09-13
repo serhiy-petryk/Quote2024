@@ -55,11 +55,11 @@ namespace Data.Actions.Eoddata
 
             // Save data to database
             var maxDate = timeStamp.Item1;
-            DbHelper.ClearAndSaveToDbTable(items.Where(a => a.Date <= maxDate), "dbQ2023Others..Bfr_SplitEoddata", "Exchange", "Symbol",
+            DbHelper.ClearAndSaveToDbTable(items.Where(a => a.Date <= maxDate), "dbQ2024..Bfr_SplitEoddata", "Exchange", "Symbol",
                 "Date", "Ratio", "K", "TimeStamp");
-            DbHelper.ExecuteSql("INSERT INTO dbQ2023Others..SplitEoddata (Exchange,Symbol,[Date],Ratio,K,[TimeStamp]) " +
-                               "SELECT a.Exchange, a.Symbol, a.[Date], a.Ratio, a.K, a.[TimeStamp] FROM dbQ2023Others..Bfr_SplitEoddata a " +
-                               "LEFT JOIN dbQ2023Others..SplitEoddata b ON a.Exchange=b.Exchange AND a.Symbol = b.Symbol AND a.Date = b.Date " +
+            DbHelper.ExecuteSql("INSERT INTO dbQ2024..SplitEoddata (Exchange,Symbol,[Date],Ratio,K,[TimeStamp]) " +
+                               "SELECT a.Exchange, a.Symbol, a.[Date], a.Ratio, a.K, a.[TimeStamp] FROM dbQ2024..Bfr_SplitEoddata a " +
+                               "LEFT JOIN dbQ2024..SplitEoddata b ON a.Exchange=b.Exchange AND a.Symbol = b.Symbol AND a.Date = b.Date " +
                                "WHERE b.Symbol IS NULL");
 
             Logger.AddMessage($"!Finished. Items: {items.Count:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
