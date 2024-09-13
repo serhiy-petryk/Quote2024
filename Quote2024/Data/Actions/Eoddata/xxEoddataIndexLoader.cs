@@ -160,7 +160,7 @@ namespace Data.Actions.Eoddata
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandTimeout = 150;
-                    cmd.CommandText = "SELECT distinct Exchange, date from dbQ2023Others..DayEoddata";
+                    cmd.CommandText = "SELECT distinct Exchange, date from dbQ2024..DayEoddata";
                     using (var rdr = cmd.ExecuteReader())
                         while (rdr.Read())
                             existingQuotes.Add($"{FILE_FOLDER}{(string)rdr["Exchange"]}_{(DateTime)rdr["Date"]:yyyyMMdd}.zip", null);
@@ -186,7 +186,7 @@ namespace Data.Actions.Eoddata
             if (newFileCount > 0)
             {
                 Logger.AddMessage($"Update data in database ('pUpdateDayEoddata' procedure)");
-                DbHelper.RunProcedure("dbQ2023Others..pUpdateDayEoddata");
+                DbHelper.RunProcedure("dbQ2024..pUpdateDayEoddata");
             }
 
             Logger.AddMessage($"!Finished. Loaded quotes into DayEoddata table. Quotes: {itemCount:N0}. Number of files: {newFileCount}. Size of files: {fileSize:N0}KB");
@@ -216,7 +216,7 @@ namespace Data.Actions.Eoddata
                 }
             }
 
-            DbHelper.SaveToDbTable(quotes, "dbQ2023Others..DayEoddata", "Symbol", "Exchange", "Date", "Open", "High", "Low", "Close", "Volume");
+            DbHelper.SaveToDbTable(quotes, "dbQ2024..DayEoddata", "Symbol", "Exchange", "Date", "Open", "High", "Low", "Close", "Volume");
             return itemCount;
         }
 
