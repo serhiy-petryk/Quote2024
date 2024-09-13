@@ -38,7 +38,7 @@ namespace Data.Actions.Yahoo
                 {
                     conn.Open();
                     cmd.CommandText =
-                        $"DELETE dbQ2023Others..FileLogMinuteYahoo WHERE [file]='{Path.GetFileNameWithoutExtension(zipFileName)}'";
+                        $"DELETE dbQ2024..FileLogMinuteYahoo WHERE [file]='{Path.GetFileNameWithoutExtension(zipFileName)}'";
                     cmd.ExecuteNonQuery();
                 }
 
@@ -82,7 +82,7 @@ namespace Data.Actions.Yahoo
 
                 showStatusAction($"YahooMinuteSaveLogToDb. Save data to database ...");
                 // Save items to database table
-                Helpers.DbHelper.SaveToDbTable(log, " dbQ2023Others..FileLogMinuteYahoo", "File", "Symbol", "Date", "MinTime", "MaxTime", "Count", "Open", "High", "Low", "Close", "Volume");
+                Helpers.DbHelper.SaveToDbTable(log, " dbQ2024..FileLogMinuteYahoo", "File", "Symbol", "Date", "MinTime", "MaxTime", "Count", "Open", "High", "Low", "Close", "Volume");
 
                 showStatusAction($"YahooMinuteSaveLogToDb. Finished!");
             }
