@@ -187,12 +187,12 @@ namespace Data.Actions.Yahoo
         {
             if (data.Count > 0)
             {
-                DbHelper.ClearAndSaveToDbTable(data, "dbQ2023Others..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
+                DbHelper.ClearAndSaveToDbTable(data, "dbQ2024..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
                     "Close", "Volume", "AdjClose");
-                DbHelper.ExecuteSql("INSERT into dbQ2023Others..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
+                DbHelper.ExecuteSql("INSERT into dbQ2024..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
                                     "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
-                                    "from dbQ2023Others..Bfr_DayYahooIndexes a " +
-                                    "left join dbQ2023Others..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
+                                    "from dbQ2024..Bfr_DayYahooIndexes a " +
+                                    "left join dbQ2024..DayYahooIndexes b on a.Symbol = b.Symbol and a.Date = b.Date " +
                                     "where b.Symbol is null");
 
                 Logger.AddMessage($"Update trading days in dbQ2024 database");
