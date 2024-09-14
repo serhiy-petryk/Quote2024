@@ -182,9 +182,9 @@ namespace Data.Tests
                             entryStream.CopyTo(memstream);
                             var bytes = memstream.ToArray();
                             var o = Helpers.ZipUtils.DeserializeZipEntry<Models.MinuteYahoo>(entry);
-                            if (o.chart.result != null)
+                            if (o.chart.result != null && o.chart.result[0].indicators.quote.Length > 0)
                             {
-                                var a1 = o.chart.result[0].meta.NyRegularMarketTime;
+                                var a1 = o.chart.result[0].meta.NyRegularMarketTime.Value;
                                 Debug.Print($"regularMarketTime: {a1:yyyy-MM-dd HH:mm:ss}\tFileDateTime: {nyFileDateTime:yyyy-MM-dd HH:mm:ss}");
                             }
                         }
