@@ -8,7 +8,7 @@ using Data.Helpers;
 
 namespace Data.Actions.Nasdaq
 {
-    public static class NasdaqScreenerGithubLoader
+    public static class ObsoleteNasdaqScreenerGithubLoader
     {
         private static string StartUrl = "https://github.com/rreichel3/US-Stock-Symbols/commits/main";
 
@@ -137,9 +137,9 @@ namespace Data.Actions.Nasdaq
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
                     var exchange = entry.Name.Split('_')[1].ToUpper();
-                    var items = ZipUtils.DeserializeZipEntry<Nasdaq.NasdaqScreenerLoader.cStockRow[]>(entry);
+                    var items = ZipUtils.DeserializeZipEntry<Nasdaq.ObsoleteNasdaqScreenerLoader.cStockRow[]>(entry);
                     var dbItems = items.Select(a =>
-                        new NasdaqScreenerLoader.DbStockRow(exchange, timestamp, a, dateKey));
+                        new ObsoleteNasdaqScreenerLoader.DbStockRow(exchange, timestamp, a, dateKey));
 
                     DbHelper.SaveToDbTable(dbItems, "dbQ2023Others..Bfr_ScreenerNasdaqStock", "Symbol", "Exchange",
                         "Name", "LastSale", "Volume", "NetChange", "Change", "MarketCap", "Country", "IpoYear",

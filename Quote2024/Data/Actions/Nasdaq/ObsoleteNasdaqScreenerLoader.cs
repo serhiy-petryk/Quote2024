@@ -8,7 +8,7 @@ using Data.Helpers;
 
 namespace Data.Actions.Nasdaq
 {
-    public class NasdaqScreenerLoader
+    public class ObsoleteNasdaqScreenerLoader
     {
         // Nasdaq screener history (from Feb 2, 2021): https://github.com/rreichel3/US-Stock-Symbols
 
