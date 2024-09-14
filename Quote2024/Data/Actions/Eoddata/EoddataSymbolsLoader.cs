@@ -44,7 +44,7 @@ namespace Data.Actions.Eoddata
             var itemCount = ParseAndSaveToDb(zipFileName);
 
             Logger.AddMessage($"Run sql procedure: pUpdateSymbolsXref");
-            DbHelper.RunProcedure("dbQ2023Others..pUpdateSymbolsXref");
+            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXref");
 
             Logger.AddMessage($"!Finished. Items: {itemCount:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
         }

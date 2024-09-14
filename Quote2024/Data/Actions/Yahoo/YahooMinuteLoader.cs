@@ -89,14 +89,19 @@ namespace Data.Actions.Yahoo
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
-                cmd.CommandText = "SELECT '^DJI' Symbol UNION SELECT '^GSPC' UNION " +
+                /*cmd.CommandText = "SELECT '^DJI' Symbol UNION SELECT '^GSPC' UNION " +
                                   "SELECT b.YahooSymbol FROM dbQ2024..DayEoddata a " +
                                   "INNER JOIN dbQ2024..SymbolsEoddata b on a.Exchange = b.Exchange and a.Symbol = b.Symbol " +
                                   "WHERE b.YahooSymbol is not null AND a.volume* a.[close]>= 5000000 and a.date >= DATEADD(day, -30, GetDate()) UNION " +
                                   "SELECT b.Symbol from dbQ2024..SymbolsEoddata a " +
                                   "RIGHT JOIN(SELECT * from dbQ2023Others..ScreenerNasdaqStock " +
                                   "WHERE Deleted is null or Deleted > DATEADD(day, -30, GetDate())) b " +
-                                  "ON a.NasdaqSymbol = b.Symbol WHERE a.Symbol is null AND b.MaxTradeValue > 5 ORDER BY 1";
+                                  "ON a.NasdaqSymbol = b.Symbol WHERE a.Symbol is null AND b.MaxTradeValue > 5 ORDER BY 1";*/
+                cmd.CommandText = "SELECT '^DJI' Symbol UNION SELECT '^GSPC' UNION " +
+                                  "SELECT b.YahooSymbol FROM dbQ2024..DayEoddata a " +
+                                  "INNER JOIN dbQ2024..SymbolsEoddata b on a.Exchange = b.Exchange and a.Symbol = b.Symbol " +
+                                  "WHERE b.YahooSymbol is not null AND a.volume* a.[close]>= 5000000 and a.date >= DATEADD(day, -30, GetDate()) " +
+                                  "ORDER BY 1";
 
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
