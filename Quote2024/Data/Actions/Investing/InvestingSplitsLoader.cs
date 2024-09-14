@@ -101,7 +101,7 @@ namespace Data.Actions.Investing
 
                 var i2 = cells[1].LastIndexOf("</span>", StringComparison.InvariantCulture);
                 var i1 = cells[1].LastIndexOf(">", i2 - 7, StringComparison.InvariantCulture);
-                var name = cells[1].Substring(i1 + 1, i2 - i1 - 1).Trim();
+                var name = cells[1].Substring(i1 + 1, i2 - i1 - 1).Replace("<span class=\"inlineblock\">", "").Trim();
 
                 var ratio = GetCellValue(cells[2]);
 
