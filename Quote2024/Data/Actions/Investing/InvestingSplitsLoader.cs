@@ -20,7 +20,7 @@ namespace Data.Actions.Investing
             var postData = string.Format(POST_DATA_TEMPLATE,
                 timeStamp.Item1.AddDays(-30).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 timeStamp.Item1.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
-            var zipFileName = $@"E:\Quote\WebData\Splits\Investing\InvestingSplits_{timeStamp.Item2}.zip";
+            var zipFileName = Settings.DataFolder + $@"Splits\Investing\InvestingSplits_{timeStamp.Item2}.zip";
 
             // Download data
             Logger.AddMessage($"Download data from {URL}");

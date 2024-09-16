@@ -26,8 +26,7 @@ namespace Data.Actions.Wikipedia
             Logger.AddMessage($"Started");
 
             var timeStamp = TimeHelper.GetTimeStamp();
-            var zipFileName =
-                $@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\IndexComponents_{timeStamp.Item2}.zip";
+            var zipFileName = Settings.DataFolder + $@"Indices\Wikipedia\IndexComponents\IndexComponents_{timeStamp.Item2}.zip";
             var virtualFileEntries = new List<VirtualFileEntry>();
 
             // Download data
@@ -53,9 +52,9 @@ namespace Data.Actions.Wikipedia
         public static void ParseAndSaveToDbAllFiles()
         {
             var allZipFiles = new List<string>
-                { @"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\WebArchive.Wikipedia.Indices.zip" };
+                { Settings.DataFolder + @"Indices\Wikipedia\IndexComponents\WebArchive.Wikipedia.Indices.zip" };
 
-            const string folder = @"E:\Quote\WebData\Indices\Wikipedia\IndexComponents";
+            const string folder = Settings.DataFolder + @"Indices\Wikipedia\IndexComponents";
             var files = Directory.GetFiles(folder, "*_202*.zip").OrderBy(a=>a);
             allZipFiles.AddRange(files);
             foreach (var zipFileName in allZipFiles)

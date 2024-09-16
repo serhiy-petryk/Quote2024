@@ -15,8 +15,8 @@ namespace Data.Actions.Yahoo
     public static class WA_YahooProfile
     {
         private const string ListUrlTemplateByLetter = "https://web.archive.org/cdx/search/cdx?url=https://finance.yahoo.com/quote/{0}&matchType=prefix&limit=300000&filter=statuscode:200";
-        private const string ListDataFolderByLetter = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_ListByLetter";
-        private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data";
+        private const string ListDataFolderByLetter = Settings.DataFolder + @"Symbols\Yahoo\WA_Profile\WA_ListByLetter";
+        private const string HtmlDataFolder = Settings.DataFolder + @"Symbols\Yahoo\WA_Profile\WA_Data";
 
         public static Dictionary<string, object> ValidSectors = new Dictionary<string, object>
         {
@@ -30,7 +30,7 @@ namespace Data.Actions.Yahoo
         public static void TestWAFiles()
         {
             var symbolXref = GetSymbolXref(false).ToDictionary(a=>a.Value, a=>a.Key);
-            var folder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short";
+            var folder = Settings.DataFolder + @"Symbols\Yahoo\WA_Profile\WA_Data.Short";
             var files = Directory.GetFiles(folder, "*.html");
             foreach (var file in files)
             {
@@ -51,7 +51,7 @@ namespace Data.Actions.Yahoo
             var polygonSymbolXref = yahooSymbolXref.ToDictionary(a => a.Value, a => a.Key);
 
             var data = new List<(string, string, string, DateTime)>();
-            var folder = @"E:\Quote\WebData\Symbols\Yahoo\Profile\Data";
+            var folder = Settings.DataFolder + @"Symbols\Yahoo\Profile\Data";
             var zipFiles = Directory.GetFiles(folder, "*.zip");
             foreach (var zipFileName in zipFiles)
             {
@@ -59,7 +59,7 @@ namespace Data.Actions.Yahoo
                 ParseZip(zipFileName, null);
             }
 
-            var wa_zipFileName = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short.zip";
+            var wa_zipFileName = Settings.DataFolder + @"Symbols\Yahoo\WA_Profile\WA_Data.Short.zip";
             Logger.AddMessage($"Parse data from {Path.GetFileName(wa_zipFileName)}");
             ParseZip(wa_zipFileName, polygonSymbolXref, true);
 
@@ -399,7 +399,7 @@ namespace Data.Actions.Yahoo
                             var polygonSymbol = symbolXref[item.Symbol];
                             var filename = Path.Combine(HtmlDataFolder, $"{polygonSymbol}_{item.TimeStamp}.html");
                             var checkFilename =
-                                Path.Combine(@"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short.2020",
+                                Path.Combine(Settings.DataFolder + @"Symbols\Yahoo\WA_Profile\WA_Data.Short.2020",
                                     $"{polygonSymbol}_{item.TimeStamp}.html");
                             if (!File.Exists(checkFilename))
                                 toDownload.Add(new DownloadItem(url, filename));

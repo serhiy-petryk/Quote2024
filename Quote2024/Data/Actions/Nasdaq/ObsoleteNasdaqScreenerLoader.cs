@@ -50,7 +50,7 @@ namespace Data.Actions.Nasdaq
             virtualFileEntries.Add(entry2);
 
             // Zip data
-            var zipFileName = $@"E:\Quote\WebData\Screener\Nasdaq\NasdaqScreener_{timeStamp.Item2}.zip";
+            var zipFileName = Settings.DataFolder + $@"Screener\Nasdaq\NasdaqScreener_{timeStamp.Item2}.zip";
             ZipUtils.ZipVirtualFileEntries(zipFileName, virtualFileEntries);
 
             // Parse and save data to database

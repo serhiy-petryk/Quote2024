@@ -14,7 +14,7 @@ namespace Data.Actions.Yahoo
     public static class YahooProfileLoader
     {
         private const string UrlTemplate = @"https://finance.yahoo.com/quote/{0}/profile/";
-        private const string FileNameTemplate = @"E:\Quote\WebData\Symbols\Yahoo\ProfileTest\Data\YP_{1}\YP_{0}_{1}.html";
+        private const string FileNameTemplate = Settings.DataFolder + @"Symbols\Yahoo\ProfileTest\Data\YP_{1}\YP_{0}_{1}.html";
 
 
         public static void RemoveNotFound()

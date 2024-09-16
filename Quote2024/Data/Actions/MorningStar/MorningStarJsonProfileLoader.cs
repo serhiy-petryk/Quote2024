@@ -11,12 +11,12 @@ namespace Data.Actions.MorningStar
     public class MorningStarJsonProfileLoader
     {
         private const string UrlTemplate = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
-        private const string FileTemplate = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}\MSProfile_{1}_{2}.json";
-        private const string FolderTemplate = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}";
+        private const string FileTemplate = Settings.DataFolder + @"Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}\MSProfile_{1}_{2}.json";
+        private const string FolderTemplate = Settings.DataFolder + @"Symbols\MorningStar\Profile\Data.JSON\MSProfiles_{0}";
 
         public static void ParseJsonZipAll(List<WA_MorningStarSector.DbItem> data)
         {
-            var folder = @"E:\Quote\WebData\Symbols\MorningStar\Data";
+            var folder = Settings.DataFolder + @"Symbols\MorningStar\Data";
             var files = Directory.GetFiles(folder, "*json_*.zip");
             foreach (var file in files)
                 ParseJsonZip(file, data);
@@ -96,7 +96,7 @@ namespace Data.Actions.MorningStar
 
         public static void TestParse()
         {
-            var folder = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data.JSON\MSProfiles_20240710.zip";
+            var folder = Settings.DataFolder + @"Symbols\MorningStar\Profile\Data.JSON\MSProfiles_20240710.zip";
             ParseJsonZipAndSaveToDb(folder);
             Logger.AddMessage($"Finished");
         }

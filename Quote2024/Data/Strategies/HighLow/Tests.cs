@@ -18,7 +18,7 @@ namespace Data.Strategies.HighLow
         {
             var startTime = new TimeSpan(9, 30, 0);
             var endTime = new TimeSpan(16, 0, 0);
-            var zipFileName = @"E:\Quote\WebData\Trades\PolygonNbbo\Data\2024-04-05\PolygonNbbo_20240405_Z.zip";
+            var zipFileName = Settings.DataFolder + @"Trades\PolygonNbbo\Data\2024-04-05\PolygonNbbo_20240405_Z.zip";
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
             {
                 var results = new List<PolygonNbboLoader.cResult>();
@@ -93,7 +93,7 @@ namespace Data.Strategies.HighLow
             var symbols = tickerAndDateAndHighToLow.Keys.ToArray();
             // var symbols = new List<string>{"A", "AA", "AAAU"};
 
-            var zipFileName = @"E:\Quote\WebData\Minute\Polygon2003\Data\MP2003_20240406.zip";
+            var zipFileName = Settings.DataFolder + @"Minute\Polygon2003\Data\MP2003_20240406.zip";
             var fromTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date + startTime);
             var toTicks = TimeHelper.GetUnixMillisecondsFromEstDateTime(date + endTime);
             var quotes = new Dictionary<string, PolygonCommon.cMinuteItem[]>();

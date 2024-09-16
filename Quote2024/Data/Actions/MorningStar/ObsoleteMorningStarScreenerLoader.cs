@@ -13,7 +13,7 @@ namespace Data.Actions.MorningStar
         // page numeration from 1
         // private const string UrlTemplate = @"https://www.morningstar.com/api/v2/navigation-list/{0}?sort=marketCap:desc&page={1}&limit=50";
         private const string UrlTemplate = @"https://www.morningstar.com/api/v2/navigation-list/{0}?sort=ticker&page={1}&limit=50";
-        private const string DataFolder = @"E:\Quote\WebData\Screener\MorningStar\Data";
+        private const string DataFolder = Settings.DataFolder + @"Screener\MorningStar\Data";
 
         // Doesn't work from 2024-06: Not found error
         public static void Start()

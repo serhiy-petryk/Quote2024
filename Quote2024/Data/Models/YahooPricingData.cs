@@ -18,7 +18,7 @@ namespace Data.Models
 
         public static void CorrectYahooStreamerFiles()
         {
-            var folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-05";
+            var folder = Settings.DataFolder + @"RealTime\YahooSocket\Data\2024-04-05";
             var files = Directory.GetFiles(folder,"YSocket*.txt");
             foreach (var file in files)
             {

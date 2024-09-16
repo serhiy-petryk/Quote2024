@@ -16,9 +16,9 @@ namespace Data.Actions.Nasdaq
         // private static string _githubApiCommits = "https://api.github.com/repos/rreichel3/US-Stock-Symbols/commits";
         // ?! (don't) use request: https://api.github.com/repos/rreichel3/US-Stock-Symbols/commits
 
-        private const string HtmlFileNameTemplate = @"E:\Quote\WebData\Screener\NasdaqGithub\Html\NG_{0}.html";
+        private const string HtmlFileNameTemplate = Settings.DataFolder + @"Screener\NasdaqGithub\Html\NG_{0}.html";
         private const string JsonFileNameTemplate = @"NG_{1}_{0}.json";
-        private const string ZipFileNameTemplate = @"E:\Quote\WebData\Screener\NasdaqGithub\Data\NG_{0}.zip";
+        private const string ZipFileNameTemplate = Settings.DataFolder + @"Screener\NasdaqGithub\Data\NG_{0}.zip";
 
         public static void Start()
         {

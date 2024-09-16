@@ -12,7 +12,7 @@ namespace Data.Actions.Polygon
     public static class PolygonTradesLoader
     {
         private const string UrlTemplate = @"https://api.polygon.io/v3/trades/{0}?timestamp={1}&limit=50000";
-        private const string DataFolder = @"E:\Quote\WebData\Trades\Polygon\Data";
+        private const string DataFolder = Settings.DataFolder + @"Trades\Polygon\Data";
         private static readonly string ZipFileNameTemplate = Path.Combine(DataFolder, @"{2}\TradesPolygon_{1}_{0}.zip");
 
         public static void Test()
@@ -24,11 +24,11 @@ namespace Data.Actions.Polygon
             var sizes = new Dictionary<int, int>();
             var conditions = new Dictionary<byte, int> { { 0, 0 } };
             var sConditions = new Dictionary<string, int> { { "", 0 } };
-            var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
+            var files = Directory.GetFiles(Settings.DataFolder + @"Trades\Polygon\Data\2024-04-05", "*.zip");
             foreach (var zipFileName in files)
             {
                 Logger.AddMessage($"File: {zipFileName}");
-                //var zipFileName = @"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05\TradesPolygon_20240405_AA.zip";
+                //var zipFileName = Settings.DataFolder + @"Trades\Polygon\Data\2024-04-05\TradesPolygon_20240405_AA.zip";
                 using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                     foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                     {

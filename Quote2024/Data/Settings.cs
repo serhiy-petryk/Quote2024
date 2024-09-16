@@ -12,7 +12,7 @@ namespace Data
 
         public static void SetZipLibrary() => SevenZipBase.SetLibraryPath(@"7z1900\x64-dll\7z.dll");
 
-        // private const string BaseFolder = @"E:\Quote\";
+        public const string DataFolder = @"E:\Quote\WebData\";
 
         // see https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/market-hours
         private const string ShortenedDaysList = "1999-11-26,2000-07-03,2000-11-24,2001-07-03,2001-11-23,2001-12-24,2002-07-05,2002-11-29,2002-12-24," +

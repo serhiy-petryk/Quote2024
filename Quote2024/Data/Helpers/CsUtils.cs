@@ -133,7 +133,7 @@ namespace Data.Helpers
 
         public static string[] GetApiKeys(string dataProvider)
         {
-            const string filename = @"E:\Quote\WebData\ApiKeys.txt";
+            const string filename = Settings.DataFolder + @"ApiKeys.txt";
             var keys = File.ReadAllLines(filename)
                 .Where(a => a.StartsWith(dataProvider, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Split('\t')[1].Trim()).ToArray();

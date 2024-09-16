@@ -8,7 +8,7 @@ namespace Data.Actions.Polygon
     public static class PolygonNbboLoader
     {
         private const string UrlTemplate = @"https://api.polygon.io/v3/quotes/{0}?timestamp={1}&limit=50000";
-        private const string DataFolder = @"E:\Quote\WebData\Trades\PolygonNbbo\Data";
+        private const string DataFolder = Settings.DataFolder + @"Trades\PolygonNbbo\Data";
         private static readonly string ZipFileNameTemplate = Path.Combine(DataFolder, @"{2}\PolygonNbbo_{1}_{0}.zip");
 
         public static void Start()

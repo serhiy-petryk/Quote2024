@@ -15,8 +15,8 @@ namespace Data.Actions.MorningStar
     public static class WA_MorningStarProfile
     {
         private const string ListUrlTemplateByExchange = "https://web.archive.org/cdx/search/cdx?url=https://www.morningstar.com/stocks/{0}&matchType=prefix&limit=300000";
-        private const string ListDataFolderByExchange = @"E:\Quote\WebData\Symbols\MorningStar\WA_ListByExchange";
-        private const string HtmlDataFolder = @"E:\Quote\WebData\Symbols\MorningStar\WA_Profile";
+        private const string ListDataFolderByExchange = Settings.DataFolder + @"Symbols\MorningStar\WA_ListByExchange";
+        private const string HtmlDataFolder = Settings.DataFolder + @"Symbols\MorningStar\WA_Profile";
 
         private static readonly string[] Exchanges = new[] { "arcx", "bats", "xase", "xnas", "xnys" };
         private static readonly Dictionary<string, object> ValidSectors = Yahoo.WA_YahooProfile.ValidSectors;

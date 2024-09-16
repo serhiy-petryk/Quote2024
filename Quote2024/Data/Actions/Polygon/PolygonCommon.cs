@@ -10,9 +10,9 @@ namespace Data.Actions.Polygon
 {
     public class PolygonCommon
     {
-        public const string DataFolderDaily = @"E:\Quote\WebData\Daily\Polygon2003\Data\";
-        public const string DataFolderMinute = @"E:\Quote\WebData\Minute\Polygon2003\Data\";
-        public const string DataFolderSymbols = @"E:\Quote\WebData\Symbols\Polygon2003\Data\";
+        public const string DataFolderDaily = Settings.DataFolder + @"Daily\Polygon2003\Data\";
+        public const string DataFolderMinute = Settings.DataFolder + @"Minute\Polygon2003\Data\";
+        public const string DataFolderSymbols = Settings.DataFolder + @"Symbols\Polygon2003\Data\";
 
         public static string GetApiKey() => CsUtils.GetApiKeys("polygon.io")[0];
         public static string GetApiKey2003() => CsUtils.GetApiKeys("polygon.io.2003")[0];

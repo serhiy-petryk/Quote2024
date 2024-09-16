@@ -20,17 +20,17 @@ namespace Data.Actions.MorningStar
         // private const string UrlTemplateJson = @"https://www.morningstar.com/api/v2/stocks/{1}/{0}/quote";
         private const string UrlTemplateJson = @"https://www.morningstar.com/stocks/{1}/{0}/quote";
         private const string UrlTemplateHtml = @"https://www.morningstar.com/stocks/{1}/{0}/quote";
-        private const string FileTemplateHtml = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_{1}_{0}.html";
-        // private const string FileTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_{2}\MSProfile_{1}_{0}.json";
-        private const string FileTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data\MSProfiles_{2}\MSProfile_{1}_{0}.html";
-        // private const string FolderTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_{0}";
-        private const string FolderTemplateJson = @"E:\Quote\WebData\Symbols\MorningStar\Profile\Data\MSProfiles_{0}";
+        private const string FileTemplateHtml = Settings.DataFolder + @"Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_{1}_{0}.html";
+        // private const string FileTemplateJson = Settings.DataFolder + @"Symbols\MorningStar\Data\MSProfiles_{2}\MSProfile_{1}_{0}.json";
+        private const string FileTemplateJson = Settings.DataFolder + @"Symbols\MorningStar\Profile\Data\MSProfiles_{2}\MSProfile_{1}_{0}.html";
+        // private const string FolderTemplateJson = Settings.DataFolder + @"Symbols\MorningStar\Data\MSProfiles_{0}";
+        private const string FolderTemplateJson = Settings.DataFolder + @"Symbols\MorningStar\Profile\Data\MSProfiles_{0}";
 
         public static void Test()
         {
             var dbItems = new List<ObsoleteMorningStarScreenerLoader.DbItem>();
             var types = new Dictionary<string, int>();
-            var folder = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240620";
+            var folder = Settings.DataFolder + @"Symbols\MorningStar\Data\MSProfiles_20240620";
             var files = Directory.GetFiles(folder, "*.json").OrderBy(a=>a).ToArray();
             var ss2 = Path.GetFileNameWithoutExtension(folder).Split('_');
             var dateKey = DateTime.ParseExact(ss2[ss2.Length - 1], "yyyyMMdd", CultureInfo.InvariantCulture);

@@ -10,7 +10,7 @@ namespace Data.RealTime
 {
     public class RealTimeCommon
     {
-        private const string DayPolygonDataFolder = @"E:\Quote\WebData\RealTime\YahooMinute\DayPolygon";
+        private const string DayPolygonDataFolder = Settings.DataFolder + @"RealTime\YahooMinute\DayPolygon";
 
         public static List<string> GetTickerList(Action<string> fnShowStatus, int tradingDays, float minTradeValue,
             float maxTradeValue, int minTradeCount, float minClose, float maxClose)

@@ -18,7 +18,7 @@ namespace Data.Actions.Eoddata
 
             var timeStamp = TimeHelper.GetTimeStamp();
             var virtualFileEntries = new List<VirtualFileEntry>();
-            var zipFileName = $@"E:\Quote\WebData\Symbols\Eoddata\SymbolsEoddata_{timeStamp.Item2}.zip";
+            var zipFileName = Settings.DataFolder + $@"Symbols\Eoddata\SymbolsEoddata_{timeStamp.Item2}.zip";
 
             // Prepare cookies
             var cookies = EoddataCommon.GetEoddataCookies();

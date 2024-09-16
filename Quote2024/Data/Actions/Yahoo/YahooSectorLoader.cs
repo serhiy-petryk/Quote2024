@@ -15,7 +15,7 @@ namespace Data.Actions.Yahoo
     public static class YahooSectorLoader
     {
         private const string UrlTemplate = @"https://query1.finance.yahoo.com/ws/insights/v3/finance/insights?disableRelatedReports=true&formatted=true&getAllResearchReports=false&reportsCount=0&ssl=true&symbols={0}&lang=en-US&region=US";
-        private const string ZipFileNameTemplate = @"E:\Quote\WebData\Symbols\Yahoo\Sectors\Data\YS_{0}.zip";
+        private const string ZipFileNameTemplate = Settings.DataFolder + @"Symbols\Yahoo\Sectors\Data\YS_{0}.zip";
         private const string FileNameTemplate = @"YS_{1}_{2}_{0}.json";
 
         public static void TestParse()

@@ -12,7 +12,7 @@ namespace Data.Actions.Eoddata
 {
     public class EoddataDailyLoader
     {
-        private const string FILE_FOLDER = @"E:\Quote\WebData\Daily\Eoddata\";
+        private const string FILE_FOLDER = Settings.DataFolder + @"Daily\Eoddata\";
         private static string[] _exchanges = new string[] {"AMEX", "NASDAQ", "NYSE"};
         private const string URL_FOR_COOKIES = "https://www.eoddata.com/";
         private const string URL_HOME = "https://www.eoddata.com/download.aspx";

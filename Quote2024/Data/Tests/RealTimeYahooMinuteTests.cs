@@ -11,9 +11,9 @@ namespace Data.Tests
 {
     public static class RealTimeYahooMinuteTests
     {
-        private const string Folder = @"E:\Quote\WebData\RealTime\YahooMinute\2024-03-21";
-        private const string Folder2 = @"E:\Quote\WebData\RealTime\YahooMinute\2024-03-26";
-        private const string MainFolder = @"E:\Quote\WebData\RealTime\YahooMinute";
+        private const string Folder = Settings.DataFolder + @"RealTime\YahooMinute\2024-03-21";
+        private const string Folder2 = Settings.DataFolder + @"RealTime\YahooMinute\2024-03-26";
+        private const string MainFolder = Settings.DataFolder + @"RealTime\YahooMinute";
 
         public static void TestTradingPeriod()
         {

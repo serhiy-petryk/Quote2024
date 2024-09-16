@@ -14,9 +14,9 @@ namespace Data.Actions.MorningStar
     public static class WA_MorningStarScreenerLoader
     {
         private const string ListUrlTemplate = "https://web.archive.org/cdx/search/cdx?url=morningstar.com/{0}&matchType=prefix&limit=100000";
-        private const string ListDataFolder = @"E:\Quote\WebData\Screener\MorningStar\WA_List.2024-07";
-        private const string HtmlDataFolder = @"E:\Quote\WebData\Screener\MorningStar\WA_Data";
-        private const string JsonDataFolder2024 = @"E:\Quote\WebData\Screener\MorningStar\Data";
+        private const string ListDataFolder = Settings.DataFolder + @"Screener\MorningStar\WA_List.2024-07";
+        private const string HtmlDataFolder = Settings.DataFolder + @"Screener\MorningStar\WA_Data";
+        private const string JsonDataFolder2024 = Settings.DataFolder + @"Screener\MorningStar\Data";
 
         public static void ParseJson2024AllFiles(List<WA_MorningStarSector.DbItem> data)
         {

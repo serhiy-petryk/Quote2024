@@ -23,7 +23,7 @@ namespace Data.Actions.Chartmill
         private const string ParameterTemplateWithDate = @"{""sort"":""ticker"",""sortDir"":""ASC"",""tickers"":null,""conditions"":null,""exchanges"":""125,119,3"",""indexes"":null,""types"":null,""date"":""{1}"",""sectors"":null,""loadWatchListId"":null,""start"":{0}}";
         // 2020-01-03,2020-04-03,2020-07-10,2020-10-02,2021-01-08,2021-04-09,2021-07-02,2021-10-01,2022-01-07,2022-01-07,2022-04-01,2022-07-01,2022-10-07,2023-01-06,2023-03-31,2023-07-07,2023-10-02,2024-01-02,
 
-        private const string DataFolder = @"E:\Quote\WebData\Screener\Chartmill\Data";
+        private const string DataFolder = Settings.DataFolder + @"Screener\Chartmill\Data";
 
         public static void Start()
         {

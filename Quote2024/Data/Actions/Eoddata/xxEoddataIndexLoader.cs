@@ -14,7 +14,7 @@ namespace Data.Actions.Eoddata
     // Temporary for replace YahooIndexLoader
     public class xxEoddataIndexLoader
     {
-        private const string FILE_FOLDER = @"E:\Quote\WebData\Daily\Eoddata\";
+        private const string FILE_FOLDER = Settings.DataFolder + @"Daily\Eoddata\";
         private static string[] _indexes = new string[] { "DJI", "SP500"};
         private const string URL_HOME = "https://www.eoddata.com/download.aspx";
         private const string URL_TEMPLATE = "https://eoddata.com/data/filedownload.aspx?e=INDEX&s={0}&sd={1}&ed={2}&d=9&p=0&o=d&k={3}";

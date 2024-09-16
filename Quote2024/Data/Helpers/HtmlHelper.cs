@@ -7,17 +7,17 @@ namespace Data.Helpers
     {
         public static void TestFile()
         {
-            var filename2 = @"E:\Quote\WebData\Splits\StockSplitHistory\StockSplitHistory_20230304\sshAMST.html";
-            var filename3 = @"E:\Quote\WebData\Symbols\Quantumonline\Profiles\Profiles\pA.html";
-            // var filename = @"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_arcx_esba.html";
-            var filename = @"E:\Quote\WebData\Symbols\Yahoo\Profile\ok\ABNB_20230519031517.html";
+            var filename2 = Settings.DataFolder + @"Splits\StockSplitHistory\StockSplitHistory_20230304\sshAMST.html";
+            var filename3 = Settings.DataFolder + @"Symbols\Quantumonline\Profiles\Profiles\pA.html";
+            // var filename = Settings.DataFolder + @"Symbols\MorningStar\Data\MSProfiles_20240615\MSProfile_arcx_esba.html";
+            var filename = Settings.DataFolder + @"Symbols\Yahoo\Profile\ok\ABNB_20230519031517.html";
             var s = RemoveUselessTags(File.ReadAllText(filename));
         }
 
         public static void ProcessFolder()
         {
             Logger.AddMessage($"Started");
-            ProcessFolder(@"E:\Quote\WebData\Symbols\MorningStar\Data\MSProfiles_20240615");
+            ProcessFolder(Settings.DataFolder + @"Symbols\MorningStar\Data\MSProfiles_20240615");
             Logger.AddMessage($"Finished");
         }
 

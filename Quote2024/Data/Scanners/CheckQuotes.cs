@@ -12,7 +12,7 @@ namespace Data.Scanners
         public static void Start()
         {
             var lockObj = new object();
-            var folder = @"E:\Quote\WebData\Minute\Polygon2003\Data";
+            var folder = Settings.DataFolder + @"Minute\Polygon2003\Data";
             var files = Directory.GetFiles(folder, "MP2003_20230325.zip");
             foreach (var zipFileName in files)
             {
@@ -54,7 +54,7 @@ namespace Data.Scanners
 
         public static void StartNonParallel()
         {
-            var folder = @"E:\Quote\WebData\Minute\Polygon2003\Data";
+            var folder = Settings.DataFolder + @"Minute\Polygon2003\Data";
             var files = Directory.GetFiles(folder, "MP2003_20230325.zip");
             long itemCount = 0;
             var sw = new Stopwatch();

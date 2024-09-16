@@ -102,7 +102,7 @@ namespace Data.RealTime
                 "15:00", "15:30"
             };
 
-            const string baseFolder = @"D:\Quote\WebData\Minute\Nasdaq2";
+            const string baseFolder = Settings.DataFolder + @"Minute\Nasdaq2";
             var dateKey = TimeHelper.GetCurrentEstDateTime();
             var dataFolder = Path.Combine(baseFolder, dateKey.ToString("yyyy-MM-dd"));
             if (!Directory.Exists(dataFolder))

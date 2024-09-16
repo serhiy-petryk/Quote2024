@@ -21,7 +21,7 @@ namespace Data.Strategies
             var highToLowPercent = 0.5f;
 
             Logger.AddMessage($"Select tickers");
-            var zipFileName = @"E:\Quote\WebData\Minute\Polygon2003\Data\MP2003_20240406.zip";
+            var zipFileName = Settings.DataFolder + @"Minute\Polygon2003\Data\MP2003_20240406.zip";
             Dictionary<string, Dictionary<DateTime, float>> tickerAndDateAndHighToLow;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
             {
@@ -102,7 +102,7 @@ namespace Data.Strategies
             var highToLowPercent = 0.5f;
 
             Logger.AddMessage($"Define dates");
-            var zipFileName = @"E:\Quote\WebData\Minute\Polygon2003\Data\MP2003_20240406.zip";
+            var zipFileName = Settings.DataFolder + @"Minute\Polygon2003\Data\MP2003_20240406.zip";
             Dictionary<string, Dictionary<DateTime, float>> tickerAndDateAndHighToLow;
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
             {

@@ -19,7 +19,7 @@ namespace Data.Actions.TradingView
 
             // Download
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmm");
-            var zipFileName = $@"E:\Quote\WebData\Screener\TradingView\TVScreener_{timeStamp}.zip";
+            var zipFileName = Settings.DataFolder + $@"Screener\TradingView\TVScreener_{timeStamp}.zip";
 
             Logger.AddMessage($"Download data from {URL}");
             var o = WebClientExt.PostToBytes(URL, parameters, true);

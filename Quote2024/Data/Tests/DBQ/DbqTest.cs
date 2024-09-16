@@ -13,7 +13,7 @@ namespace Data.Tests.DBQ
     {
         public static void InvestigateNewCompressor()    // 110 358 milliseconds (83 368 milliseconds - no actions)
         {
-            var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
+            var files = Directory.GetFiles(Settings.DataFolder + @"Trades\Polygon\Data\2024-04-05", "*.zip");
             long byteCount = 0;
             long recCount = 0;
             var cnt1 = 0;
@@ -117,7 +117,7 @@ namespace Data.Tests.DBQ
 
         public static void RunStatistics()    // 110 358 milliseconds (83 368 milliseconds - no actions)
         {
-            var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
+            var files = Directory.GetFiles(Settings.DataFolder + @"Trades\Polygon\Data\2024-04-05", "*.zip");
             long byteCount = 0;
             long recCount = 0;
             var cnt1 = 0;
@@ -186,7 +186,7 @@ namespace Data.Tests.DBQ
 
         public static void RunDbq()    //76 274 milliseconds
         {
-            var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
+            var files = Directory.GetFiles(Settings.DataFolder + @"Trades\Polygon\Data\2024-04-05", "*.zip");
             long byteCount = 0;
             long recCount = 0;
             foreach (var zipFileName in files)
@@ -224,7 +224,7 @@ namespace Data.Tests.DBQ
 
         public static void RunProtobuf()    //76 274 milliseconds
         {
-            var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
+            var files = Directory.GetFiles(Settings.DataFolder + @"Trades\Polygon\Data\2024-04-05", "*.zip");
             long byteCount = 0;
             long recCount = 0;
             foreach (var zipFileName in files)
@@ -285,7 +285,7 @@ namespace Data.Tests.DBQ
 
         public static void Run()    //76 274 milliseconds
         {
-            var files = Directory.GetFiles(@"E:\Quote\WebData\Trades\Polygon\Data\2024-04-05", "*.zip");
+            var files = Directory.GetFiles(Settings.DataFolder + @"Trades\Polygon\Data\2024-04-05", "*.zip");
             foreach (var zipFileName in files.Take(3))
             {
                 Logger.AddMessage($"File: {zipFileName}");

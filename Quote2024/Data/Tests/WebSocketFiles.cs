@@ -11,8 +11,8 @@ namespace Data.Tests
 {
     public class WebSocketFiles
     {
-        private const string folderOld = @"E:\Quote\WebData\RealTime\WebSockets";
-        private const string folder = @"E:\Quote\WebData\RealTime\YahooSocket\Data\2024-04-08";
+        private const string folderOld = Settings.DataFolder + @"RealTime\WebSockets";
+        private const string folder = Settings.DataFolder + @"RealTime\YahooSocket\Data\2024-04-08";
 
         public class DelayStat
         {

@@ -17,7 +17,7 @@ namespace Data.Actions.Eoddata
             Logger.AddMessage($"Started");
 
             var timeStamp = TimeHelper.GetTimeStamp();
-            var zipFileName = $@"E:\Quote\WebData\Splits\Eoddata\EoddataSplits_{timeStamp.Item2}.zip";
+            var zipFileName = Settings.DataFolder + $@"Splits\Eoddata\EoddataSplits_{timeStamp.Item2}.zip";
 
             // Download html data
             var o = WebClientExt.GetToBytes(URL, false, true);

@@ -8,7 +8,7 @@ namespace Data.Actions.StockAnalysis
     public class StockAnalysisIPOs
     {
         private const string Url = @"https://stockanalysis.com/api/screener/s/f?m=ipoDate&s=desc&c=ipoDate,s,n,ipoPrice,ippc,exchange,sector,industry,employees&cn=5000&i=histip";
-        private const string Folder = @"E:\Quote\WebData\Splits\StockAnalysis\IPOs\";
+        private const string Folder = Settings.DataFolder + @"Splits\StockAnalysis\IPOs\";
 
         public static void Start()
         {

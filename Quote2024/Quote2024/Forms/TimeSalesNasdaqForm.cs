@@ -22,7 +22,7 @@ namespace Quote2024.Forms
         private string[] Tickers => txtTickerList.Text.Split(new []{"\t", " ", "\n"}, StringSplitOptions.RemoveEmptyEntries).Where(a => !string.IsNullOrWhiteSpace(a))
             .Select(a => a.Trim()).ToArray();
 
-        private readonly string _baseFolder = @"D:\Quote\WebData\Minute\NasdaqTimeSales";
+        private readonly string _baseFolder = Settings.DataFolder + @"Minute\NasdaqTimeSales";
         private string _dataFolder;
 
         private int _tickCount;

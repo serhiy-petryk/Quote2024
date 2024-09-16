@@ -12,7 +12,7 @@ namespace Data.Actions.StockAnalysis
     public class StockAnalysisActions
     {
         private const string Url = @"https://stockanalysis.com/actions/";
-        private const string Folder = @"E:\Quote\WebData\Splits\StockAnalysis\Actions\";
+        private const string Folder = Settings.DataFolder + @"Splits\StockAnalysis\Actions\";
 
         public static void Start()
         {
@@ -99,7 +99,7 @@ namespace Data.Actions.StockAnalysis
 
         public static string GetJsonContent()
         {
-            var fileContent = File.ReadAllText(@"E:\Quote\WebData\Splits\StockAnalysis\StockAnalysisActions_20240127.html");
+            var fileContent = File.ReadAllText(Settings.DataFolder + @"Splits\StockAnalysis\StockAnalysisActions_20240127.html");
             var i1 = fileContent.IndexOf("const data =", StringComparison.InvariantCulture);
             if (i1 == -1) return null;
 
