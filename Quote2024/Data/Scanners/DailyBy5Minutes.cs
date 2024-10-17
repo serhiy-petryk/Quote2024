@@ -85,7 +85,7 @@ namespace Data.Scanners
                                 valid = !data.ContainsKey(key) && symbolAndDates.ContainsKey(key) && symbolAndDates[key].HasValue;
                                 if (valid)
                                 {
-                                    if (data.Count > 1000)
+                                    if (data.Count > 10000)
                                     {
                                         SaveToDb(data.Values);
                                         data.Clear();
