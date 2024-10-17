@@ -248,5 +248,21 @@ namespace Quote2024.Forms
             var form = new WebSocketYahooForm();
             form.Show();
         }
+
+        private async void btnDailyBy5Minutes_Click(object sender, EventArgs e)
+        {
+            btnDailyBy5Minutes.Enabled = false;
+
+            // Data.Helpers.StatMethods.Tests();
+            var sw = new Stopwatch();
+            sw.Start();
+
+            // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
+
+            // await Task.Factory.StartNew(Data.Actions.Eoddata.EoddataIndexLoader.Start);
+            await Task.Factory.StartNew(Data.Scanners.DailyBy5Minutes.Start);
+
+            btnDailyBy5Minutes.Enabled = true;
+        }
     }
 }
