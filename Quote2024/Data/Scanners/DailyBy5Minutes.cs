@@ -273,7 +273,7 @@ namespace Data.Scanners
                 if (Open.HasValue)
                 {
                     if (High.Value < item.h) High = item.h;
-                    if (Low.Value < item.l) Low = item.l;
+                    if (Low.Value > item.l) Low = item.l;
                 }
                 else if (item.DateTime.TimeOfDay < ToLocal)
                 {
