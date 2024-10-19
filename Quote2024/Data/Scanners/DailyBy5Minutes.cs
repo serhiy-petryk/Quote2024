@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Xml;
 using Data.Actions.Polygon;
 using Data.Helpers;
 using Microsoft.Data.SqlClient;
