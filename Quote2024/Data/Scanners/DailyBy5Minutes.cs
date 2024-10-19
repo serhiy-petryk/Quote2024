@@ -106,7 +106,7 @@ namespace Data.Scanners
                                 var time = item.DateTime.TimeOfDay;
                                 if (time < BeforeNotInInterval || time > AfterNotInInterval) continue;
 
-                                foreach(var o in dbEntry.Intervals.Where(a=>time>=a.From && time<a.To))
+                                foreach (var o in dbEntry.Intervals.Where(a => time >= a.From && time < a.To))
                                     o.ProcessQuote(item);
                             }
                         }
@@ -270,19 +270,21 @@ namespace Data.Scanners
 
             public void ProcessQuote(PolygonCommon.cMinuteItem item)
             {
-                if (Open.HasValue)
-                {
-                    if (High.Value < item.h) High = item.h;
-                    if (Low.Value > item.l) Low = item.l;
-                }
-                else if (item.DateTime.TimeOfDay < ToLocal)
-                {
-                    Open = item.o;
-                    High = item.h;
-                    Low = item.l;
-                }
+              if (!Open.HasValue && item.DateTime.TimeOfDay < ToLocal)
+                Open = item.o;
+
+              if (!High.HasValue)
+              {
+                High = item.h;
+                Low = item.l;
+              }
+              else
+              {
+                if (High.Value < item.h) High = item.h;
+                if (Low.Value > item.l) Low = item.l;
+              }
             }
-        }
+    }
         #endregion
     }
 }
