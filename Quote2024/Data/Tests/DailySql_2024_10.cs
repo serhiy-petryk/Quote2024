@@ -14,39 +14,6 @@ namespace Data.Tests
             var closes = new string[]
                 { "O1520", "O1525", "O1530", "O1535", "O1540", "O1545", "O1550", "O1555"};
 
-            var sqlTemplate2 = ";with data as\n" +
-                      "(\n" +
-                      "select (a.[Open]-a.[Close])/a.[Open]*100 PrevOpenRate,\n" +
-                      "(a.[Open]-a.[Close])/(a.[Open]+a.[Close])*200 PrevCOProfit,\n" +
-                      "(a.[High]-a.[Low])/(a.High+a.Low)*200 PrevHLProfit,\n" +
-                      "a.*, b.MyType, b.Sector from dbQ2024..DayPolygon a \n" +
-                      "inner join dbQ2024..SymbolsPolygon b on a.Symbol=b.Symbol and a.Date between b.Date and isnull(b.[To],'2099-12-31')\n" +
-                      "where a.IsTest is null and year(a.Date) in (2022,2023) and\n" +
-                      "a.Volume*a.[Close]>=50000000 and a.TradeCount>=10000 --and a.Low>=5.0\n" +
-                      "-- !!?? and a.[Close] between a.Low*1.05 and a.High*0.95  -- !!?? is worse\n" +
-                      "),\n" +
-                      "data2 as (\n" +
-                      "select c.Profit, ({0}) ProfitValue, a.* from data a\n" +
-                      "inner join dbQ2024..TradingDays b on a.Date=b.Prev1\n" +
-                      "inner join (select ({0})/{1}*100 Profit,\n" +
-                      "*\n" +
-                      "from dbQ2024MinuteScanner..DailyBy5Minutes\n" +
-                      "where {1}>=5.0 and H1025 is not null /*Bad quote: EDTX/2023-07-14*/\n" +
-                      " and O0930 is not null {2})\n" +
-                      "c on a.Symbol=c.Symbol and a.Date=c.PrevDate\n" +
-                      "--and c.[Open] between a.Low and a.High -- is worse\n" +
-                      "--and (c.[Open] <= a.Low or c.[Open]>=a.High) -- is worse\n" +
-                      "where b.IsShortened is null\n" +
-                      "),\n" +
-                      "data3 as (\n" +
-                      "       SELECT RN = ROW_NUMBER() OVER (PARTITION BY Date ORDER BY PrevHLProfit DESC), *\n" +
-                      "   FROM data2\n" +
-                      ")\n" +
-                      "\n" +
-                      "select cast(ROUND(avg(Profit),3) as real) Profit, count(*) Recs, ROUND(avg(PrevHLProfit),2) PrevHLProfit,\n" +
-                      "ROUND(sum(ProfitValue),0) ProfitValue\n" +
-                      "from data3\n" +
-                      "    WHERE RN<=10 and PrevHLProfit>10\n";
             var sqlTemplate = ";with data as\n" +
                               "(\n" +
                               "select (a.[Open]-a.[Close])/a.[Open]*100 PrevOpenRate,\n" +
@@ -123,7 +90,7 @@ namespace Data.Tests
                     var closeInString = sb1.ToString() + "O1600" + sb2.ToString();
 
                     var openIn = opens[k1];
-                    var highIn = openIn.Replace("O", "H");
+                    var highIn = openIn.Replace("O", "HG");
 
                     sb1.Clear();
                     for (var k11 = 0; k11 <= k1; k11++)
