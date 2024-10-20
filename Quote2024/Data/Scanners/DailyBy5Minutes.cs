@@ -20,7 +20,7 @@ namespace Data.Scanners
                 int.Parse(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1].Substring(0, 4));
 
             var zipFiles = Directory.GetFiles(PolygonCommon.DataFolderMinute, "*.zip")
-                .Where(a => GetYear(a)>=2010).OrderBy(a => a).ToList();
+                .Where(a => GetYear(a)>=2022).OrderBy(a => a).ToList();
 
             Logger.AddMessage($"Started. Select list of symbols and dates");
             var symbolAndDates = new Dictionary<(string, DateTime), DateTime?>();
@@ -32,7 +32,7 @@ namespace Data.Scanners
                 cmd.CommandText = $"select a.Symbol, a.Date PrevDate, b.Date NextDate " +
                                   "from dbQ2024..DayPolygon a " +
                                   "inner join dbQ2024..TradingDays b on b.Prev1 = a.Date " +
-                                  "where year(a.Date)>=2010 and a.IsTest is null and a.Volume*a.[Close]>= 50000000 and a.TradeCount >= 10000";
+                                  "where year(a.Date)>=2022 and a.IsTest is null and a.Volume*a.[Close]>= 50000000 and a.TradeCount >= 10000";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                         symbolAndDates.Add(((string)rdr["Symbol"], (DateTime)rdr["NextDate"]), (DateTime)rdr["PrevDate"]);
@@ -118,13 +118,18 @@ namespace Data.Scanners
         {
             Logger.AddMessage($"Save data to database ...");
             DbHelper.SaveToDbTable(data, "dbQ2024MinuteScanner..DailyBy5Minutes", "Symbol", "PrevDate", "NextDate",
-                "O0930", "H0930", "L0930", "O0935", "H0935", "L0935",
-                "O0940", "H0940", "L0940", "O0945", "H0945", "L0945",
-                "O0950", "H0950", "L0950", "O0955", "H0955", "L0955",
-                "O1000", "H1000", "L1000", "O1005", "H1005", "L1005",
-                "O1010", "H1010", "L1010", "O1015", "H1015", "L1015",
-                "O1020", "H1020", "L1020", "O1025", "H1025", "L1025",
-
+                "O0930", "H0930", "L0930", "C0930", "HG0930", "LG0930",
+                "O0935", "H0935", "L0935", "C0935", "HG0935", "LG0935",
+                "O0940", "H0940", "L0940", "C0940", "HG0940", "LG0940",
+                "O0945", "H0945", "L0945", "C0945", "HG0945", "LG0945",
+                "O0950", "H0950", "L0950", "C0950", "HG0950", "LG0950",
+                "O0955", "H0955", "L0955", "C0955", "HG0955", "LG0955",
+                "O1000", "H1000", "L1000", "C1000", "HG1000", "LG1000",
+                "O1005", "H1005", "L1005", "C1005", "HG1005", "LG1005",
+                "O1010", "H1010", "L1010", "C1010", "HG1010", "LG1010",
+                "O1015", "H1015", "L1015", "C1015", "HG1015", "LG1015",
+                "O1020", "H1020", "L1020", "C1020", "HG1020", "LG1020",
+                "O1025", "H1025", "L1025", "C1025", "HG1025", "LG1025",
                 "O1520", "H1520", "L1520", "O1525", "H1525", "L1525",
                 "O1530", "H1530", "L1530", "O1535", "H1535", "L1535",
                 "O1540", "H1540", "L1540", "O1545", "H1545", "L1545",
@@ -141,50 +146,86 @@ namespace Data.Scanners
             public float? O0930 => Intervals[0].Open;
             public float? H0930 => Intervals[0].High;
             public float? L0930 => Intervals[0].Low;
+            public float? C0930 => Intervals[0].Close;
+            public float? HG0930 => Intervals[0].HighGlobal;
+            public float? LG0930 => Intervals[0].LowGlobal;
 
             public float? O0935 => Intervals[1].Open;
             public float? H0935 => Intervals[1].High;
             public float? L0935 => Intervals[1].Low;
-            
+            public float? C0935 => Intervals[1].Close;
+            public float? HG0935 => Intervals[1].HighGlobal;
+            public float? LG0935 => Intervals[1].LowGlobal;
+
             public float? O0940 => Intervals[2].Open;
             public float? H0940 => Intervals[2].High;
             public float? L0940 => Intervals[2].Low;
-            
+            public float? C0940 => Intervals[2].Close;
+            public float? HG0940 => Intervals[2].HighGlobal;
+            public float? LG0940 => Intervals[2].LowGlobal;
+
             public float? O0945 => Intervals[3].Open;
             public float? H0945 => Intervals[3].High;
             public float? L0945 => Intervals[3].Low;
+            public float? C0945 => Intervals[3].Close;
+            public float? HG0945 => Intervals[3].HighGlobal;
+            public float? LG0945 => Intervals[3].LowGlobal;
 
             public float? O0950 => Intervals[4].Open;
             public float? H0950 => Intervals[4].High;
             public float? L0950 => Intervals[4].Low;
-            
+            public float? C0950 => Intervals[4].Close;
+            public float? HG0950 => Intervals[4].HighGlobal;
+            public float? LG0950 => Intervals[4].LowGlobal;
+
             public float? O0955 => Intervals[5].Open;
             public float? H0955 => Intervals[5].High;
             public float? L0955 => Intervals[5].Low;
+            public float? C0955 => Intervals[5].Close;
+            public float? HG0955 => Intervals[5].HighGlobal;
+            public float? LG0955 => Intervals[5].LowGlobal;
 
             public float? O1000 => Intervals[6].Open;
             public float? H1000 => Intervals[6].High;
             public float? L1000 => Intervals[6].Low;
+            public float? C1000 => Intervals[6].Close;
+            public float? HG1000 => Intervals[6].HighGlobal;
+            public float? LG1000 => Intervals[6].LowGlobal;
 
             public float? O1005 => Intervals[7].Open;
             public float? H1005 => Intervals[7].High;
             public float? L1005 => Intervals[7].Low;
+            public float? C1005 => Intervals[7].Close;
+            public float? HG1005 => Intervals[7].HighGlobal;
+            public float? LG1005 => Intervals[7].LowGlobal;
 
             public float? O1010 => Intervals[8].Open;
             public float? H1010 => Intervals[8].High;
             public float? L1010 => Intervals[8].Low;
+            public float? C1010 => Intervals[8].Close;
+            public float? HG1010 => Intervals[8].HighGlobal;
+            public float? LG1010 => Intervals[8].LowGlobal;
 
             public float? O1015 => Intervals[9].Open;
             public float? H1015 => Intervals[9].High;
             public float? L1015 => Intervals[9].Low;
+            public float? C1015 => Intervals[9].Close;
+            public float? HG1015 => Intervals[9].HighGlobal;
+            public float? LG1015 => Intervals[9].LowGlobal;
 
             public float? O1020 => Intervals[10].Open;
             public float? H1020 => Intervals[10].High;
             public float? L1020 => Intervals[10].Low;
+            public float? C1020 => Intervals[10].Close;
+            public float? HG1020 => Intervals[10].HighGlobal;
+            public float? LG1020 => Intervals[10].LowGlobal;
 
             public float? O1025 => Intervals[11].Open;
             public float? H1025 => Intervals[11].High;
             public float? L1025 => Intervals[11].Low;
+            public float? C1025 => Intervals[11].Close;
+            public float? HG1025 => Intervals[11].HighGlobal;
+            public float? LG1025 => Intervals[11].LowGlobal;
 
             // =================
             public float? O1520 => Intervals[12].Open;
@@ -251,6 +292,9 @@ namespace Data.Scanners
             public float? Open;
             public float? High;
             public float? Low;
+            public float? Close;
+            public float? HighGlobal;
+            public float? LowGlobal;
 
             public DbInterval(TimeSpan from)
             {
@@ -267,19 +311,33 @@ namespace Data.Scanners
 
             public void ProcessQuote(PolygonCommon.cMinuteItem item)
             {
-              if (!Open.HasValue && item.DateTime.TimeOfDay < ToLocal)
-                Open = item.o;
+                if (item.DateTime.TimeOfDay < ToLocal)
+                {
+                    if (Open.HasValue)
+                    {
+                        if (High < item.h) High = item.h;
+                        if (Low > item.l) Low = item.l;
+                        Close = item.c;
+                    }
+                    else
+                    {
+                        Open = item.o;
+                        High = item.h;
+                        Low = item.l;
+                        Close = item.c;
+                    }
+                }
 
-              if (!High.HasValue)
-              {
-                High = item.h;
-                Low = item.l;
-              }
-              else
-              {
-                if (High.Value < item.h) High = item.h;
-                if (Low.Value > item.l) Low = item.l;
-              }
+                if (!HighGlobal.HasValue)
+                {
+                    HighGlobal = item.h;
+                    LowGlobal = item.l;
+                }
+                else
+                {
+                    if (HighGlobal.Value < item.h) HighGlobal = item.h;
+                    if (LowGlobal.Value > item.l) LowGlobal = item.l;
+                }
             }
     }
         #endregion
