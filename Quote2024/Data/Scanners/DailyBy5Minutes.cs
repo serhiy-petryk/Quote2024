@@ -20,7 +20,7 @@ namespace Data.Scanners
                 int.Parse(Path.GetFileNameWithoutExtension(zipFileName).Split('_')[1].Substring(0, 4));
 
             var zipFiles = Directory.GetFiles(PolygonCommon.DataFolderMinute, "*.zip")
-                .Where(a => GetYear(a)>=2022).OrderBy(a => a).ToList();
+                .Where(a => GetYear(a)>=2010).OrderBy(a => a).ToList();
 
             Logger.AddMessage($"Started. Select list of symbols and dates");
             var symbolAndDates = new Dictionary<(string, DateTime), DateTime?>();
@@ -32,7 +32,7 @@ namespace Data.Scanners
                 cmd.CommandText = $"select a.Symbol, a.Date PrevDate, b.Date NextDate " +
                                   "from dbQ2024..DayPolygon a " +
                                   "inner join dbQ2024..TradingDays b on b.Prev1 = a.Date " +
-                                  "where year(a.Date)>=2022 and a.IsTest is null and a.Volume*a.[Close]>= 50000000 and a.TradeCount >= 10000";
+                                  "where year(a.Date)>=2010 and a.IsTest is null and a.Volume*a.[Close]>= 50000000 and a.TradeCount >= 10000";
                 using (var rdr = cmd.ExecuteReader())
                     while (rdr.Read())
                         symbolAndDates.Add(((string)rdr["Symbol"], (DateTime)rdr["NextDate"]), (DateTime)rdr["PrevDate"]);
@@ -119,6 +119,10 @@ namespace Data.Scanners
             Logger.AddMessage($"Save data to database ...");
             DbHelper.SaveToDbTable(data, "dbQ2024MinuteScanner..DailyBy5Minutes", "Symbol", "PrevDate", "NextDate",
                 "O0930", "H0930", "L0930", "C0930", "HG0930", "LG0930",
+                "O0931", "H0931", "L0931", "C0931", "HG0931", "LG0931",
+                "O0932", "H0932", "L0932", "C0932", "HG0932", "LG0932",
+                "O0933", "H0933", "L0933", "C0933", "HG0933", "LG0933",
+                "O0934", "H0934", "L0934", "C0934", "HG0934", "LG0934",
                 "O0935", "H0935", "L0935", "C0935", "HG0935", "LG0935",
                 "O0940", "H0940", "L0940", "C0940", "HG0940", "LG0940",
                 "O0945", "H0945", "L0945", "C0945", "HG0945", "LG0945",
@@ -149,6 +153,34 @@ namespace Data.Scanners
             public float? C0930 => Intervals[0].Close;
             public float? HG0930 => Intervals[0].HighGlobal;
             public float? LG0930 => Intervals[0].LowGlobal;
+
+            public float? O0931 => Intervals[21].Open;
+            public float? H0931 => Intervals[21].High;
+            public float? L0931 => Intervals[21].Low;
+            public float? C0931 => Intervals[21].Close;
+            public float? HG0931 => Intervals[21].HighGlobal;
+            public float? LG0931 => Intervals[21].LowGlobal;
+
+            public float? O0932 => Intervals[22].Open;
+            public float? H0932 => Intervals[22].High;
+            public float? L0932 => Intervals[22].Low;
+            public float? C0932 => Intervals[22].Close;
+            public float? HG0932 => Intervals[22].HighGlobal;
+            public float? LG0932 => Intervals[22].LowGlobal;
+
+            public float? O0933 => Intervals[23].Open;
+            public float? H0933 => Intervals[23].High;
+            public float? L0933 => Intervals[23].Low;
+            public float? C0933 => Intervals[23].Close;
+            public float? HG0933 => Intervals[23].HighGlobal;
+            public float? LG0933 => Intervals[23].LowGlobal;
+
+            public float? O0934 => Intervals[24].Open;
+            public float? H0934 => Intervals[24].High;
+            public float? L0934 => Intervals[24].Low;
+            public float? C0934 => Intervals[24].Close;
+            public float? HG0934 => Intervals[24].HighGlobal;
+            public float? LG0934 => Intervals[24].LowGlobal;
 
             public float? O0935 => Intervals[1].Open;
             public float? H0935 => Intervals[1].High;
@@ -280,7 +312,9 @@ namespace Data.Scanners
                 new DbInterval(new TimeSpan(15, 45, 0), new TimeSpan(15, 50, 0)), //17
                 new DbInterval(new TimeSpan(15, 50, 0), new TimeSpan(15, 55, 0)), //18
                 new DbInterval(new TimeSpan(15, 55, 0), new TimeSpan(16, 0, 0)), //19
-                new DbInterval(new TimeSpan(16, 0, 0), new TimeSpan(16, 2, 0)) //20
+                new DbInterval(new TimeSpan(16, 0, 0), new TimeSpan(16, 2, 0)), //20
+                new DbInterval(new TimeSpan(9, 31, 0)), new DbInterval(new TimeSpan(9, 32, 0)), // 21-22
+                new DbInterval(new TimeSpan(9, 33, 0)), new DbInterval(new TimeSpan(9, 34, 0)) // 23-24
             };
         }
 
@@ -300,7 +334,10 @@ namespace Data.Scanners
             {
                 From = from;
                 To = new TimeSpan(15, 20, 0);
-                ToLocal = From.Add(new TimeSpan(0, 5, 0));
+                if (from < new TimeSpan(9, 35, 0))
+                    ToLocal = From.Add(new TimeSpan(0, 1, 0));
+                else
+                    ToLocal = From.Add(new TimeSpan(0, 5, 0));
             }
             public DbInterval(TimeSpan from, TimeSpan to)
             {
