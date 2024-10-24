@@ -17,8 +17,8 @@ namespace Data.Tests
             var sqlTemplate = ";with data as\n" +
                               "(\n" +
                               "select (a.[Open]-a.[Close])/a.[Open]*100 PrevOpenRate,\n" +
-                              "(a.[Open]-a.[Close])/(a.[Open]+a.[Close])*200 PrevCOProfit,\n" +
-                              "(a.[High]-a.[Low])/(a.High+a.Low)*200 PrevHLProfit,\n" +
+                              "(a.[Open]-a.[Close])/(a.[Open]+a.[Close])*200 PrevCO,\n" +
+                              "(a.[High]-a.[Low])/(a.High+a.Low)*200 PrevHL,\n" +
                               "a.*, b.MyType, b.Sector from dbQ2024..DayPolygon a \n" +
                               "inner join dbQ2024..SymbolsPolygon b on a.Symbol=b.Symbol and a.Date between b.Date and isnull(b.[To],'2099-12-31')\n" +
                               "where a.IsTest is null and year(a.Date) in (2022,2023) and\n" +
@@ -50,11 +50,11 @@ namespace Data.Tests
                               "where b.IsShortened is null\n" +
                               "),\n" +
                               "data3 as (\n" +
-                              "       SELECT RN = ROW_NUMBER() OVER (PARTITION BY Date ORDER BY PrevHLProfit DESC), *\n" +
+                              "       SELECT RN = ROW_NUMBER() OVER (PARTITION BY Date ORDER BY PrevHL DESC), *\n" +
                               "   FROM data2\n" +
                               ")\n" +
                               "\n" +
-                              "select cast(ROUND(avg(Profit),3) as real) Profit, count(*) Recs, ROUND(avg(PrevHLProfit),2) PrevHLProfit,\n" +
+                              "select cast(ROUND(avg(Profit),3) as real) Profit, count(*) Recs, ROUND(avg(PrevHL),2) PrevHL,\n" +
                               "ROUND(sum(ProfitValue),0) ProfitValue,\n" +
                               "ROUND(avg(Amt1),3) Amt1,\n" +
                               "ROUND(avg(Amt2),3) Amt2,\n" +
@@ -69,7 +69,7 @@ namespace Data.Tests
                               "cast(ROUND(100.0*sum(Cnt2P)/count(*),1) as real) Cnt2P,\n" +
                               "cast(ROUND(100.0*sum(Cnt5P)/count(*),1) as real) Cnt5P\n" +
                               "from data3\n" +
-                              "    WHERE RN<=5 and PrevHLProfit>15";
+                              "    WHERE RN<=5 and PrevHL>15";
 
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
@@ -106,7 +106,7 @@ namespace Data.Tests
                         while (rdr.Read())
                         {
                             Debug.Print(
-                                $"{opens[k1]}-{closes[k2]}\t{rdr["Profit"]}\t{rdr["Recs"]}\t{rdr["PrevHLProfit"]}\t{rdr["ProfitValue"]}\t{rdr["Amt1"]}\t{rdr["Amt2"]}\t{rdr["Amt5"]}\t{rdr["Amt1P"]}\t{rdr["Amt2P"]}\t{rdr["Amt5P"]}\t{rdr["Cnt1"]}\t{rdr["Cnt2"]}\t{rdr["Cnt5"]}\t{rdr["Cnt1P"]}\t{rdr["Cnt2P"]}\t{rdr["Cnt5P"]}");
+                                $"{opens[k1]}-{closes[k2]}\t{rdr["Profit"]}\t{rdr["Recs"]}\t{rdr["PrevHL"]}\t{rdr["ProfitValue"]}\t{rdr["Amt1"]}\t{rdr["Amt2"]}\t{rdr["Amt5"]}\t{rdr["Amt1P"]}\t{rdr["Amt2P"]}\t{rdr["Amt5P"]}\t{rdr["Cnt1"]}\t{rdr["Cnt2"]}\t{rdr["Cnt5"]}\t{rdr["Cnt1P"]}\t{rdr["Cnt2P"]}\t{rdr["Cnt5P"]}");
                         }
                 }
             }
