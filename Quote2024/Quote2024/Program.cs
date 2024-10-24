@@ -28,6 +28,8 @@ namespace Quote2024
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            // Data.Tests.DailySql_2024_10.Start();
+
             Data.Helpers.WebClientExt.CheckVpnConnection();
 
             Application.Run(new MainForm());
