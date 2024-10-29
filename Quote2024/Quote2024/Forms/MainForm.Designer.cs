@@ -34,6 +34,7 @@ namespace Quote2024.Forms
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnDailyBy5Minutes = new System.Windows.Forms.Button();
             this.btnYahooWebSocketForm = new System.Windows.Forms.Button();
             this.btnFinageTradesForm = new System.Windows.Forms.Button();
             this.btnFinageMinuteForm = new System.Windows.Forms.Button();
@@ -54,7 +55,7 @@ namespace Quote2024.Forms
             this.loaderItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnTest = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnDailyBy5Minutes = new System.Windows.Forms.Button();
+            this.btnIntradayBy5Minutes = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
@@ -92,6 +93,7 @@ namespace Quote2024.Forms
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnIntradayBy5Minutes);
             this.tpLoader.Controls.Add(this.btnDailyBy5Minutes);
             this.tpLoader.Controls.Add(this.btnYahooWebSocketForm);
             this.tpLoader.Controls.Add(this.btnFinageTradesForm);
@@ -113,6 +115,17 @@ namespace Quote2024.Forms
             this.tpLoader.TabIndex = 0;
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
+            // 
+            // btnDailyBy5Minutes
+            // 
+            this.btnDailyBy5Minutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDailyBy5Minutes.Location = new System.Drawing.Point(398, 156);
+            this.btnDailyBy5Minutes.Name = "btnDailyBy5Minutes";
+            this.btnDailyBy5Minutes.Size = new System.Drawing.Size(171, 36);
+            this.btnDailyBy5Minutes.TabIndex = 79;
+            this.btnDailyBy5Minutes.Text = "DailyBy5Minutes create";
+            this.btnDailyBy5Minutes.UseVisualStyleBackColor = true;
+            this.btnDailyBy5Minutes.Click += new System.EventHandler(this.btnDailyBy5Minutes_Click);
             // 
             // btnYahooWebSocketForm
             // 
@@ -340,16 +353,16 @@ namespace Quote2024.Forms
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // btnDailyBy5Minutes
+            // btnIntradayBy5Minutes
             // 
-            this.btnDailyBy5Minutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDailyBy5Minutes.Location = new System.Drawing.Point(398, 156);
-            this.btnDailyBy5Minutes.Name = "btnDailyBy5Minutes";
-            this.btnDailyBy5Minutes.Size = new System.Drawing.Size(171, 36);
-            this.btnDailyBy5Minutes.TabIndex = 79;
-            this.btnDailyBy5Minutes.Text = "DailyBy5Minutes create";
-            this.btnDailyBy5Minutes.UseVisualStyleBackColor = true;
-            this.btnDailyBy5Minutes.Click += new System.EventHandler(this.btnDailyBy5Minutes_Click);
+            this.btnIntradayBy5Minutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnIntradayBy5Minutes.Location = new System.Drawing.Point(397, 198);
+            this.btnIntradayBy5Minutes.Name = "btnIntradayBy5Minutes";
+            this.btnIntradayBy5Minutes.Size = new System.Drawing.Size(171, 36);
+            this.btnIntradayBy5Minutes.TabIndex = 80;
+            this.btnIntradayBy5Minutes.Text = "IntradayBy5Minutes create";
+            this.btnIntradayBy5Minutes.UseVisualStyleBackColor = true;
+            this.btnIntradayBy5Minutes.Click += new System.EventHandler(this.btnIntradayBy5Minutes_Click);
             // 
             // MainForm
             // 
@@ -398,5 +411,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnFinageTradesForm;
         private System.Windows.Forms.Button btnYahooWebSocketForm;
         private System.Windows.Forms.Button btnDailyBy5Minutes;
+        private System.Windows.Forms.Button btnIntradayBy5Minutes;
     }
 }

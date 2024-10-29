@@ -11,8 +11,8 @@ namespace Data.Scanners
 {
     public static class DailyBy5Minutes
     {
-        private static readonly TimeSpan BeforeNotInInterval = new TimeSpan(9, 0, 0);
-        private static readonly TimeSpan AfterNotInInterval = new TimeSpan(16, 2, 0);
+        private static readonly TimeSpan StartTime = new TimeSpan(9, 30, 0);
+        private static readonly TimeSpan EndTime = new TimeSpan(16, 2, 0);
 
         public static void Start()
         {
@@ -97,11 +97,12 @@ namespace Data.Scanners
                                 else
                                     dbEntry = null;
                             }
-                            else if (!valid) continue;
+
+                            if (!valid) continue;
                             else
                             {
                                 var time = item.DateTime.TimeOfDay;
-                                if (time < BeforeNotInInterval || time > AfterNotInInterval) continue;
+                                if (time < StartTime || time > EndTime) continue;
 
                                 foreach (var o in dbEntry.Intervals.Where(a => time >= a.From && time < a.To))
                                     o.ProcessQuote(item);
