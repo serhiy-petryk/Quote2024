@@ -179,7 +179,7 @@ namespace Data.Actions.StockAnalysis
             public string text;
 
             public DateTime pDate => DateTime.Parse(date, CultureInfo.InvariantCulture);
-            public string pSymbol => symbol.StartsWith("$") ? symbol.Substring(1) : symbol;
+            public string pSymbol => symbol.StartsWith("$") ? symbol.Substring(1) : (symbol.StartsWith("!otc/") ? symbol.Substring(5) : symbol);
             public string pOther => other == "N/A" || string.IsNullOrWhiteSpace(other) ? null : other;
             public string pName => string.IsNullOrWhiteSpace(name) ? null : name;
 

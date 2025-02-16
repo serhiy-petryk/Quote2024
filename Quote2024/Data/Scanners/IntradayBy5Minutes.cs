@@ -13,6 +13,8 @@ namespace Data.Scanners
     {
         private static readonly TimeSpan StartTime = new TimeSpan(9, 30, 0);
         private static readonly TimeSpan EndTime = new TimeSpan(16, 0, 0);
+        private const float MinTurnover = 0.5f;
+        private const int MinTradeCount = 100;
 
         public static void Start()
         {
@@ -27,8 +29,8 @@ namespace Data.Scanners
                                   "FROM [dbQ2024Minute].[dbo].[MinutePolygonLog] a "+
                                   "inner join dbQ2024..TradingDays b on a.Date = b.Date "+
                                   "WHERE RowStatus in (2, 5) AND year(a.date)>= 2010 and "+
-                                  "high>= 5.0 and(High - Low) / (High + Low) * 200 >= 5.0 and "+
-                                  "Volume*High >= 500000 and TradeCount>= 100 and "+
+                                  "high>=5.0 and (High-Low)/(High+Low)*200>=5.0 and "+
+                                  $"Volume*High>={MinTurnover*1000000f} and TradeCount>={MinTradeCount} and "+
                                   "b.IsShortened is null and MinTime < '12:00'";
 
                 using (var rdr = cmd.ExecuteReader())
@@ -111,15 +113,11 @@ namespace Data.Scanners
                                 var index = minutes / 5;
                                 if (minutes >= 0 && index < dbEntry.Intervals.Count)
                                     dbEntry.Intervals[index].ProcessQuote(item);
-                                /*var time = item.DateTime.TimeOfDay - StartTime;
-                                if (time < StartTime || time >= EndTime) continue;
 
-                                if (symbol == "AAR" && item.DateTime.Date == new DateTime(2010, 2, 9))
+                                /*if (minutes >= 0 && symbol == "AA" && item.DateTime.Date == new DateTime(2010, 1, 12))
                                 {
-
-                                }
-                                foreach (var o in dbEntry.Intervals.Where(a => time >= a.From && time < a.To))
-                                    o.ProcessQuote(item);*/
+                                    var x1 = dbEntry.MaxTurnover;
+                                }*/
                             }
                         }
                     }
@@ -132,7 +130,8 @@ namespace Data.Scanners
         private static void SaveToDb(IEnumerable<DbEntry> data)
         {
             Logger.AddMessage($"Save data to database ...");
-            DbHelper.SaveToDbTable(data, "dbQ2024MinuteScanner..IntradayBy5Minutes", "Symbol", "Date",
+            DbHelper.SaveToDbTable(data.Where(a=>a.MaxTurnover>=MinTurnover && a.MaxTradeCount>=MinTradeCount),
+                "dbQ2024MinuteScanner..IntradayBy5Minutes", "Symbol", "Date", "MaxTurnover", "MaxTradeCount",
                 "O0930", "H0930", "L0930", "C0930", "V0930", "N0930", "O0935", "H0935", "L0935", "C0935", "V0935", "N0935",
                 "O0940", "H0940", "L0940", "C0940", "V0940", "N0940", "O0945", "H0945", "L0945", "C0945", "V0945", "N0945",
                 "O0950", "H0950", "L0950", "C0950", "V0950", "N0950", "O0955", "H0955", "L0955", "C0955", "V0955", "N0955",
@@ -180,6 +179,8 @@ namespace Data.Scanners
         {
             public string Symbol;
             public DateTime Date;
+            public float MaxTurnover => Intervals.Max(a => a.Volume * ((a.Low ?? 0.0f) + (a.High ?? 0.0f)) / 2000000f);
+            public int MaxTradeCount => Intervals.Max(a => a.Trades);
 
             public float? O0930 => Intervals[0].Open;
             public float? H0930 => Intervals[0].High;

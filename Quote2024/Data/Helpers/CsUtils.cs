@@ -159,6 +159,5 @@ namespace Data.Helpers
                 return GC.GetTotalMemory(true);
             }
         }
-
     }
 }

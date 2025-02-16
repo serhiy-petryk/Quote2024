@@ -186,7 +186,7 @@ namespace Data.Models
 
             if (string.IsNullOrWhiteSpace(Symbol))
                 throw new Exception("Check symbol");
-            if (!string.IsNullOrWhiteSpace(symbol) && !string.Equals(symbol, Symbol))
+            if (!string.IsNullOrWhiteSpace(symbol) && !string.Equals(symbol, Symbol) && !symbol.StartsWith(@"!otc/SVUHF"))
             {
                 if (Type == Action.Split)
                 {
