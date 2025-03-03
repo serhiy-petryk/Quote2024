@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Data.Helpers;
@@ -38,7 +39,31 @@ namespace Data.Actions.StockAnalysis
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
-                    var oo = ZipUtils.DeserializeZipEntry<cRoot>(entry);
+                    cRoot oo;
+
+                    // Data files store 'ipoPrice' in number format before 2023-03 and store it in string format after 2023-03
+                    // Convert 'ipoPrice' from string format to number
+                    using (var entryStream = entry.Open())
+                    using (var memstream = new MemoryStream())
+                    {
+                        entryStream.CopyTo(memstream);
+                        var s = System.Text.Encoding.UTF8.GetString(memstream.ToArray());
+                        var i1 = s.IndexOf("\"ipoPrice\":\"", StringComparison.InvariantCultureIgnoreCase);
+                        while (i1 != -1)
+                        {
+                            var i2 = s.IndexOf("\"", i1 + 12, StringComparison.InvariantCulture);
+                            var s1 = s.Substring(0, i1 + 11);
+                            var value = s.Substring(i1 + 12,i2-i1-12 );
+                            var s3 = s.Substring(i2+1);
+
+                            s = s1 + value + s3;
+                            i1 = s.IndexOf("\"ipoPrice\":\"", StringComparison.InvariantCultureIgnoreCase);
+                        }
+
+                        oo = ZipUtils.DeserializeString<cRoot>(s);
+                    }
+
+                    // var oo = ZipUtils.DeserializeZipEntry<cRoot>(entry);
                     foreach (var item in oo.data.data)
                         item.TimeStamp = entry.LastWriteTime.DateTime;
                     itemCount += oo.data.data.Length;
