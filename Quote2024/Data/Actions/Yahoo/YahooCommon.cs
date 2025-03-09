@@ -56,7 +56,7 @@ namespace Data.Actions.Yahoo
                             throw new Exception($"Bad file name in {zipFileName}: {entry.Name}. Must starts with 'yMin-'");
 
                         var symbol = entry.Name.Substring(5, entry.Name.Length - 9).ToUpper();
-                        var o = Helpers.ZipUtils.DeserializeZipEntry<Models.MinuteYahoo>(entry);
+                        var o = ZipUtils.DeserializeZipEntry<Models.MinuteYahoo>(entry);
                         if (o.chart.error != null)
                         {
                             errorLog.Add(symbol, o.chart.error.description ?? o.chart.error.code);
