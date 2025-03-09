@@ -29,6 +29,8 @@ namespace Quote2024
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Data.Tests.DailySql_2024_10.Start();
+            // Data.Actions.StockAnalysis.StockAnalysisIPOs.ParseAndSaveToDb(@"E:\Quote\WebData\Splits\StockAnalysis\IPOs\StockAnalysisIPOs_20250208.zip");
+            // Data.Actions.StockAnalysis.StockAnalysisIPOs.ParseAndSaveToDb(@"E:\Quote\WebData\Splits\StockAnalysis\IPOs\StockAnalysisIPOs_20250308.zip");
 
             Data.Helpers.WebClientExt.CheckVpnConnection();
 

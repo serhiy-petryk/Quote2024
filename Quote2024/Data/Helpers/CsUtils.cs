@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -8,6 +9,22 @@ namespace Data.Helpers
 {
     public static class CsUtils
     {
+        public static float? FromSpanJsonDynamicToFloat(object spanValue)
+        {
+            if (spanValue is SpanJson.Formatters.Dynamic.SpanJsonDynamicUtf8String stringSpan)
+                return float.Parse(spanValue.ToString(), CultureInfo.InvariantCulture);
+
+            if (spanValue is SpanJson.Formatters.Dynamic.SpanJsonDynamicUtf8Number numberSpan)
+            {
+                numberSpan.TryConvert(typeof(float), out var f2);
+                return (float)f2;
+            }
+
+            if (spanValue == null) return null;
+
+            throw new Exception("Check FromSpanJsonDynamicToFloat parser");
+        }
+
         #region =======  difference between two strings  ========
         // see Ben Gripka comment in https://stackoverflow.com/questions/2344320/comparing-strings-with-tolerance
         //      https://en.wikipedia.org/wiki/Levenshtein_distance
