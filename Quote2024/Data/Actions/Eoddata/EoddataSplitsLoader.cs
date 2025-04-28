@@ -28,7 +28,7 @@ namespace Data.Actions.Eoddata
 
             // Convert data to text format
             var now = DateTime.Now;
-            var items = new List<SplitModel>();
+            var items = new Dictionary<(string, string, DateTime), SplitModel>();
             var fileLines = new List<string> { "Exchange\tSymbol\tDate\tRatio" };
 
             var i1 = htmlContent.IndexOf("<th>Ratio</th>", StringComparison.InvariantCulture);
@@ -45,7 +45,9 @@ namespace Data.Actions.Eoddata
                 fileLines.Add($"{exchange}\t{symbol}\t{sDate}\t{ratio}");
                 ratio = ratio.Replace('-', ':');
                 var item = new SplitModel(exchange, symbol, date, ratio, now);
-                items.Add(item);
+                var key = (item.Exchange, item.Symbol, item.Date);
+                if (!items.ContainsKey(key))
+                    items.Add(key, item);
             }
 
             // Save data to zip file
@@ -55,7 +57,7 @@ namespace Data.Actions.Eoddata
 
             // Save data to database
             var maxDate = timeStamp.Item1;
-            DbHelper.ClearAndSaveToDbTable(items.Where(a => a.Date <= maxDate), "dbQ2024..Bfr_SplitEoddata", "Exchange", "Symbol",
+            DbHelper.ClearAndSaveToDbTable(items.Values.Where(a => a.Date <= maxDate), "dbQ2024..Bfr_SplitEoddata", "Exchange", "Symbol",
                 "Date", "Ratio", "K", "TimeStamp");
             DbHelper.ExecuteSql("INSERT INTO dbQ2024..SplitEoddata (Exchange,Symbol,[Date],Ratio,K,[TimeStamp]) " +
                                "SELECT a.Exchange, a.Symbol, a.[Date], a.Ratio, a.K, a.[TimeStamp] FROM dbQ2024..Bfr_SplitEoddata a " +

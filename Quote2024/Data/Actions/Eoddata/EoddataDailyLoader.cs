@@ -140,7 +140,20 @@ namespace Data.Actions.Eoddata
                 {
                     itemCount++;
                     prevLine = line;
-                    quotes.Add(new DayEoddata(exchange, line.Split(',')));
+                    var q = new DayEoddata(exchange, line.Split(','));
+                    if (quotes.Count > 0)
+                    {
+                        var prevQuote = quotes[quotes.Count - 1];
+                        if (q.Symbol == prevQuote.Symbol)
+                        {
+                            if (q.Volume > prevQuote.Volume)
+                                quotes[quotes.Count - 1] = q;
+                        }
+                        else
+                            quotes.Add(q);
+                    }
+                    else
+                        quotes.Add(q);
                 }
             }
 
@@ -163,7 +176,7 @@ namespace Data.Actions.Eoddata
 
             public DayEoddata(string exchange, string[] ss)
             {
-                Symbol = ss[0];
+                Symbol = ss[0].Trim();
                 Exchange = exchange.Trim().ToUpper();
                 Date = DateTime.ParseExact(ss[1], "yyyyMMdd", CultureInfo.InvariantCulture);
                 Open = float.Parse(ss[2].Trim(), CultureInfo.InvariantCulture);

@@ -66,13 +66,35 @@ namespace Data.Actions.Eoddata
 
                     var items = lines.Skip(1).Select(line => new SymbolsEoddata(exchange, date, line.Split('\t')))
                         .ToArray();
+                    var filteredItems = new List<SymbolsEoddata>();
                     foreach (var item in items)
+                    {
                         item.TimeStamp = entry.LastWriteTime.DateTime;
+                        if (filteredItems.Count>0 && string.Equals(filteredItems[filteredItems.Count - 1].Symbol, item.Symbol))
+                        {
+                            if (!string.Equals(filteredItems[filteredItems.Count - 1].Name, item.Name))
+                            {
+                                if (string.IsNullOrEmpty(item.Name))
+                                    continue;
+
+                                if (item.Symbol == "DVS" && item.Name == "Diversified Security Solutions Inc.")
+                                    continue;
+                                if (item.Symbol == "MBBC" && item.Name == "Monterey Bay Bancorp Inc.")
+                                    continue;
+
+                                continue;
+                                throw new Exception(
+                                    $"Duplicate '{item.Symbol}' in {entry.Name} entry of {Path.GetFileName(zipFileName)}");
+                            }
+                        }
+                        else
+                            filteredItems.Add(item);
+                    }
 
                     itemCount += items.Length;
 
                     // Save data to buffer table of data server
-                    DbHelper.ClearAndSaveToDbTable(items, "dbQ2024..Bfr_SymbolsEoddata", "Symbol", "Exchange", "Name",
+                    DbHelper.ClearAndSaveToDbTable(filteredItems, "dbQ2024..Bfr_SymbolsEoddata", "Symbol", "Exchange", "Name",
                         "TimeStamp");
                     DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsEoddata");
                 }
