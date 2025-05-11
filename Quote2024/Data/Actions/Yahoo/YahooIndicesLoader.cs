@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Data.Helpers;
 
@@ -73,6 +75,8 @@ namespace Data.Actions.Yahoo
         private static void YahooMinuteDownloadData(string symbol, long fromUnixSeconds, long toUnixSeconds, List<DayYahoo> data)
         {
             Logger.AddMessage($"Download data for {symbol}");
+            var fileName = $@"E:\Quote\WebData\Indices\Yahoo\{symbol}.2025-05-10.json";
+            // var o = (File.ReadAllBytes(fileName), (CookieCollection)null, (Exception)null);
             var url = string.Format(YahooMinuteUrlTemplate, symbol, fromUnixSeconds, toUnixSeconds);
             var o = WebClientExt.GetToBytes(url, false);
             if (o.Item3 != null)

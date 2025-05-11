@@ -239,7 +239,9 @@ namespace Data.Helpers
         protected override WebRequest GetWebRequest(Uri address)
         {
             var request = (HttpWebRequest)base.GetWebRequest(address);
-            request.UserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
+            // request.UserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
+            // Fixed 'To many requests' error for finance.yahoo.com api
+            request.UserAgent = @"Mozilla/5.0 (333333)";
             request.AllowAutoRedirect = true;
             request.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
             request.Headers.Add(HttpRequestHeader.AcceptLanguage, "en-US,en;q=0.9,uk;q=0.8,ru;q=0.7"); // for https://api.nasdaq.com/api/quote/INDU/historical?assetclass=index&fromdate=2024-08-30&limit=9999&todate=2024-09-07
