@@ -24,7 +24,7 @@ namespace Data.Models
             // new LoaderItem {Name = "MorningStar Screener", Action = Actions.MorningStar.MorningStarScreenerLoader.Start, Checked = false},
             // new LoaderItem {Name = "Chartmill Screener", Action = Actions.Chartmill.ChartmillScreenerLoader.Start, Checked = false},
             new LoaderItem {Name = "Index components from Wikipedia", Action = Actions.Wikipedia.WikipediaIndexLoader.Start, Checked = false},
-            new LoaderItem {Name = "StockAnalysis Corporate Actions", Action = Actions.StockAnalysis.StockAnalysisActions.Start, Checked = false},
+            new LoaderItem {Name = "StockAnalysis Corporate Actions", Action = Actions.StockAnalysis.StockAnalysisActions.StartJson, Checked = false},
             new LoaderItem {Name = "StockAnalysis IPOs", Action = Actions.StockAnalysis.StockAnalysisIPOs.Start, Checked=false},
             new LoaderItem {Name = "Eoddata Symbols", Action = Actions.Eoddata.EoddataSymbolsLoader.Start, Checked = false},
             // new LoaderItem {Name = "Yahoo Profiles", Action=Actions.Yahoo.YahooProfileLoader.Start},

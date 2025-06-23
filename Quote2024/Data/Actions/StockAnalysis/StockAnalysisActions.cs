@@ -11,8 +11,32 @@ namespace Data.Actions.StockAnalysis
 {
     public class StockAnalysisActions
     {
+        private const string JsonUrl = @"https://api.stockanalysis.com/api/actions/all/recent";
         private const string Url = @"https://stockanalysis.com/actions/";
         private const string Folder = Settings.DataFolder + @"Splits\StockAnalysis\Actions\";
+
+        public static void StartJson()
+        {
+            Logger.AddMessage($"Started");
+
+            var timeStamp = TimeHelper.GetTimeStamp();
+            var zipFileName = Folder + $"StockAnalysisActions_{timeStamp.Item2}.zip";
+
+            // Download html data
+            var o = WebClientExt.GetToBytes(JsonUrl, false);
+            if (o.Item3 != null)
+                throw new Exception(
+                    $"StockAnalysisActions: Error while download from {Url}. Error message: {o.Item3.Message}");
+
+            // Save html data to zip
+            var entry = new VirtualFileEntry($"StockAnalysisActions_{timeStamp.Item2}.json", o.Item1);
+            ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
+
+            // Parse and save to database
+            var itemCount = ParseAndSaveToDb(zipFileName, false);
+
+            Logger.AddMessage($"!Finished. Items: {itemCount:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
+        }
 
         public static void Start()
         {
@@ -57,7 +81,23 @@ namespace Data.Actions.StockAnalysis
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
                     var items = new List<Models.ActionStockAnalysis>();
-                    Parse(entry.GetContentOfZipEntry(), items, entry.LastWriteTime.DateTime);
+
+                    if (entry.Name.EndsWith(".json"))
+                    {
+                        var content = entry.GetContentOfZipEntry();
+                        var oo = ZipUtils.DeserializeString<cRoot2>(content);
+
+                        foreach (var item in oo.data.data)
+                            items.Add(new ActionStockAnalysis(item, entry.LastWriteTime.DateTime));
+
+                        if (oo.status != 200 || oo.data.fullCount != items.Count)
+                            throw new Exception($"Check json in {zipFileName}");
+                    }
+                    else
+                    {
+                        Parse(entry.GetContentOfZipEntry(), items, entry.LastWriteTime.DateTime);
+                    }
+
                     itemCount += items.Count;
 
                     if (onlyCheck) continue;
@@ -156,6 +196,17 @@ namespace Data.Actions.StockAnalysis
         #endregion
 
         #region =======  Json subclasses  =============
+        private class cRoot2
+        {
+            public int status;
+            public cData2 data;
+        }
+        private class cData2
+        {
+            public cItem[] data;
+            public int fullCount;
+        }
+
         private class cRoot
         {
             public string type;
