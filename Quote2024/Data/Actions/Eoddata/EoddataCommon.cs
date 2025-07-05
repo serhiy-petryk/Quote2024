@@ -50,8 +50,8 @@ namespace Data.Actions.Eoddata
 
                 if (_eoddataCookies["ASP.NET_SessionId"] == null)
                     throw new Exception("No 'ASP.NET_SessionId' cookie");
-                if (_eoddataCookies["EODDataAdmin"] == null)
-                    throw new Exception("No 'EODDataAdmin' cookie");
+                //if (_eoddataCookies["EODDataAdmin"] == null)
+                  //  throw new Exception("No 'EODDataAdmin' cookie");
                 if (_eoddataCookies["EODDataLogin"] == null)
                     throw new Exception("No 'EODDataLogin' cookie");
             }
