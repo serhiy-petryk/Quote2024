@@ -36,11 +36,14 @@ namespace Data.Actions.Eoddata
             var rows = htmlContent.Substring(i1 + 14, i2 - i1 - 14).Trim().Split(new[] { "</tr>" }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var row in rows)
             {
+                if (string.Equals(row.Trim(), "</tbody>")) continue;
+
                 var cells = row.Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
                 var exchange = GetCellValue(cells[0]);
                 var symbol = GetCellValue(cells[1]);
                 var sDate = GetCellValue(cells[2]);
-                var date = DateTime.ParseExact(sDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                // var date = DateTime.ParseExact(sDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                var date = DateTime.ParseExact(sDate, "dd MMM yyyy", CultureInfo.InvariantCulture); // Added at 2025-08-10
                 var ratio = GetCellValue(cells[3]);
                 fileLines.Add($"{exchange}\t{symbol}\t{sDate}\t{ratio}");
                 ratio = ratio.Replace('-', ':');

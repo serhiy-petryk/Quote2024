@@ -78,15 +78,9 @@ namespace Quote2024.Forms
 
         private async void btnTest_Click(object sender, EventArgs e)
         {
-            /*var folder = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short.2020";
-            var files = Directory.GetFiles(folder, "*.html");
-            foreach (var file in files)
-            {
-                var newFN = @"E:\Quote\WebData\Symbols\Yahoo\WA_Profile\WA_Data.Short\" + Path.GetFileName(file);
-                File.Move(file, newFN);
-            }*/
-
             btnTest.Enabled = false;
+
+            var file = @"E:\Quote\WebData\Symbols\Eoddata\SymbolsEoddata_20250809.zip";
 
             // Data.Helpers.StatMethods.Tests();
             var sw = new Stopwatch();
@@ -94,71 +88,7 @@ namespace Quote2024.Forms
 
             // var s = Data.Actions.StockAnalysis.StockAnalysisActions.GetJsonContent();
 
-            // await Task.Factory.StartNew(Data.Actions.Eoddata.EoddataIndexLoader.Start);
-            await Task.Factory.StartNew(Data.Actions.Yahoo.YahooIndicesLoader.YahooMinuteStart);
-
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.ParseAndSaveToDb);
-            // await Data.Actions.MorningStar.WA_MorningStarProfile.DownloadDataByExchange();
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarProfile.DownloadList);
-
-            // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.ProcessFolder);
-            // await Task.Factory.StartNew(Data.Helpers.HtmlHelper.TestFile);
-
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.TestParse);
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Start);
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.TestWAFiles);
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseAndSaveToDb);
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.DownloadListByLetter);
-            // await Data.Actions.Yahoo.WA_YahooProfile.DownloadDataByLetter();
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.WA_YahooProfile.ParseHtml);
-
-            // await Data.Actions.Yahoo.YahooSectorLoader.Start();
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooSectorLoader.Parse);
-
-            // await Data.Actions.Yahoo.YahooProfileLoader.Start();
-            // await Task.Factory.StartNew(Data.Actions.Yahoo.YahooProfileLoader.RemoveNotFound);
-
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarJsonProfileLoader.TestParse);
-            // await Data.Actions.MorningStar.MorningStarJsonProfileLoader.Start();
-
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarSymbolsLoader.Test);
-            // await Data.Actions.MorningStar.MorningStarSymbolsLoader.StartJson();
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.MorningStarSymbolsLoader.ParseAllJson);
-            // await Task.Factory.StartNew(Data.Scanners.CheckQuotes.Start);
-
-            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTradesLoader.Start);
-            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonNbboLoader.Start);
-            // await Task.Factory.StartNew(Data.Strategies.BigTickWithBigTradeCount.StartDown);
-
-            // await Task.Factory.StartNew(Data.Tests.DBQ.DbqTest.InvestigateNewCompressor);
-
-            // await Task.Factory.StartNew(Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles);
-
-            // await Task.Factory.StartNew(Data.Actions.Chartmill.ChartmillScreenerLoader.ParseAllZipFiles);
-
-            // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHourHalf);
-            // await Task.Factory.StartNew(Data.Tests.ScannerIntraday.Test);
-            // await Task.Factory.StartNew(Data.Tests.ScannerIntraday.Test2);
-            // await Task.Factory.StartNew(Data.Scanners.HourPolygon.StartHour);
-            // await Task.Factory.StartNew(Data.Scanners.QuoteScanner.StartHour);
-
-            // await Task.Factory.StartNew(Data.Tests.RealTimeYahooMinuteTests.DefineDelay);
-            // await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
-            // await Task.Factory.StartNew((() => Data.RealTime.YahooMinutes.GetTickerList(1)));
-            // await Task.Factory.StartNew(Data.RealTime.YahooMinutes.InitTimer);
-
-            // await Task.Factory.StartNew(Data.Tests.WebSocketFiles.YahooDelayRun);
-            // await Task.Factory.StartNew(Data.Tests.Twelvedata.TestComplexCall);
-
-            // await Task.Factory.StartNew(Data.Actions.Nasdaq.NasdaqScreenerGithubLoader.Start);
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarScreenerLoader.Start);
-            // await Task.Factory.StartNew(Data.Actions.MorningStar.WA_MorningStarSector.Start);
-
-
-            // await Task.Factory.StartNew(()=>Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\WebArchive.Wikipedia.Indices.zip"));
-
-            // await Task.Factory.StartNew(TradesPerMinute.Start);
-            // await Task.Factory.StartNew(Data.Actions.Polygon.PolygonSymbolsLoader.ParseAndSaveAllZip);
+            await Task.Factory.StartNew(() => Data.Actions.Eoddata.EoddataSymbolsLoader.ParseAndSaveToDb(file));
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;
