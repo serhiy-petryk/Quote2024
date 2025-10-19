@@ -113,7 +113,7 @@ namespace Data.Actions.Eoddata
             public SymbolsEoddata(string exchange, DateTime timeStamp, string[] ss)
             {
                 this.Exchange = exchange.ToUpper();
-                Symbol = ss[0].Trim().ToUpper();
+                Symbol = ss[0].Trim();
                 Name = ss[1].Trim();
                 if (string.IsNullOrWhiteSpace(Name)) Name = null;
                 TimeStamp = timeStamp;
