@@ -37,6 +37,7 @@ namespace Data.Actions.Eoddata
             foreach (var row in rows)
             {
                 if (string.Equals(row.Trim(), "</tbody>")) continue;
+                if (string.Equals(row.Trim(), "</thead>\r\n<tbody>\r\n</tbody>")) continue;
 
                 var cells = row.Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
                 var exchange = GetCellValue(cells[0]);
