@@ -55,8 +55,9 @@ namespace Data.Actions.Eoddata
                     throw new Exception("No 'ASP.NET_SessionId' cookie");
                 if (_eoddataCookies["EODDataLogin"] == null)
                     throw new Exception("No 'EODDataLogin' cookie");
-                if (_eoddataCookies[".ASPXAUTH"] == null)
-                    throw new Exception("No '.ASPXAUTH' cookie");
+                // changed at 2025-12-13 if (_eoddataCookies[".ASPXAUTH"] == null)
+                if (_eoddataCookies[".ASPXFORMSAUTH"] == null)
+                    throw new Exception("No '.ASPXFORMSAUTH' cookie");
             }
 
             return _eoddataCookies;

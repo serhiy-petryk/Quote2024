@@ -8,6 +8,7 @@ namespace Data.Actions
         {
             Logger.AddMessage($"Run sql procedure: pUpdateSymbolsXrefAndSectors");
             DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXrefAndSectors");
+            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXref");
 
             Logger.AddMessage($"!Finished.");
         }
