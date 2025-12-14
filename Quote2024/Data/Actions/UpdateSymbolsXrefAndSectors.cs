@@ -6,9 +6,9 @@ namespace Data.Actions
     {
         public static void Start()
         {
-            Logger.AddMessage($"Run sql procedure: pUpdateSymbolsXrefAndSectors");
-            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXrefAndSectors");
-            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXref");
+            Logger.AddMessage($"Run sql UpdateSymbolsXref procedures");
+            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXrefAndSectorsOfPolygon");
+            DbHelper.RunProcedure("dbQ2024..pUpdateSymbolsXrefOfEoddata");
 
             Logger.AddMessage($"!Finished.");
         }
