@@ -85,17 +85,6 @@ namespace Quote2024.Forms
             var sw = new Stopwatch();
             sw.Start();
 
-            /*var file = @"E:\Quote\WebData\Symbols\Eoddata\SymbolsEoddata_20250809.zip";
-            await Task.Factory.StartNew(() => Data.Actions.Eoddata.EoddataSymbolsLoader.ParseAndSaveToDb(file));*/
-
-            /*var folder = @"E:\Quote\WebData\Splits\Polygon\AllSplitsPolygon_20251028";
-            var files = Directory.GetFiles(folder, "*.json");
-            foreach (var file in files)
-            {
-                var newFileName = Path.Combine(folder, Path.GetFileName(file).Replace("-", ""));
-                File.Move(file, newFileName);
-            }*/
-
             // Data.Actions.Polygon.PolygonSplits.ParseAllFiles();
 
             sw.Stop();
