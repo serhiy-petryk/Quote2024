@@ -35,6 +35,7 @@ namespace Data.Models
             new LoaderItem {Name = "Yahoo sectors (need fresh data of SymbolsPolygon)", Action = Actions.Yahoo.YahooSectorLoader.Start, Checked = false}, // After SymbolsPolygon
             new LoaderItem {Name = "Eoddata Daily Quotes", Action = Actions.Eoddata.EoddataDailyLoader.Start, Checked = false},
             new LoaderItem {Name = "Update Symbols Xref and Sectors", Action = Actions.UpdateSymbolsXrefAndSectors.Start, Checked = false},
+            new LoaderItem {Name = "Polygon Splits", Action = Actions.Polygon.PolygonSplitsLoader.Start, Checked = false},
             new LoaderItem {Name = "Eoddata Splits", Action = Actions.Eoddata.EoddataSplitsLoader.Start, Checked = false},
             new LoaderItem {Name = "Investing Splits", Action = Actions.Investing.InvestingSplitsLoader.Start, Checked = false},
             new LoaderItem {Name = "Refresh Split data", Action = Models.SplitModel.RefreshSplitData, Checked = false},

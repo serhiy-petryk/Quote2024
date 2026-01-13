@@ -36,7 +36,7 @@ namespace Data.Helpers
             }
         }
 
-        public static void RunProcedure(string procedureName, Dictionary<string, object> paramaters = null)
+        public static void RunProcedure(string procedureName, Dictionary<string, object> parameters = null)
         {
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
@@ -45,16 +45,16 @@ namespace Data.Helpers
                 cmd.CommandText = procedureName;
                 cmd.CommandTimeout = 60 * 60;
                 cmd.CommandType = CommandType.StoredProcedure;
-                if (paramaters != null)
+                if (parameters != null)
                 {
-                    foreach (var kvp in paramaters)
+                    foreach (var kvp in parameters)
                         cmd.Parameters.AddWithValue(kvp.Key, kvp.Value);
                 }
                 cmd.ExecuteNonQuery();
             }
         }
 
-        public static void ExecuteSql(string sql, Dictionary<string, object> paramaters = null)
+        public static void ExecuteSql(string sql, Dictionary<string, object> parameters = null)
         {
             using (var conn = new SqlConnection(Settings.DbConnectionString))
             using (var cmd = conn.CreateCommand())
@@ -63,12 +63,30 @@ namespace Data.Helpers
                 cmd.CommandText = sql;
                 cmd.CommandTimeout = 250;
                 cmd.CommandType = CommandType.Text;
-                if (paramaters != null)
+                if (parameters != null)
                 {
-                    foreach (var kvp in paramaters)
+                    foreach (var kvp in parameters)
                         cmd.Parameters.AddWithValue(kvp.Key, kvp.Value);
                 }
                 cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static object ExecuteScalarSql(string sql, Dictionary<string, object> parameters = null)
+        {
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+                cmd.CommandText = sql;
+                cmd.CommandTimeout = 250;
+                cmd.CommandType = CommandType.Text;
+                if (parameters != null)
+                {
+                    foreach (var kvp in parameters)
+                        cmd.Parameters.AddWithValue(kvp.Key, kvp.Value);
+                }
+                return cmd.ExecuteScalar();
             }
         }
 

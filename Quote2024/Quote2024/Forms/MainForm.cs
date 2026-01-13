@@ -86,6 +86,7 @@ namespace Quote2024.Forms
             sw.Start();
 
             // Data.Actions.Polygon.PolygonSplits.ParseAllFiles();
+            Data.Actions.Polygon.PolygonSplitsLoader.Start();
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;

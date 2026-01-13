@@ -28,7 +28,7 @@ namespace Data.Actions.Polygon
 
         }
 
-        public static void Parse(string filename, Dictionary<(DateTime,string), DbItem> dbItems)
+        private static void Parse(string filename, Dictionary<(DateTime,string), DbItem> dbItems)
         {
 
             var bytes = File.ReadAllBytes(filename);
