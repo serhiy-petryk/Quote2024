@@ -23,7 +23,7 @@ namespace Data.Models
         public string Name;
         public string Description;
         public string SplitRatio;
-        public double? SplitK;
+        public float? SplitK;
         public DateTime TimeStamp;
         public bool IsBad;
         public Action DescriptionAction;
@@ -146,8 +146,8 @@ namespace Data.Models
                     Symbol = GetFirstWord(Description);
                     var ss = Description.Split(new[] { " stock split: ", " for " }, StringSplitOptions.None);
                     SplitRatio = ss[1] + ":" + ss[2];
-                    var d1 = double.Parse(ss[1], CultureInfo.InvariantCulture);
-                    var d2 = double.Parse(ss[2], CultureInfo.InvariantCulture);
+                    var d1 = float.Parse(ss[1], CultureInfo.InvariantCulture);
+                    var d2 = float.Parse(ss[2], CultureInfo.InvariantCulture);
                     SplitK = d1 / d2;
                 }
                 else
