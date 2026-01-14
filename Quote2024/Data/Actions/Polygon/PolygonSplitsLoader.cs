@@ -55,8 +55,11 @@ namespace Data.Actions.Polygon
 
             if (dbItems.Count > 0)
             {
+                foreach (var item in dbItems)
+                    item.TimeSpan = timeStamp.Item1;
+
                 DbHelper.ClearAndSaveToDbTable(dbItems, "dbQ2024..Bfr_SplitPolygon", "id", "ticker", "Date",
-                    "split_from", "split_to", "adjustment_type");
+                    "split_from", "split_to", "adjustment_type", "TimeSpan");
 
                 DbHelper.RunProcedure("dbQ2024..pUpdateSplitPolygon");
             }
@@ -80,7 +83,8 @@ namespace Data.Actions.Polygon
             public float split_to;
             public string ticker;
             public string adjustment_type;
-
+            
+            public DateTime TimeSpan;
             public DateTime Date => DateTime.ParseExact(execution_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
     }
