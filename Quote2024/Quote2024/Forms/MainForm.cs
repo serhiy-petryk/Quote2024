@@ -85,8 +85,7 @@ namespace Quote2024.Forms
             var sw = new Stopwatch();
             sw.Start();
 
-            // Data.Actions.Polygon.PolygonSplits.ParseAllFiles();
-            Data.Actions.Polygon.PolygonSplitsLoader.Start();
+            // Data.Actions.Polygon.PolygonSplitsLoader.Start();
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;
