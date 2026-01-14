@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Data.Helpers;
+using Data.Models;
 
 namespace Quote2024.Forms
 {
@@ -206,6 +206,14 @@ namespace Quote2024.Forms
             Debug.Print($"Duration: {d1:N0} seconds");
 
             btnIntradayBy5Minutes.Enabled = true;
+        }
+
+        private void btnChangeChecks_Click(object sender, EventArgs e)
+        {
+            var checkedCount = LoaderItem.DataGridLoaderItems.Count(a => a.Checked);
+            var newValue = checkedCount == 0;
+            foreach (var item in Data.Models.LoaderItem.DataGridLoaderItems)
+                item.Checked = newValue;
         }
     }
 }

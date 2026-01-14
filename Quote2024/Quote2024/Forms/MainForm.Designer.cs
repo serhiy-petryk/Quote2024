@@ -34,6 +34,7 @@ namespace Quote2024.Forms
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnChangeChecks = new System.Windows.Forms.Button();
             this.btnIntradayBy5Minutes = new System.Windows.Forms.Button();
             this.btnDailyBy5Minutes = new System.Windows.Forms.Button();
             this.btnYahooWebSocketForm = new System.Windows.Forms.Button();
@@ -93,6 +94,7 @@ namespace Quote2024.Forms
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnChangeChecks);
             this.tpLoader.Controls.Add(this.btnIntradayBy5Minutes);
             this.tpLoader.Controls.Add(this.btnDailyBy5Minutes);
             this.tpLoader.Controls.Add(this.btnYahooWebSocketForm);
@@ -116,10 +118,21 @@ namespace Quote2024.Forms
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
             // 
+            // btnChangeChecks
+            // 
+            this.btnChangeChecks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnChangeChecks.Location = new System.Drawing.Point(398, 8);
+            this.btnChangeChecks.Name = "btnChangeChecks";
+            this.btnChangeChecks.Size = new System.Drawing.Size(144, 37);
+            this.btnChangeChecks.TabIndex = 81;
+            this.btnChangeChecks.Text = "Change Checks";
+            this.btnChangeChecks.UseVisualStyleBackColor = true;
+            this.btnChangeChecks.Click += new System.EventHandler(this.btnChangeChecks_Click);
+            // 
             // btnIntradayBy5Minutes
             // 
             this.btnIntradayBy5Minutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnIntradayBy5Minutes.Location = new System.Drawing.Point(397, 198);
+            this.btnIntradayBy5Minutes.Location = new System.Drawing.Point(397, 211);
             this.btnIntradayBy5Minutes.Name = "btnIntradayBy5Minutes";
             this.btnIntradayBy5Minutes.Size = new System.Drawing.Size(171, 36);
             this.btnIntradayBy5Minutes.TabIndex = 80;
@@ -130,7 +143,7 @@ namespace Quote2024.Forms
             // btnDailyBy5Minutes
             // 
             this.btnDailyBy5Minutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDailyBy5Minutes.Location = new System.Drawing.Point(398, 156);
+            this.btnDailyBy5Minutes.Location = new System.Drawing.Point(398, 169);
             this.btnDailyBy5Minutes.Name = "btnDailyBy5Minutes";
             this.btnDailyBy5Minutes.Size = new System.Drawing.Size(171, 36);
             this.btnDailyBy5Minutes.TabIndex = 79;
@@ -141,7 +154,7 @@ namespace Quote2024.Forms
             // btnYahooWebSocketForm
             // 
             this.btnYahooWebSocketForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnYahooWebSocketForm.Location = new System.Drawing.Point(398, 57);
+            this.btnYahooWebSocketForm.Location = new System.Drawing.Point(397, 114);
             this.btnYahooWebSocketForm.Name = "btnYahooWebSocketForm";
             this.btnYahooWebSocketForm.Size = new System.Drawing.Size(186, 36);
             this.btnYahooWebSocketForm.TabIndex = 78;
@@ -254,7 +267,7 @@ namespace Quote2024.Forms
             // btnRunMultiItemsLoader
             // 
             this.btnRunMultiItemsLoader.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(398, 6);
+            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(398, 55);
             this.btnRunMultiItemsLoader.Name = "btnRunMultiItemsLoader";
             this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 37);
             this.btnRunMultiItemsLoader.TabIndex = 68;
@@ -413,5 +426,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnYahooWebSocketForm;
         private System.Windows.Forms.Button btnDailyBy5Minutes;
         private System.Windows.Forms.Button btnIntradayBy5Minutes;
+        private System.Windows.Forms.Button btnChangeChecks;
     }
 }
