@@ -359,7 +359,6 @@ namespace Quote2024.Forms
             // btnTest
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTest.Enabled = false;
             this.btnTest.Location = new System.Drawing.Point(435, 318);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(75, 36);

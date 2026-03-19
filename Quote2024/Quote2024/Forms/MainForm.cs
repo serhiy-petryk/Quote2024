@@ -85,6 +85,7 @@ namespace Quote2024.Forms
             var sw = new Stopwatch();
             sw.Start();
 
+            GetCurrentTime();
             // Data.Actions.Polygon.PolygonSplitsLoader.Start();
 
             sw.Stop();
@@ -92,6 +93,13 @@ namespace Quote2024.Forms
             Debug.Print($"Test duration: {d1:N0} milliseconds");
 
             btnTest.Enabled = true;
+        }
+
+        static void GetCurrentTime()
+        {
+            var dt21 = DateTime.UtcNow;
+            var dt22 = TimeHelper.GetNetworkTimeFromNtpServer();
+            var difference21 = dt22 - dt21; // = 1.43 seconds
         }
 
         private void ShowStatus(string message)

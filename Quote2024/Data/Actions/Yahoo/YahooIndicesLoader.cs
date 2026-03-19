@@ -82,11 +82,15 @@ namespace Data.Actions.Yahoo
 
             var oo = ZipUtils.DeserializeBytes<cYahooMinuteRoot>(o.Item1);
 
+            var dates = new Dictionary<DateTime, object>();
             var quotes = oo.chart.result[0].indicators.quote[0];
             for (var k = 0; k < oo.chart.result[0].timestamp.Length; k++)
             {
                 var dataSymbol = oo.chart.result[0].meta.symbol;
                 var date = TimeHelper.GetEstDateTimeFromUnixMilliseconds(oo.chart.result[0].timestamp[k] * 1000).Date;
+                if (dates.ContainsKey(date)) continue;
+
+                dates.Add(date, null);
                 var open = quotes.open[k];
                 var high = quotes.high[k];
                 var low = quotes.low[k];
