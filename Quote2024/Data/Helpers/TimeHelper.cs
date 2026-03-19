@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 
@@ -52,7 +53,7 @@ namespace Data.Helpers
         // see https://stackoverflow.com/questions/1193955/how-to-query-an-ntp-server-using-c
         // doesn't work: var response = await client.GetStringAsync("https://worldtimeapi.org/api/timezone/America/New_York");
         // https://time.is/ - show difference between Internet time and PC time
-        // GetNetworkTimeFromNtpServer is more faster than GetNetworkTime
+        // GetNetworkTimeFromNtpServer (~50 ms) is more faster than GetNetworkTime (~500 ms)
         public static DateTime GetNetworkTimeFromNtpServer()
         {
             //default Windows time server
@@ -128,10 +129,36 @@ namespace Data.Helpers
             return utcDateTime;
         }
 
+        public static void CompareGetCurrentTimeMethods()
+        {
+            var sw = new Stopwatch();
+
+            sw.Start();
+            var dt21 = TimeHelper.GetNetworkTime();
+            sw.Stop();
+            var d1 = sw.ElapsedMilliseconds;
+
+            sw.Reset();
+            sw.Start();
+            var dt22 = TimeHelper.GetNetworkTimeFromNtpServer();
+            sw.Stop();
+            var d2 = sw.ElapsedMilliseconds;
+
+            sw.Reset();
+            sw.Start();
+            var dt23 = TimeHelper.GetNetworkTime();
+            sw.Stop();
+            var d3 = sw.ElapsedMilliseconds;
+
+            var difference21 = dt22 - dt21;
+            var difference32 = dt23 - dt22;
+        }
+
         public class worldclockapi_json
         {
             public long currentFileTime;
         }
+
         #endregion
     }
 
