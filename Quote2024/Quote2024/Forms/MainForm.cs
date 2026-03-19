@@ -85,8 +85,9 @@ namespace Quote2024.Forms
             var sw = new Stopwatch();
             sw.Start();
 
-            GetCurrentTime();
+            // GetCurrentTime();
             // Data.Actions.Polygon.PolygonSplitsLoader.Start();
+            // Data.Tests.WebSocketFiles.PrintPolygonLatency();
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;
@@ -100,6 +101,7 @@ namespace Quote2024.Forms
             var dt21 = DateTime.UtcNow;
             var dt22 = TimeHelper.GetNetworkTimeFromNtpServer();
             var difference21 = dt22 - dt21; // = 1.43 seconds
+            Debug.Print($"Time difference is {difference21}");
         }
 
         private void ShowStatus(string message)

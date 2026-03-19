@@ -51,6 +51,70 @@ namespace Data.Tests
                 $"{Type}\t{Id}\t{MessageCount}\t{Math.Round(0.001 * TotalDelayMsecs / MessageCount, 1)}\t{BadRecordDayCount}\t{Math.Round(0.001 * MinDelayMsecs, 2)}\t{Math.Round(0.001 * MaxDelayMsecs, 1)}";
         }
 
+        public static void PrintPolygonLatency()
+        {
+            var filename3 = Settings.DataFolder + @"RealTime\PolygonMinuteSocket\WebSocket_20260318154015.3.txt";
+            var filename2 = Settings.DataFolder + @"RealTime\PolygonMinuteSocket\WebSocket_20260318121544.2.txt";
+            var filename = Settings.DataFolder + @"RealTime\PolygonMinuteSocket\WebSocket_20260319202037.txt";
+            var sDateTime = Path.GetFileNameWithoutExtension(filename).Split(new[]{'_','.'})[1];
+            var recordDate = DateTime.ParseExact(sDateTime, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+            var recordUtcOffset = TimeZoneInfo.Local.GetUtcOffset(recordDate);
+            var estOffset = TimeHelper.EstTimeZone.GetUtcOffset(recordDate);
+
+            var timesDict = new Dictionary<TimeSpan, List<TimeSpan>>();
+            var invalidTime = new Dictionary<TimeSpan, List<oPolygon>>();
+            var lines = File.ReadAllLines(filename);
+            foreach (var line in lines)
+            {
+                var items = SpanJson.JsonSerializer.Generic.Utf16.Deserialize<oPolygon[]>(line.Substring(13));
+                foreach (var item in items)
+                {
+                    if (item.ev != "AM") continue;
+
+                    var recordUtcTime = TimeSpan.ParseExact(line.Substring(0, 12), @"hh\:mm\:ss\.fff", CultureInfo.InvariantCulture) - recordUtcOffset;
+                    if (item.e - item.s != 60000)
+                        throw new Exception($"Check end/start time of entry.item.e - item.s is {item.e - item.s}, must be 60000");
+
+                    var keyTime = recordUtcTime.RoundToNearestMinute();
+
+                    var dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(item.e);
+                    var itemUtcTime = dateTimeOffset.UtcDateTime.TimeOfDay;
+                    if (itemUtcTime != keyTime)
+                    {
+                        // throw new Exception($"Check record time and item end start. Rounding record time is {keyTime}, item end time is {itemUtcTime}");
+                        if (!invalidTime.ContainsKey(keyTime))
+                            invalidTime.Add(keyTime, new List<oPolygon>());
+                        invalidTime[keyTime].Add(item);
+                    }
+                    else
+                    {
+                        if (!timesDict.ContainsKey(keyTime))
+                            timesDict.Add(keyTime, new List<TimeSpan>());
+                        timesDict[keyTime].Add(recordUtcTime);
+                    }
+
+                    if (item.sym == "SPT" || item.sym == "UDMY")
+                    {
+                        var time = DateTimeOffset.FromUnixTimeMilliseconds(item.e).UtcDateTime.TimeOfDay + estOffset;
+                        Debug.Print($"{item.sym}\t{time}\t{item.o}\t{item.h}\t{item.l}\t{item.c}\t{item.v}\t{item.v/item.z}");
+                    }
+                }
+            }
+
+            var timeDiff = timesDict.ToDictionary(a => a.Key, a => a.Value.Select(a1 => a1 - a.Key).ToList());
+            var timeDiffMin = timesDict.ToDictionary(a => a.Key, a => a.Value.Select(a1 => a1 - a.Key).Min());
+            var timeDiffMax = timesDict.ToDictionary(a => a.Key, a => a.Value.Select(a1 => a1 - a.Key).Max());
+
+            Debug.Print("\n\nUtcTime\tNY time\tCount\tMin milliseconds\tMax milliseconds");
+            foreach (var kvp in timesDict)
+            {
+                var minDelay = kvp.Value.Min() - kvp.Key;
+                var maxDelay = kvp.Value.Max() - kvp.Key;
+                // Debug.Print($"{kvp.Key}\t{kvp.Key + estOffset}\t{minDelay}\t{maxDelay}\t{minDelay.TotalMilliseconds}\t{maxDelay.TotalMilliseconds}");
+                Debug.Print($"{kvp.Key}\t{kvp.Key + estOffset}\t{kvp.Value.Count}\t{minDelay.TotalMilliseconds}\t{maxDelay.TotalMilliseconds}");
+            }
+        }
+
         public static void DecodePolygonRun()
         {
             // Result for Yahoo: min - 7 minutes 8 seconds
@@ -264,6 +328,9 @@ namespace Data.Tests
             public long s;
             public long e;
             public bool otc;
+
+            public DateTime StartDate => DateTimeOffset.FromUnixTimeMilliseconds(s).UtcDateTime;
+            public DateTime EndDate => DateTimeOffset.FromUnixTimeMilliseconds(e).UtcDateTime;
         }
     }
 }

@@ -160,6 +160,15 @@ namespace Data.Helpers
         }
 
         #endregion
+
+        public static TimeSpan RoundToNearestMinute(this TimeSpan input)
+        {
+            // Use Math.Round on the TotalMinutes property
+            long totalMinutes = (long)Math.Round(input.TotalMinutes, MidpointRounding.AwayFromZero);
+
+            // Create a new TimeSpan from the rounded total minutes
+            return TimeSpan.FromMinutes(totalMinutes);
+        }
     }
 
 }
