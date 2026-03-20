@@ -42,6 +42,7 @@ namespace WebSocketClientApp
             this.button1 = new System.Windows.Forms.Button();
             this.cbSocketList = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnShowLastReceivedMessage = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SendMessageText
@@ -60,9 +61,9 @@ namespace WebSocketClientApp
             this.SendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.SendButton.Location = new System.Drawing.Point(560, 66);
             this.SendButton.Name = "SendButton";
-            this.SendButton.Size = new System.Drawing.Size(75, 27);
+            this.SendButton.Size = new System.Drawing.Size(119, 44);
             this.SendButton.TabIndex = 1;
-            this.SendButton.Text = "Send";
+            this.SendButton.Text = "Send (each line is one message)";
             this.SendButton.UseVisualStyleBackColor = true;
             this.SendButton.Click += new System.EventHandler(this.SendButton_Click);
             // 
@@ -148,6 +149,8 @@ namespace WebSocketClientApp
             // 
             this.cbSaveLogToFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbSaveLogToFile.AutoSize = true;
+            this.cbSaveLogToFile.Checked = true;
+            this.cbSaveLogToFile.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbSaveLogToFile.Location = new System.Drawing.Point(484, 11);
             this.cbSaveLogToFile.Name = "cbSaveLogToFile";
             this.cbSaveLogToFile.Size = new System.Drawing.Size(141, 19);
@@ -188,11 +191,23 @@ namespace WebSocketClientApp
             this.label2.TabIndex = 17;
             this.label2.Text = "Web socket url:";
             // 
+            // btnShowLastReceivedMessage
+            // 
+            this.btnShowLastReceivedMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnShowLastReceivedMessage.Location = new System.Drawing.Point(679, 316);
+            this.btnShowLastReceivedMessage.Name = "btnShowLastReceivedMessage";
+            this.btnShowLastReceivedMessage.Size = new System.Drawing.Size(114, 46);
+            this.btnShowLastReceivedMessage.TabIndex = 18;
+            this.btnShowLastReceivedMessage.Text = "Show last received message";
+            this.btnShowLastReceivedMessage.UseVisualStyleBackColor = true;
+            this.btnShowLastReceivedMessage.Click += new System.EventHandler(this.btnShowLastReceivedMessage_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(838, 450);
+            this.Controls.Add(this.btnShowLastReceivedMessage);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cbSocketList);
             this.Controls.Add(this.button1);
@@ -228,5 +243,6 @@ namespace WebSocketClientApp
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ComboBox cbSocketList;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnShowLastReceivedMessage;
     }
 }

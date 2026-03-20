@@ -14,6 +14,7 @@ namespace WebSocketClientApp
         private string _lastSendMessage;
         private List<string> _fileLogBuffer;
         private readonly object _fileLocker = new object();
+        private string _lastReceivedMessage;
 
         public MainForm()
         {
@@ -75,6 +76,8 @@ namespace WebSocketClientApp
                 }
                 if (cbLogMessages.Checked)
                     SaveLog(messText);
+
+                _lastReceivedMessage = messText;
             });
 
             _client.Start();
@@ -151,5 +154,7 @@ namespace WebSocketClientApp
             var frm = new MainForm();
             frm.Show();
         }
+
+        private void btnShowLastReceivedMessage_Click(object sender, EventArgs e) => MessageBox.Show(_lastReceivedMessage);
     }
 }
