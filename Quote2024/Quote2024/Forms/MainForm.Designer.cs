@@ -34,6 +34,7 @@ namespace Quote2024.Forms
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnPolygonMS = new System.Windows.Forms.Button();
             this.btnChangeChecks = new System.Windows.Forms.Button();
             this.btnIntradayBy5Minutes = new System.Windows.Forms.Button();
             this.btnDailyBy5Minutes = new System.Windows.Forms.Button();
@@ -57,18 +58,21 @@ namespace Quote2024.Forms
             this.loaderItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnTest = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnPolygonTopMovers = new System.Windows.Forms.Button();
+            this.btnPolygonMarketSnapshotForm = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.loaderItemBindingSource)).BeginInit();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.StatusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 388);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 421);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(804, 22);
             this.statusStrip1.TabIndex = 0;
@@ -88,12 +92,13 @@ namespace Quote2024.Forms
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(804, 388);
+            this.tabControl1.Size = new System.Drawing.Size(804, 421);
             this.tabControl1.TabIndex = 1;
             // 
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnPolygonMS);
             this.tpLoader.Controls.Add(this.btnChangeChecks);
             this.tpLoader.Controls.Add(this.btnIntradayBy5Minutes);
             this.tpLoader.Controls.Add(this.btnDailyBy5Minutes);
@@ -113,10 +118,21 @@ namespace Quote2024.Forms
             this.tpLoader.Location = new System.Drawing.Point(4, 24);
             this.tpLoader.Name = "tpLoader";
             this.tpLoader.Padding = new System.Windows.Forms.Padding(3);
-            this.tpLoader.Size = new System.Drawing.Size(796, 360);
+            this.tpLoader.Size = new System.Drawing.Size(796, 393);
             this.tpLoader.TabIndex = 0;
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
+            // 
+            // btnPolygonMS
+            // 
+            this.btnPolygonMS.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPolygonMS.Location = new System.Drawing.Point(399, 255);
+            this.btnPolygonMS.Name = "btnPolygonMS";
+            this.btnPolygonMS.Size = new System.Drawing.Size(170, 47);
+            this.btnPolygonMS.TabIndex = 82;
+            this.btnPolygonMS.Text = "Download Polygon Market Snapshot";
+            this.btnPolygonMS.UseVisualStyleBackColor = true;
+            this.btnPolygonMS.Click += new System.EventHandler(this.btnPolygonMS_Click);
             // 
             // btnChangeChecks
             // 
@@ -220,7 +236,7 @@ namespace Quote2024.Forms
             // btnOpenWebSocket
             // 
             this.btnOpenWebSocket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenWebSocket.Location = new System.Drawing.Point(398, 279);
+            this.btnOpenWebSocket.Location = new System.Drawing.Point(398, 308);
             this.btnOpenWebSocket.Name = "btnOpenWebSocket";
             this.btnOpenWebSocket.Size = new System.Drawing.Size(171, 33);
             this.btnOpenWebSocket.TabIndex = 72;
@@ -301,7 +317,7 @@ namespace Quote2024.Forms
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 18;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(385, 348);
+            this.dataGridView1.Size = new System.Drawing.Size(385, 381);
             this.dataGridView1.TabIndex = 67;
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
@@ -359,7 +375,7 @@ namespace Quote2024.Forms
             // btnTest
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTest.Location = new System.Drawing.Point(435, 318);
+            this.btnTest.Location = new System.Drawing.Point(435, 347);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(75, 36);
             this.btnTest.TabIndex = 66;
@@ -369,19 +385,43 @@ namespace Quote2024.Forms
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.btnPolygonTopMovers);
+            this.tabPage2.Controls.Add(this.btnPolygonMarketSnapshotForm);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(796, 360);
+            this.tabPage2.Size = new System.Drawing.Size(796, 393);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btnPolygonTopMovers
+            // 
+            this.btnPolygonTopMovers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPolygonTopMovers.Location = new System.Drawing.Point(8, 84);
+            this.btnPolygonTopMovers.Name = "btnPolygonTopMovers";
+            this.btnPolygonTopMovers.Size = new System.Drawing.Size(170, 47);
+            this.btnPolygonTopMovers.TabIndex = 84;
+            this.btnPolygonTopMovers.Text = "Open Polygon Top Movers Form";
+            this.btnPolygonTopMovers.UseVisualStyleBackColor = true;
+            this.btnPolygonTopMovers.Click += new System.EventHandler(this.btnPolygonTopMovers_Click);
+            // 
+            // btnPolygonMarketSnapshotForm
+            // 
+            this.btnPolygonMarketSnapshotForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPolygonMarketSnapshotForm.Location = new System.Drawing.Point(8, 16);
+            this.btnPolygonMarketSnapshotForm.Name = "btnPolygonMarketSnapshotForm";
+            this.btnPolygonMarketSnapshotForm.Size = new System.Drawing.Size(170, 47);
+            this.btnPolygonMarketSnapshotForm.TabIndex = 83;
+            this.btnPolygonMarketSnapshotForm.Text = "Open Polygon Market Snapshot Form";
+            this.btnPolygonMarketSnapshotForm.UseVisualStyleBackColor = true;
+            this.btnPolygonMarketSnapshotForm.Click += new System.EventHandler(this.btnPolygonMarketSnapshotForm_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(804, 410);
+            this.ClientSize = new System.Drawing.Size(804, 443);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.statusStrip1);
             this.Name = "MainForm";
@@ -392,6 +432,7 @@ namespace Quote2024.Forms
             this.tpLoader.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.loaderItemBindingSource)).EndInit();
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -426,5 +467,8 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnDailyBy5Minutes;
         private System.Windows.Forms.Button btnIntradayBy5Minutes;
         private System.Windows.Forms.Button btnChangeChecks;
+        private System.Windows.Forms.Button btnPolygonMS;
+        private System.Windows.Forms.Button btnPolygonMarketSnapshotForm;
+        private System.Windows.Forms.Button btnPolygonTopMovers;
     }
 }

@@ -225,5 +225,26 @@ namespace Quote2024.Forms
             foreach (var item in Data.Models.LoaderItem.DataGridLoaderItems)
                 item.Checked = newValue;
         }
+
+        private async void btnPolygonMS_Click(object sender, EventArgs e)
+        {
+            btnPolygonMS.Enabled = false;
+
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMarketSnapshot.Start);
+
+            btnPolygonMS.Enabled = true;
+        }
+
+        private void btnPolygonMarketSnapshotForm_Click(object sender, EventArgs e)
+        {
+            var form = new PolygonMarketSnapshotForm();
+            form.Show();
+        }
+
+        private void btnPolygonTopMovers_Click(object sender, EventArgs e)
+        {
+            var form = new PolygonTopMovers();
+            form.Show();
+        }
     }
 }

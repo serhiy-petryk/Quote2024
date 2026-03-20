@@ -15,6 +15,7 @@ namespace Data.Actions.Polygon
         public const string DataFolderSymbols = Settings.DataFolder + @"Symbols\Polygon2003\Data\";
 
         public static string GetApiKey2003() => CsUtils.GetApiKeys("polygon.io.2003")[0];
+        public static string GetRealTimeApiKey2003() => CsUtils.GetApiKeys("polygon.io_realtimesocket")[0];
 
         public static string GetMyTicker(string polygonTicker)
         {
