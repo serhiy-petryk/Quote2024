@@ -36,7 +36,8 @@ namespace WebSocketClientApp
             {
                 if (info.Type == ReconnectionType.Initial)
                     _lastSendMessage = null;
-                else if (info.Type == ReconnectionType.Lost || info.Type== ReconnectionType.NoMessageReceived)
+                else if (info.Type == ReconnectionType.Lost || info.Type == ReconnectionType.NoMessageReceived)
+//                    else if (info.Type == ReconnectionType.Lost || info.Type == ReconnectionType.NoMessageReceived || info.Type == ReconnectionType.Error)
                     SendMessage(_lastSendMessage);
 
                 SaveLog($"{DateTime.Now:HH:mm:ss.fff},Reconnection happened, type {info.Type}");
@@ -48,8 +49,9 @@ namespace WebSocketClientApp
                 //  _client.Reconnect();
                 SaveLog($"{DateTime.Now:HH:mm:ss.fff},Disconnection happened, type {info.Type}");
                 if (info.Type == DisconnectionType.NoMessageReceived && _lastSendMessage != null)
+//                    if ((info.Type == DisconnectionType.NoMessageReceived || info.Type == DisconnectionType.Error) && _lastSendMessage != null)
                 {
-                    Debug.Print("Resend message");
+                        Debug.Print("Resend message");
                     SendMessage(_lastSendMessage);
                     SaveLog("Send last message after disconnection happened");
                 }
@@ -104,7 +106,16 @@ namespace WebSocketClientApp
         {
             if (!string.IsNullOrWhiteSpace(message))
             {
-                _client?.Send(message.Trim());
+                using (var reader = new StringReader(message))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (!string.IsNullOrEmpty(line))
+                            _client?.Send(line.Trim());
+                    }
+                }
+
                 _lastSendMessage = message;
             }
         }
