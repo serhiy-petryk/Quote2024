@@ -34,6 +34,7 @@ namespace Quote2024.Forms
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpLoader = new System.Windows.Forms.TabPage();
+            this.btnPolygonSnapshots = new System.Windows.Forms.Button();
             this.btnChangeChecks = new System.Windows.Forms.Button();
             this.btnIntradayBy5Minutes = new System.Windows.Forms.Button();
             this.btnDailyBy5Minutes = new System.Windows.Forms.Button();
@@ -57,13 +58,11 @@ namespace Quote2024.Forms
             this.loaderItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnTest = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnPolygonSnapshots = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.loaderItemBindingSource)).BeginInit();
-            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -72,7 +71,7 @@ namespace Quote2024.Forms
             this.StatusLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 383);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(804, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(959, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -90,12 +89,13 @@ namespace Quote2024.Forms
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(804, 383);
+            this.tabControl1.Size = new System.Drawing.Size(959, 383);
             this.tabControl1.TabIndex = 1;
             // 
             // tpLoader
             // 
             this.tpLoader.AutoScroll = true;
+            this.tpLoader.Controls.Add(this.btnPolygonSnapshots);
             this.tpLoader.Controls.Add(this.btnChangeChecks);
             this.tpLoader.Controls.Add(this.btnIntradayBy5Minutes);
             this.tpLoader.Controls.Add(this.btnDailyBy5Minutes);
@@ -115,17 +115,28 @@ namespace Quote2024.Forms
             this.tpLoader.Location = new System.Drawing.Point(4, 24);
             this.tpLoader.Name = "tpLoader";
             this.tpLoader.Padding = new System.Windows.Forms.Padding(3);
-            this.tpLoader.Size = new System.Drawing.Size(796, 355);
+            this.tpLoader.Size = new System.Drawing.Size(951, 355);
             this.tpLoader.TabIndex = 0;
             this.tpLoader.Text = "Loader";
             this.tpLoader.UseVisualStyleBackColor = true;
             // 
+            // btnPolygonSnapshots
+            // 
+            this.btnPolygonSnapshots.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPolygonSnapshots.Location = new System.Drawing.Point(580, 214);
+            this.btnPolygonSnapshots.Name = "btnPolygonSnapshots";
+            this.btnPolygonSnapshots.Size = new System.Drawing.Size(186, 33);
+            this.btnPolygonSnapshots.TabIndex = 86;
+            this.btnPolygonSnapshots.Text = "Open Polygon Snapshots Form";
+            this.btnPolygonSnapshots.UseVisualStyleBackColor = true;
+            this.btnPolygonSnapshots.Click += new System.EventHandler(this.btnPolygonSnapshots_Click);
+            // 
             // btnChangeChecks
             // 
             this.btnChangeChecks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnChangeChecks.Location = new System.Drawing.Point(398, 8);
+            this.btnChangeChecks.Location = new System.Drawing.Point(401, 7);
             this.btnChangeChecks.Name = "btnChangeChecks";
-            this.btnChangeChecks.Size = new System.Drawing.Size(144, 37);
+            this.btnChangeChecks.Size = new System.Drawing.Size(144, 33);
             this.btnChangeChecks.TabIndex = 81;
             this.btnChangeChecks.Text = "Change Checks";
             this.btnChangeChecks.UseVisualStyleBackColor = true;
@@ -134,9 +145,9 @@ namespace Quote2024.Forms
             // btnIntradayBy5Minutes
             // 
             this.btnIntradayBy5Minutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnIntradayBy5Minutes.Location = new System.Drawing.Point(397, 211);
+            this.btnIntradayBy5Minutes.Location = new System.Drawing.Point(772, 46);
             this.btnIntradayBy5Minutes.Name = "btnIntradayBy5Minutes";
-            this.btnIntradayBy5Minutes.Size = new System.Drawing.Size(171, 36);
+            this.btnIntradayBy5Minutes.Size = new System.Drawing.Size(171, 33);
             this.btnIntradayBy5Minutes.TabIndex = 80;
             this.btnIntradayBy5Minutes.Text = "IntradayBy5Minutes create";
             this.btnIntradayBy5Minutes.UseVisualStyleBackColor = true;
@@ -145,9 +156,9 @@ namespace Quote2024.Forms
             // btnDailyBy5Minutes
             // 
             this.btnDailyBy5Minutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDailyBy5Minutes.Location = new System.Drawing.Point(398, 169);
+            this.btnDailyBy5Minutes.Location = new System.Drawing.Point(772, 7);
             this.btnDailyBy5Minutes.Name = "btnDailyBy5Minutes";
-            this.btnDailyBy5Minutes.Size = new System.Drawing.Size(171, 36);
+            this.btnDailyBy5Minutes.Size = new System.Drawing.Size(171, 33);
             this.btnDailyBy5Minutes.TabIndex = 79;
             this.btnDailyBy5Minutes.Text = "DailyBy5Minutes create";
             this.btnDailyBy5Minutes.UseVisualStyleBackColor = true;
@@ -156,9 +167,9 @@ namespace Quote2024.Forms
             // btnYahooWebSocketForm
             // 
             this.btnYahooWebSocketForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnYahooWebSocketForm.Location = new System.Drawing.Point(397, 114);
+            this.btnYahooWebSocketForm.Location = new System.Drawing.Point(580, 163);
             this.btnYahooWebSocketForm.Name = "btnYahooWebSocketForm";
-            this.btnYahooWebSocketForm.Size = new System.Drawing.Size(186, 36);
+            this.btnYahooWebSocketForm.Size = new System.Drawing.Size(186, 33);
             this.btnYahooWebSocketForm.TabIndex = 78;
             this.btnYahooWebSocketForm.Text = "Open Yahoo WebSocket form";
             this.btnYahooWebSocketForm.UseVisualStyleBackColor = true;
@@ -167,9 +178,9 @@ namespace Quote2024.Forms
             // btnFinageTradesForm
             // 
             this.btnFinageTradesForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFinageTradesForm.Location = new System.Drawing.Point(591, 262);
+            this.btnFinageTradesForm.Location = new System.Drawing.Point(577, 124);
             this.btnFinageTradesForm.Name = "btnFinageTradesForm";
-            this.btnFinageTradesForm.Size = new System.Drawing.Size(196, 33);
+            this.btnFinageTradesForm.Size = new System.Drawing.Size(189, 33);
             this.btnFinageTradesForm.TabIndex = 77;
             this.btnFinageTradesForm.Text = "Open Finage Trades form";
             this.btnFinageTradesForm.UseVisualStyleBackColor = true;
@@ -178,9 +189,9 @@ namespace Quote2024.Forms
             // btnFinageMinuteForm
             // 
             this.btnFinageMinuteForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFinageMinuteForm.Location = new System.Drawing.Point(591, 223);
+            this.btnFinageMinuteForm.Location = new System.Drawing.Point(577, 85);
             this.btnFinageMinuteForm.Name = "btnFinageMinuteForm";
-            this.btnFinageMinuteForm.Size = new System.Drawing.Size(196, 33);
+            this.btnFinageMinuteForm.Size = new System.Drawing.Size(189, 33);
             this.btnFinageMinuteForm.TabIndex = 76;
             this.btnFinageMinuteForm.Text = "Open Finage Minute form";
             this.btnFinageMinuteForm.UseVisualStyleBackColor = true;
@@ -189,9 +200,9 @@ namespace Quote2024.Forms
             // btnOpenTestForm
             // 
             this.btnOpenTestForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenTestForm.Location = new System.Drawing.Point(591, 318);
+            this.btnOpenTestForm.Location = new System.Drawing.Point(580, 310);
             this.btnOpenTestForm.Name = "btnOpenTestForm";
-            this.btnOpenTestForm.Size = new System.Drawing.Size(196, 33);
+            this.btnOpenTestForm.Size = new System.Drawing.Size(186, 33);
             this.btnOpenTestForm.TabIndex = 75;
             this.btnOpenTestForm.Text = "Open Test form";
             this.btnOpenTestForm.UseVisualStyleBackColor = true;
@@ -200,9 +211,9 @@ namespace Quote2024.Forms
             // btnOpenTimeSalesNasdaq
             // 
             this.btnOpenTimeSalesNasdaq.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenTimeSalesNasdaq.Location = new System.Drawing.Point(591, 184);
+            this.btnOpenTimeSalesNasdaq.Location = new System.Drawing.Point(577, 46);
             this.btnOpenTimeSalesNasdaq.Name = "btnOpenTimeSalesNasdaq";
-            this.btnOpenTimeSalesNasdaq.Size = new System.Drawing.Size(196, 33);
+            this.btnOpenTimeSalesNasdaq.Size = new System.Drawing.Size(189, 33);
             this.btnOpenTimeSalesNasdaq.TabIndex = 74;
             this.btnOpenTimeSalesNasdaq.Text = "Open TimeSales Nasdaq form";
             this.btnOpenTimeSalesNasdaq.UseVisualStyleBackColor = true;
@@ -211,9 +222,9 @@ namespace Quote2024.Forms
             // btnOpenRealTimeYahoo
             // 
             this.btnOpenRealTimeYahoo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenRealTimeYahoo.Location = new System.Drawing.Point(591, 145);
+            this.btnOpenRealTimeYahoo.Location = new System.Drawing.Point(577, 7);
             this.btnOpenRealTimeYahoo.Name = "btnOpenRealTimeYahoo";
-            this.btnOpenRealTimeYahoo.Size = new System.Drawing.Size(198, 33);
+            this.btnOpenRealTimeYahoo.Size = new System.Drawing.Size(189, 33);
             this.btnOpenRealTimeYahoo.TabIndex = 73;
             this.btnOpenRealTimeYahoo.Text = "Open RealTime Yahoo form";
             this.btnOpenRealTimeYahoo.UseVisualStyleBackColor = true;
@@ -222,9 +233,9 @@ namespace Quote2024.Forms
             // btnOpenWebSocket
             // 
             this.btnOpenWebSocket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenWebSocket.Location = new System.Drawing.Point(398, 274);
+            this.btnOpenWebSocket.Location = new System.Drawing.Point(580, 253);
             this.btnOpenWebSocket.Name = "btnOpenWebSocket";
-            this.btnOpenWebSocket.Size = new System.Drawing.Size(171, 33);
+            this.btnOpenWebSocket.Size = new System.Drawing.Size(186, 33);
             this.btnOpenWebSocket.TabIndex = 72;
             this.btnOpenWebSocket.Text = "Open WebSocketClient form";
             this.btnOpenWebSocket.UseVisualStyleBackColor = true;
@@ -233,10 +244,10 @@ namespace Quote2024.Forms
             // btnMinuteYahooSaveLogToDb
             // 
             this.btnMinuteYahooSaveLogToDb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinuteYahooSaveLogToDb.Location = new System.Drawing.Point(591, 98);
+            this.btnMinuteYahooSaveLogToDb.Location = new System.Drawing.Point(401, 209);
             this.btnMinuteYahooSaveLogToDb.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnMinuteYahooSaveLogToDb.Name = "btnMinuteYahooSaveLogToDb";
-            this.btnMinuteYahooSaveLogToDb.Size = new System.Drawing.Size(196, 36);
+            this.btnMinuteYahooSaveLogToDb.Size = new System.Drawing.Size(170, 47);
             this.btnMinuteYahooSaveLogToDb.TabIndex = 71;
             this.btnMinuteYahooSaveLogToDb.Text = "Minute Yahoo Save Log to DB";
             this.btnMinuteYahooSaveLogToDb.UseVisualStyleBackColor = true;
@@ -245,10 +256,10 @@ namespace Quote2024.Forms
             // btnMinuteYahooErrorCheck
             // 
             this.btnMinuteYahooErrorCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinuteYahooErrorCheck.Location = new System.Drawing.Point(617, 51);
+            this.btnMinuteYahooErrorCheck.Location = new System.Drawing.Point(401, 165);
             this.btnMinuteYahooErrorCheck.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnMinuteYahooErrorCheck.Name = "btnMinuteYahooErrorCheck";
-            this.btnMinuteYahooErrorCheck.Size = new System.Drawing.Size(170, 41);
+            this.btnMinuteYahooErrorCheck.Size = new System.Drawing.Size(170, 33);
             this.btnMinuteYahooErrorCheck.TabIndex = 70;
             this.btnMinuteYahooErrorCheck.Text = "Minute Yahoo Error Check";
             this.btnMinuteYahooErrorCheck.UseVisualStyleBackColor = true;
@@ -257,10 +268,10 @@ namespace Quote2024.Forms
             // btnMinuteYahooLog
             // 
             this.btnMinuteYahooLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinuteYahooLog.Location = new System.Drawing.Point(617, 6);
+            this.btnMinuteYahooLog.Location = new System.Drawing.Point(401, 126);
             this.btnMinuteYahooLog.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnMinuteYahooLog.Name = "btnMinuteYahooLog";
-            this.btnMinuteYahooLog.Size = new System.Drawing.Size(170, 39);
+            this.btnMinuteYahooLog.Size = new System.Drawing.Size(170, 33);
             this.btnMinuteYahooLog.TabIndex = 69;
             this.btnMinuteYahooLog.Text = "Minute Yahoo Log (for zip)";
             this.btnMinuteYahooLog.UseVisualStyleBackColor = true;
@@ -269,9 +280,9 @@ namespace Quote2024.Forms
             // btnRunMultiItemsLoader
             // 
             this.btnRunMultiItemsLoader.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(398, 55);
+            this.btnRunMultiItemsLoader.Location = new System.Drawing.Point(401, 48);
             this.btnRunMultiItemsLoader.Name = "btnRunMultiItemsLoader";
-            this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 37);
+            this.btnRunMultiItemsLoader.Size = new System.Drawing.Size(144, 33);
             this.btnRunMultiItemsLoader.TabIndex = 68;
             this.btnRunMultiItemsLoader.Text = "Run multiItems loader";
             this.btnRunMultiItemsLoader.UseVisualStyleBackColor = true;
@@ -303,7 +314,7 @@ namespace Quote2024.Forms
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 18;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(385, 343);
+            this.dataGridView1.Size = new System.Drawing.Size(388, 343);
             this.dataGridView1.TabIndex = 67;
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
@@ -361,7 +372,7 @@ namespace Quote2024.Forms
             // btnTest
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTest.Location = new System.Drawing.Point(435, 313);
+            this.btnTest.Location = new System.Drawing.Point(438, 312);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(75, 36);
             this.btnTest.TabIndex = 66;
@@ -371,31 +382,19 @@ namespace Quote2024.Forms
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.btnPolygonSnapshots);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(796, 355);
+            this.tabPage2.Size = new System.Drawing.Size(970, 355);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // btnPolygonSnapshots
-            // 
-            this.btnPolygonSnapshots.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPolygonSnapshots.Location = new System.Drawing.Point(17, 16);
-            this.btnPolygonSnapshots.Name = "btnPolygonSnapshots";
-            this.btnPolygonSnapshots.Size = new System.Drawing.Size(170, 47);
-            this.btnPolygonSnapshots.TabIndex = 85;
-            this.btnPolygonSnapshots.Text = "Open Polygon Snapshots Form";
-            this.btnPolygonSnapshots.UseVisualStyleBackColor = true;
-            this.btnPolygonSnapshots.Click += new System.EventHandler(this.btnPolygonSnapshots_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(804, 405);
+            this.ClientSize = new System.Drawing.Size(959, 405);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.statusStrip1);
             this.Name = "MainForm";
@@ -406,7 +405,6 @@ namespace Quote2024.Forms
             this.tpLoader.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.loaderItemBindingSource)).EndInit();
-            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
