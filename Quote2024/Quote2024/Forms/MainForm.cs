@@ -226,15 +226,9 @@ namespace Quote2024.Forms
                 item.Checked = newValue;
         }
 
-        private void btnPolygonMarketSnapshotForm_Click(object sender, EventArgs e)
+        private void btnPolygonSnapshots_Click(object sender, EventArgs e)
         {
-            var form = new PolygonMarketSnapshotForm();
-            form.Show();
-        }
-
-        private void btnPolygonTopMovers_Click(object sender, EventArgs e)
-        {
-            var form = new PolygonTopMovers();
+            var form = new PolygonSnapshotsForm();
             form.Show();
         }
     }

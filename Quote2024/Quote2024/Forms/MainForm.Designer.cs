@@ -57,8 +57,7 @@ namespace Quote2024.Forms
             this.loaderItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnTest = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnPolygonTopMovers = new System.Windows.Forms.Button();
-            this.btnPolygonMarketSnapshotForm = new System.Windows.Forms.Button();
+            this.btnPolygonSnapshots = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpLoader.SuspendLayout();
@@ -372,37 +371,25 @@ namespace Quote2024.Forms
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.btnPolygonTopMovers);
-            this.tabPage2.Controls.Add(this.btnPolygonMarketSnapshotForm);
+            this.tabPage2.Controls.Add(this.btnPolygonSnapshots);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(796, 393);
+            this.tabPage2.Size = new System.Drawing.Size(796, 355);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // btnPolygonTopMovers
+            // btnPolygonSnapshots
             // 
-            this.btnPolygonTopMovers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPolygonTopMovers.Location = new System.Drawing.Point(8, 84);
-            this.btnPolygonTopMovers.Name = "btnPolygonTopMovers";
-            this.btnPolygonTopMovers.Size = new System.Drawing.Size(170, 47);
-            this.btnPolygonTopMovers.TabIndex = 84;
-            this.btnPolygonTopMovers.Text = "Open Polygon Top Movers Form";
-            this.btnPolygonTopMovers.UseVisualStyleBackColor = true;
-            this.btnPolygonTopMovers.Click += new System.EventHandler(this.btnPolygonTopMovers_Click);
-            // 
-            // btnPolygonMarketSnapshotForm
-            // 
-            this.btnPolygonMarketSnapshotForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPolygonMarketSnapshotForm.Location = new System.Drawing.Point(8, 16);
-            this.btnPolygonMarketSnapshotForm.Name = "btnPolygonMarketSnapshotForm";
-            this.btnPolygonMarketSnapshotForm.Size = new System.Drawing.Size(170, 47);
-            this.btnPolygonMarketSnapshotForm.TabIndex = 83;
-            this.btnPolygonMarketSnapshotForm.Text = "Open Polygon Market Snapshot Form";
-            this.btnPolygonMarketSnapshotForm.UseVisualStyleBackColor = true;
-            this.btnPolygonMarketSnapshotForm.Click += new System.EventHandler(this.btnPolygonMarketSnapshotForm_Click);
+            this.btnPolygonSnapshots.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPolygonSnapshots.Location = new System.Drawing.Point(17, 16);
+            this.btnPolygonSnapshots.Name = "btnPolygonSnapshots";
+            this.btnPolygonSnapshots.Size = new System.Drawing.Size(170, 47);
+            this.btnPolygonSnapshots.TabIndex = 85;
+            this.btnPolygonSnapshots.Text = "Open Polygon Snapshots Form";
+            this.btnPolygonSnapshots.UseVisualStyleBackColor = true;
+            this.btnPolygonSnapshots.Click += new System.EventHandler(this.btnPolygonSnapshots_Click);
             // 
             // MainForm
             // 
@@ -454,7 +441,6 @@ namespace Quote2024.Forms
         private System.Windows.Forms.Button btnDailyBy5Minutes;
         private System.Windows.Forms.Button btnIntradayBy5Minutes;
         private System.Windows.Forms.Button btnChangeChecks;
-        private System.Windows.Forms.Button btnPolygonMarketSnapshotForm;
-        private System.Windows.Forms.Button btnPolygonTopMovers;
+        private System.Windows.Forms.Button btnPolygonSnapshots;
     }
 }

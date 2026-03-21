@@ -35,8 +35,7 @@ namespace Quote2024
             Data.Helpers.WebClientExt.CheckVpnConnection();
 
             Application.Run(new MainForm());
-            // Application.Run(new TestForm());
-            // Application.Run(new PolygonMarketSnapshotForm());
+            // Application.Run(new PolygonSnapshotsForm());
         }
     }
 }
