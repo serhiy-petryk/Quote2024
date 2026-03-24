@@ -8,7 +8,7 @@ namespace Data.Actions.Polygon
     {
         private const string UrlTemplate = @"https://api.massive.com/v2/snapshot/locale/us/markets/stocks/tickers";
 
-        public static void Start()
+        public static void Download()
         {
             var timeStamp = TimeHelper.GetTimeStamp();
             var folder = Settings.DataFolder + $@"Screener\PolygonMarketSnapshot\{timeStamp.Item2}";

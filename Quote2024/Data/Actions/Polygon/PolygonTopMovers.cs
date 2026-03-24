@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using Data.Helpers;
 
 namespace Data.Actions.Polygon
@@ -9,7 +12,7 @@ namespace Data.Actions.Polygon
         private const string GainersUrlTemplate = @"https://api.massive.com/v2/snapshot/locale/us/markets/stocks/gainers";
         private const string LosersUrlTemplate = @"https://api.massive.com/v2/snapshot/locale/us/markets/stocks/losers";
 
-        public static void Start()
+        public static void Download()
         {
             var timeStamp = TimeHelper.GetTimeStamp();
             var folder = Settings.DataFolder + $@"Screener\PolygonTopMovers\{timeStamp.Item2}";
@@ -39,6 +42,98 @@ namespace Data.Actions.Polygon
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { new VirtualFileEntry(jsonFileName, o.Item1) });
 
             Logger.AddMessage($"Finished!");
+        }
+
+        public static void Parse()
+        {
+            string zipFileName =
+                @"E:\Quote\WebData\Screener\PolygonTopMovers\20260320\PolygonGainers_20260320132310.zip";
+            Debug.Print($"ticker\tChange\tfmv\tLastPrice\tVolume\tTrades");
+            using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                {
+                    var content = entry.GetContentOfZipEntry().Replace("{\"P\":", "{\"p1\":").Replace(",\"S\":", ",\"s1\":"); // remove AmbiguousMatchException for original 'P/St' and 'p/s' properties names
+                    var oo = ZipUtils.DeserializeString<cRoot>(content);
+                    foreach (var item in oo.tickers)
+                    {
+                        Debug.Print($"{item.ticker}\t{item.todaysChange}\t{item.fmv}\t{item.min.c}\t{item.min.v}\t{item.min.n}");
+                    }
+                }
+        }
+
+        public class cRoot
+        {
+            public cTicker[] tickers;
+            public string status;
+            public string request_id;
+        }
+        public class cTicker
+        {
+            public string ticker;
+            public float todaysChangePerc;
+            public float todaysChange;
+            public long updated;
+            public float fmv;
+            public cDay day;
+            public cLastQuote lastQuote;
+            public cLastTrade lastTrade;
+            public cLastMinute min;
+            public cPrevDay prevDay;
+            public DateTime dUpdated => TimeHelper.GetEstDateTimeFromUnixMilliseconds(updated/1000000);
+        }
+
+        public class cDay
+        {
+            public string dv;
+            public float o;
+            public float h;
+            public float l;
+            public float c;
+            public float v;
+            public float vw;
+        }
+        public class cLastQuote
+        {
+            public float p1;
+            public int s1;
+            public float p;
+            public int s;
+            public long t;
+            public DateTime dTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(t / 1000000);
+        }
+        public class cLastTrade
+        {
+            public string i;
+            public float p;
+            public int s;
+            public long t;
+            public int x;
+            public string ds;
+            public DateTime dTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(t / 1000000);
+        }
+        public class cLastMinute
+        {
+            public string dv;
+            public string dav;
+            public long av;
+            public long t;
+            public int n;
+            public float o;
+            public float h;
+            public float l;
+            public float c;
+            public float v;
+            public float vw;
+            public DateTime dTime => TimeHelper.GetEstDateTimeFromUnixMilliseconds(t);
+        }
+        public class cPrevDay
+        {
+            public float o;
+            public float h;
+            public float l;
+            public float c;
+            public float v;
+            public float vw;
         }
     }
 }

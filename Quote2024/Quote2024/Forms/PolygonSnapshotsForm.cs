@@ -97,14 +97,14 @@ namespace Quote2024.Forms
         {
             MarketSnapshotTickCount++;
             _marketSnapshotTimer.Interval = Convert.ToDouble(numMarketSnapshotInterval.Value * 1000);
-            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMarketSnapshot.Start);
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMarketSnapshot.Download);
         }
 
         private async void _topMoversTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             TopMoversTickCount++;
             _topMoversTimer.Interval = Convert.ToDouble(numTopMoversInterval.Value * 1000);
-            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTopMovers.Start);
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTopMovers.Download);
         }
 
 
@@ -116,7 +116,7 @@ namespace Quote2024.Forms
 
             Debug.Print($"PolygonMarketSnapshot started: {DateTime.Now.TimeOfDay}");
 
-            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMarketSnapshot.Start);
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonMarketSnapshot.Download);
             MarketSnapshotTickCount = 1;
 
             _marketSnapshotTimer.Start();
@@ -131,7 +131,7 @@ namespace Quote2024.Forms
 
             Debug.Print($"PolygonTopMovers started: {DateTime.Now.TimeOfDay}");
 
-            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTopMovers.Start);
+            await Task.Factory.StartNew(Data.Actions.Polygon.PolygonTopMovers.Download);
             TopMoversTickCount = 1;
 
             _topMoversTimer.Start();
