@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -46,7 +48,7 @@ namespace Data.Actions.Polygon
 
         public static void Parse()
         {
-            string zipFileName =
+            var zipFileName =
                 @"E:\Quote\WebData\Screener\PolygonTopMovers\20260320\PolygonGainers_20260320132310.zip";
             Debug.Print($"ticker\tChange\tfmv\tLastPrice\tVolume\tTrades");
             using (var zip = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
@@ -59,6 +61,51 @@ namespace Data.Actions.Polygon
                         Debug.Print($"{item.ticker}\t{item.todaysChange}\t{item.fmv}\t{item.min.c}\t{item.min.v}\t{item.min.n}");
                     }
                 }
+        }
+        public static void ParseFolder()
+        {
+            // Result for 2026-03-20 for Losers: 7 tickers with last price>5.0 and trades/minute>60 = 3 go down + 4 not go done
+            var folder = @"E:\Quote\WebData\Screener\PolygonTopMovers\20260320";
+            // var files = Directory.GetFiles(folder, "PolygonGainers_*.zip")
+            var files = Directory.GetFiles(folder, "PolygonLos*.zip")
+                .OrderBy(Path.GetFileNameWithoutExtension).ToArray();
+
+            var data = new Dictionary<string, Dictionary<TimeSpan, List<cTicker>>>();
+            foreach (var file in files)
+            {
+                var filename = Path.GetFileNameWithoutExtension(file);
+                var sTime = filename.Substring(filename.Length - 6);
+                var time = TimeSpan.ParseExact(sTime, "hhmmss", CultureInfo.InvariantCulture);
+                if (time<new TimeSpan(9,40,0) || time>new TimeSpan(15,30,0)) continue;
+
+                using (var zip = ZipFile.Open(file, ZipArchiveMode.Read))
+                    foreach (var entry in zip.Entries.Where(a => a.Length > 0))
+                    {
+                        var content = entry.GetContentOfZipEntry().Replace("{\"P\":", "{\"p1\":").Replace(",\"S\":", ",\"s1\":"); // remove AmbiguousMatchException for original 'P/St' and 'p/s' properties names
+                        var oo = ZipUtils.DeserializeString<cRoot>(content);
+                        foreach (var item in oo.tickers)
+                        {
+                            if (!data.ContainsKey(item.ticker))
+                                data.Add(item.ticker, new Dictionary<TimeSpan, List<cTicker>>());
+
+                            var timeData = data[item.ticker];
+                            if (!timeData.ContainsKey(time))
+                                timeData.Add(time, new List<cTicker>());
+                            timeData[time].Add(item);
+
+                            // Debug.Print($"{item.ticker}\t{item.todaysChange}\t{item.fmv}\t{item.min.c}\t{item.min.v}\t{item.min.n}");
+                        }
+                    }
+            }
+
+            Debug.Print($"ticker\tTime\tChange\tfmv\tLastPrice\tVolume\tTrades");
+
+            foreach (var kvp1 in data)
+            {
+                var minTime = kvp1.Value.Min(a => a.Key);
+                var item = kvp1.Value[minTime][0];
+                Debug.Print($"{item.ticker}\t{minTime:hh\\:mm}\t{item.todaysChange}\t{item.fmv}\t{item.min.c}\t{item.min.v}\t{item.min.n}");
+            }
         }
 
         public class cRoot

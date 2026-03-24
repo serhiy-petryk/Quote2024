@@ -88,7 +88,7 @@ namespace Quote2024.Forms
             // GetCurrentTime();
             // Data.Actions.Polygon.PolygonSplitsLoader.Start();
             // Data.Tests.WebSocketFiles.PrintPolygonLatency();
-            Data.Actions.Polygon.PolygonTopMovers.Parse();
+            Data.Actions.Polygon.PolygonTopMovers.ParseFolder();
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;
