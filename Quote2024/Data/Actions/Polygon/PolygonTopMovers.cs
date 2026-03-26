@@ -33,7 +33,6 @@ namespace Data.Actions.Polygon
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { new VirtualFileEntry(jsonFileName, o.Item1) });
 
             zipFileName = Path.Combine(folder, $"PolygonLosers_{timeStamp.Item1:yyyyMMddHHmmss}.zip");
-            // api key doesn't support FMV (Fair market value): var url = UrlTemplate + "?apiKey=" + PolygonCommon.GetRealTimeApiKey2003();
             url = LosersUrlTemplate + "?apiKey=" + PolygonCommon.GetApiKey2003();
             o = WebClientExt.GetToBytes(url, true);
             if (o.Item3 != null)
@@ -66,17 +65,33 @@ namespace Data.Actions.Polygon
         {
             // Result for 2026-03-20 for Losers: 7 tickers with last price>5.0 and trades/minute>60 = 3 go down + 4 not go done
             var folder = @"E:\Quote\WebData\Screener\PolygonTopMovers\20260320";
-            // var files = Directory.GetFiles(folder, "PolygonGainers_*.zip")
-            var files = Directory.GetFiles(folder, "PolygonLos*.zip")
-                .OrderBy(Path.GetFileNameWithoutExtension).ToArray();
+            var files = Directory.GetFiles(folder, "*.zip").OrderBy(a => a).ToArray();
 
-            var data = new Dictionary<string, Dictionary<TimeSpan, List<cTicker>>>();
+            var data = new[]
+            {
+                new Dictionary<string, Dictionary<TimeSpan, List<cTicker>>>(),
+                new Dictionary<string, Dictionary<TimeSpan, List<cTicker>>>()
+            };
+
+            var times = new[]
+            {
+                new List<TimeSpan>(),
+                new List<TimeSpan>(),
+            };
+
             foreach (var file in files)
             {
                 var filename = Path.GetFileNameWithoutExtension(file);
+                int dataIndex;
+                if (filename.Contains("Gainer", StringComparison.InvariantCultureIgnoreCase))
+                    dataIndex = 0;
+                else if (filename.Contains("Loser", StringComparison.InvariantCultureIgnoreCase))
+                    dataIndex = 1;
+                else throw new Exception("Check filename");
+
                 var sTime = filename.Substring(filename.Length - 6);
                 var time = TimeSpan.ParseExact(sTime, "hhmmss", CultureInfo.InvariantCulture);
-                if (time<new TimeSpan(9,40,0) || time>new TimeSpan(15,30,0)) continue;
+                times[dataIndex].Add(time);
 
                 using (var zip = ZipFile.Open(file, ZipArchiveMode.Read))
                     foreach (var entry in zip.Entries.Where(a => a.Length > 0))
@@ -85,26 +100,30 @@ namespace Data.Actions.Polygon
                         var oo = ZipUtils.DeserializeString<cRoot>(content);
                         foreach (var item in oo.tickers)
                         {
-                            if (!data.ContainsKey(item.ticker))
-                                data.Add(item.ticker, new Dictionary<TimeSpan, List<cTicker>>());
+                            if (!data[dataIndex].ContainsKey(item.ticker))
+                                data[dataIndex].Add(item.ticker, new Dictionary<TimeSpan, List<cTicker>>());
 
-                            var timeData = data[item.ticker];
+                            var timeData = data[dataIndex][item.ticker];
                             if (!timeData.ContainsKey(time))
                                 timeData.Add(time, new List<cTicker>());
                             timeData[time].Add(item);
-
-                            // Debug.Print($"{item.ticker}\t{item.todaysChange}\t{item.fmv}\t{item.min.c}\t{item.min.v}\t{item.min.n}");
                         }
                     }
             }
 
-            Debug.Print($"ticker\tTime\tChange\tfmv\tLastPrice\tVolume\tTrades");
+            Debug.Print($"Kind\tTicker\tPrevTime\tTime\tChange\tfmv\tLastPrice\tVolume\tTrades");
 
-            foreach (var kvp1 in data)
+            for (var dataIndex = 0; dataIndex < 2; dataIndex++)
             {
-                var minTime = kvp1.Value.Min(a => a.Key);
-                var item = kvp1.Value[minTime][0];
-                Debug.Print($"{item.ticker}\t{minTime:hh\\:mm}\t{item.todaysChange}\t{item.fmv}\t{item.min.c}\t{item.min.v}\t{item.min.n}");
+                var kind = dataIndex == 0 ? "Gainer" : "Loser";
+                foreach (var kvp1 in data[dataIndex])
+                {
+                    var minTime = kvp1.Value.Min(a => a.Key);
+                    var prevTimeArray = times[dataIndex].Where(t => t < minTime).ToArray();
+                    var prevTime = prevTimeArray.Length == 0 ? (TimeSpan?)null : times[dataIndex].Where(t => t < minTime).Max();
+                    var item = kvp1.Value[minTime][0];
+                    Debug.Print($"{kind}\t{item.ticker}\t{prevTime:hh\\:mm\\:ss}\t{minTime:hh\\:mm\\:ss}\t{item.todaysChange}\t{item.fmv}\t{item.min.c}\t{item.min.v}\t{item.min.n}");
+                }
             }
         }
 
@@ -126,7 +145,7 @@ namespace Data.Actions.Polygon
             public cLastTrade lastTrade;
             public cLastMinute min;
             public cPrevDay prevDay;
-            public DateTime dUpdated => TimeHelper.GetEstDateTimeFromUnixMilliseconds(updated/1000000);
+            public DateTime dUpdated => TimeHelper.GetEstDateTimeFromUnixMilliseconds(updated / 1000000);
         }
 
         public class cDay
