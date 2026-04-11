@@ -129,12 +129,9 @@ namespace Data.Actions.StockAnalysis
 
         private static Dictionary<string, string> _decoder = new Dictionary<string, string>
         {
-            {"{action:\"", "{\"action\":\""}, {"{title:\"", "{\"title\":\""}, {"{date:\"", "{\"date\":\""},
-            {",type:\"", ",\"type\":\""},{",url:\"", ",\"url\":\""},{",id:\"", ",\"id\":\""},{",format:\"", ",\"format\":\""},
-            {",classes:\"", ",\"classes\":\""},{",symbol:\"", ",\"symbol\":\""},{",name:\"", ",\"name\":\""},{",other:\"", ",\"other\":\""},{",text:\"", ",\"text\":\""},
-            {",heading:\"",",\"heading\":\""},{",description:\"",",\"description\":\""},{",fileName:\"",",\"fileName\":\""},{",fullCount:",",\"fullCount\":"},
-            {",props:{", ",\"props\":{"},{",columns:[", ",\"columns\":["}, {",data:[", ",\"data\":["}
-
+            { "{date:\"", "{\"date\":\"" }, { ",type:\"", ",\"type\":\"" }, { ",symbol:\"", ",\"symbol\":\"" },
+            { ",name:\"", ",\"name\":\"" }, { ",other:\"", ",\"other\":\"" }, { ",text:\"", ",\"text\":\"" },
+            { ",fullCount:", ",\"fullCount\":" }, { "{data:[", "{\"data\":[" }
         };
 
         public static string GetJsonContent()
@@ -153,23 +150,21 @@ namespace Data.Actions.StockAnalysis
 
         private static bool TryToParseAsJson(string content, List<Models.ActionStockAnalysis> items, DateTime fileTimeStamp)
         {
-            var i1 = content.IndexOf("const data =", StringComparison.InvariantCulture);
+            var i1 = content.IndexOf(",data:[{", StringComparison.InvariantCulture);
             if (i1 == -1) return false;
-            var i2 = content.IndexOf("}}]", i1 + 12, StringComparison.InvariantCulture);
-            var s = content.Substring(i1 + 12, i2 - i1 - 12 + 3).Trim();
-            var i12 = s.IndexOf("{\"type\":", StringComparison.InvariantCulture);
-            i12 = s.IndexOf("{\"type\":", i12 + 8, StringComparison.InvariantCulture);
-            var s2 = s.Substring(i12, s.Length - i12 - 1);
 
-            var s3 = s2;
+            var i2 = content.IndexOf(",fullCount:", i1, StringComparison.InvariantCulture);
+            i2 = content.IndexOf("}", i2 + 10, StringComparison.InvariantCulture);
+            var jsonOriginal = "{" + content.Substring(i1 + 1, i2 - i1);
+            var json = jsonOriginal;
             foreach (var kvp in _decoder)
-                s3 = s3.Replace(kvp.Key, kvp.Value);
+                json = json.Replace(kvp.Key, kvp.Value);
 
-            var oo = ZipUtils.DeserializeString<cRoot>(s3);
-            if (oo.data.fullCount != oo.data.data.Length)
+            var oo = ZipUtils.DeserializeString<cData>(json);
+            if (oo.fullCount != oo.data.Length)
                 throw new Exception("Check data Deserializator for StockAnalysisActions");
 
-            foreach (var item in oo.data.data)
+            foreach (var item in oo.data)
                 items.Add(new ActionStockAnalysis(item, fileTimeStamp));
 
             return true;
