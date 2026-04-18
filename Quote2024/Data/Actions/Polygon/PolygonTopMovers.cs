@@ -64,7 +64,8 @@ namespace Data.Actions.Polygon
         public static void ParseFolder()
         {
             // Result for 2026-03-20 for Losers: 7 tickers with last price>5.0 and trades/minute>60 = 3 go down + 4 not go done
-            var folder = @"E:\Quote\WebData\Screener\PolygonTopMovers\20260320";
+            // var folder = @"E:\Quote\WebData\Screener\PolygonTopMovers\20260320";
+            var folder = @"E:\Quote\WebData\Screener\PolygonTopMovers\20260327";
             var files = Directory.GetFiles(folder, "*.zip").OrderBy(a => a).ToArray();
 
             var data = new[]
