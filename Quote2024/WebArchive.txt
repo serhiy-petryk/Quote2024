@@ -1,0 +1,8 @@
+Quote project of 2010 year: D:\Old\vs\projects\sp\sp.3.1\spMain
+
+1. http://nxcoreapi.com:80/symbols.php?m_exchange=AMEX&m_type=e (2009-1 day, 2012/1, 2016/1, 2017/1, 2019-2025)
+2. http://nxcoreapi.com:80/symbols.php?m_exchange={exchange}&m_type=e (2009-2025) many exchanges
+3. https://web.archive.org/web/20260501000000*/http://www.nasdaqtrader.com:80/dynamic/symdir/nasdaqlisted.txt
+	NASDAQ Saved 82 times between January 5, 2008 and April 14, 2026
+4. http://www.nyse.com/about/listed/.... Nyse - not working
+5. http://www.amex.com/SaveAs.jsp filter="EQUITY_EODLIST", 9 responses from 2002 till 2008 years
