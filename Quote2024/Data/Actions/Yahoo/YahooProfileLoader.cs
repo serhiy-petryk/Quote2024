@@ -85,7 +85,7 @@ namespace Data.Actions.Yahoo
                     {
                         if (symbolItem.StatusCode != HttpStatusCode.NotFound)
                         {
-                            var task = WebClientExt.DownloadToBytesAsync(symbolItem.Url, false, false);
+                            var task = WebClientExt.DownloadToBytesAsync(symbolItem.Url);
                             tasks[symbolItem] = task;
                             symbolItem.StatusCode = null;
                         }

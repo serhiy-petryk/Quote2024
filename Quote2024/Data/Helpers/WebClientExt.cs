@@ -155,7 +155,7 @@ namespace Data.Helpers
         #endregion
 
         #region ====  Static region  ====
-        public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false, CookieCollection cookies = null)
+        public static Task<byte[]> DownloadToBytesAsync(string url, bool isXmlHttpRequest = false, bool noProxy = false)
         {
             using (var wc = new WebClientExt())
             {
@@ -163,11 +163,11 @@ namespace Data.Helpers
                 wc.Encoding = System.Text.Encoding.UTF8;
                 wc._isXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
-                if (cookies != null)
+                /*if (cookies != null)
                 {
                     wc._cookies = new CookieContainer();
                     wc._cookies.Add(cookies);
-                }
+                }*/
                 return wc.DownloadDataTaskAsync(url);
             }
         }
@@ -177,10 +177,10 @@ namespace Data.Helpers
             DoRequest(Method.Get, url, null, isJson, isXmlHttpRequest, null, cookies);
 
         public static (byte[], CookieCollection, Exception) PostToBytes(string url, string parameters, bool isJson,
-            bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null) =>
-            DoRequest(Method.Post, url, parameters, isJson, isXmlHttpRequest, contentType, cookies);
+            bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null, bool noProxy = false) =>
+            DoRequest(Method.Post, url, parameters, isJson, isXmlHttpRequest, contentType, cookies, noProxy);
 
-        private static (byte[], CookieCollection, Exception) DoRequest(Method method, string url, string postParameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null)
+        private static (byte[], CookieCollection, Exception) DoRequest(Method method, string url, string postParameters, bool isJson, bool isXmlHttpRequest = false, string contentType = null, CookieCollection cookies = null, bool noProxy = false)
         {
             // see https://stackoverflow.com/questions/5401501/how-to-post-data-to-specific-url-using-webclient-in-c-sharp
             using (var wc = new WebClientExt())
@@ -188,6 +188,7 @@ namespace Data.Helpers
                 wc.Encoding = System.Text.Encoding.UTF8;
                 wc._isXmlHttpRequest = isXmlHttpRequest;
                 wc.Headers.Add(HttpRequestHeader.Referer, new Uri(url).Host);
+                if (noProxy) wc.Proxy = null;
                 if (method == Method.Post)
                     wc.Headers.Add(HttpRequestHeader.ContentType, contentType ?? "application/x-www-form-urlencoded"); // very important for Investing.Splits
                 if (cookies != null)
