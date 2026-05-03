@@ -7,7 +7,8 @@ namespace Data.Actions.StockAnalysis
 {
     public class StockAnalysisIPOs
     {
-        private const string Url = @"https://stockanalysis.com/api/screener/s/f?m=ipoDate&s=desc&c=ipoDate,s,n,ipoPrice,ippc,exchange,sector,industry,employees&cn=5000&i=histip";
+        // before 2026-05-02: private const string Url = @"https://stockanalysis.com/api/screener/s/f?m=ipoDate&s=desc&c=ipoDate,s,n,ipoPrice,ippc,exchange,sector,industry,employees&cn=5000&i=histip";
+        private const string Url = @"https://stockanalysis.com/_api/endpoints/screener/table?type=s&m=ipoDate&s=desc&c=ipoDate,s,n,ipoPrice,ippc,exchange,sector,industry,employees&cn=10000&i=histip";
         private const string Folder = Settings.DataFolder + @"Splits\StockAnalysis\IPOs\";
 
         public static void Start()
