@@ -88,7 +88,7 @@ namespace Quote2024.Forms
             // GetCurrentTime();
             // Data.Actions.Polygon.PolygonSplitsLoader.Start();
             // Data.Tests.WebSocketFiles.PrintPolygonLatency();
-            Data.Actions.Polygon.PolygonTopMovers.ParseFolder();
+            // Data.Actions.Investing.InvestingSplitsLoader.ParseZipAndSaveToDb(@"E:\Quote\WebData\Splits\Investing\InvestingSplits_20260509.zip");
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;

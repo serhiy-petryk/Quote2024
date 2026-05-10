@@ -105,8 +105,12 @@ namespace Data.Actions.Investing
 
                 var ratio = GetCellValue(cells[2]);
 
-                var item = new SplitModel(symbol, date, name, ratio, null, timeStamp);
-                items.Add(item);
+                var sameItem = items.FirstOrDefault(a => a.Symbol == symbol && a.Date == date && a.Ratio == ratio);
+                if (sameItem == null)
+                {
+                    var item = new SplitModel(symbol, date, name, ratio, null, timeStamp);
+                    items.Add(item);
+                }
 
                 lastDate = sDate;
             }
