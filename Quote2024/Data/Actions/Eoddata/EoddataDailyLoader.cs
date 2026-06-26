@@ -66,7 +66,7 @@ namespace Data.Actions.Eoddata
                 foreach (var fileId in missingFiles)
                 {
                     Logger.AddMessage($"Download Eoddata daily data for {fileId.Item1} and {fileId.Item2}");
-                    var url = string.Format(URL_TEMPLATE, fileId.Item1, fileId.Item2, kParameter.Substring(2));
+                    var url = string.Format(URL_TEMPLATE, fileId.Item1, GetUrlDate(fileId.Item2), kParameter.Substring(2));
                     o = WebClientExt.GetToBytes(url, false, false, cookies);
                     if (o.Item3 != null)
                         throw new Exception($"EoddataDailyLoader: Error while download from {url}. Error message: {o.Item3.Message}");
@@ -118,6 +118,11 @@ namespace Data.Actions.Eoddata
             }
 
             Logger.AddMessage($"!Finished. Loaded quotes into DayEoddata table. Quotes: {itemCount:N0}. Number of files: {newFileCount}. Size of files: {fileSize:N0}KB");
+
+            string GetUrlDate(string fileDate)
+            {
+                return fileDate.Insert(6, "-").Insert(4, "-");
+            }
         }
 
         public static int ParseAndSaveToDb(string zipFileName)
