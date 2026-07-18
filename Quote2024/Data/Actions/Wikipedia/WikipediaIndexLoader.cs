@@ -12,7 +12,17 @@ namespace Data.Actions.Wikipedia
 {
     public static class WikipediaIndexLoader
     {
-        private static readonly (string,string)[] UrlsAndFilenames = new []
+        private static readonly (string, string)[] UrlsAndFilenames = new[]
+        {
+            ("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", "Components_SP500_{0}.html"),
+            ("https://en.wikipedia.org/wiki/List_of_S%26P_400_companies", "Components_SP400_{0}.html"),
+            ("https://en.wikipedia.org/wiki/List_of_S%26P_600_companies", "Components_SP600_{0}.html"),
+            // ("https://en.wikipedia.org/wiki/Nasdaq-100", "Components_Nasdaq100_{0}.html")
+            ("https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies", "Components_Nasdaq100_{0}.html")
+            // old: https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies
+        };
+
+        private static readonly (string, string)[] UrlsAndFilenamesX = new[]
         {
             ("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", "Components_SP500_{0}.html"),
             ("https://en.wikipedia.org/wiki/List_of_S%26P_400_companies", "Components_SP400_{0}.html"),
@@ -302,6 +312,12 @@ namespace Data.Actions.Wikipedia
 
         private static string GetCellValue(string cell)
         {
+            if (cell.EndsWith("-->"))
+            {
+                var k1 = cell.LastIndexOf("<!--", StringComparison.InvariantCulture);
+                cell = cell.Substring(0, k1);
+            }
+
             var c1 = cell.Replace("</a>", "").Trim();
             if (c1.EndsWith("</sup>"))
             {
