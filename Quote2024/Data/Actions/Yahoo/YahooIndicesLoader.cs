@@ -195,6 +195,10 @@ namespace Data.Actions.Yahoo
             {
                 DbHelper.ClearAndSaveToDbTable(data, "dbQ2024..Bfr_DayYahooIndexes", "Symbol", "Date", "Open", "High", "Low",
                     "Close", "Volume", "AdjClose");
+                DbHelper.ExecuteSql("UPDATE a SET [Open]=b.[Open], High=b.[High], Low=b.Low, [Close]=b.[Close], [Volume]=b.[Volume], AdjClose=b.AdjClose " +
+                                    "from(SELECT * from DayYahooIndexes where [close] is null) a " +
+                                    "inner join(SELECT * from Bfr_DayYahooIndexes where [close] is not null) b " +
+                                    "on a.Symbol = b.Symbol and a.Date = b.Date");
                 DbHelper.ExecuteSql("INSERT into dbQ2024..DayYahooIndexes (Symbol, Date, [Open], High, Low, [Close], Volume, AdjClose) " +
                                     "SELECT a.Symbol, a.Date, a.[Open], a.High, a.Low, a.[Close], a.Volume, a.AdjClose " +
                                     "from dbQ2024..Bfr_DayYahooIndexes a " +
@@ -217,11 +221,11 @@ namespace Data.Actions.Yahoo
         public float Open;
         public float High;
         public float Low;
-        public float Close;
+        public float? Close;
         public long Volume;
-        public float AdjClose => Close;
+        public float? AdjClose => Close;
 
-        public DayYahoo(string symbol, DateTime date, float open, float high, float low, float close, long volume)
+        public DayYahoo(string symbol, DateTime date, float open, float high, float low, float? close, long volume)
         {
             Symbol = symbol;
             Date = date;
@@ -236,20 +240,20 @@ namespace Data.Actions.Yahoo
         {
             Symbol = symbol;
             Date = DateTime.Parse(ss[0].Trim(), CultureInfo.InvariantCulture);
-            Open = Single.Parse(ss[1].Trim(), CultureInfo.InvariantCulture);
-            High = Single.Parse(ss[2].Trim(), CultureInfo.InvariantCulture);
-            Low = Single.Parse(ss[3].Trim(), CultureInfo.InvariantCulture);
-            Close = Single.Parse(ss[4].Trim(), CultureInfo.InvariantCulture);
+            Open = float.Parse(ss[1].Trim(), CultureInfo.InvariantCulture);
+            High = float.Parse(ss[2].Trim(), CultureInfo.InvariantCulture);
+            Low = float.Parse(ss[3].Trim(), CultureInfo.InvariantCulture);
+            Close = float.Parse(ss[4].Trim(), CultureInfo.InvariantCulture);
             Volume = long.Parse(ss[6].Trim(), CultureInfo.InvariantCulture);
         }
         internal DayYahoo(string symbol, cNasdaqRow row)
         {
             Symbol = symbol;
             Date = DateTime.Parse(row.date.Trim(), CultureInfo.InvariantCulture);
-            Open = Single.Parse(row.open, CultureInfo.InvariantCulture);
-            High = Single.Parse(row.high, CultureInfo.InvariantCulture);
-            Low = Single.Parse(row.low, CultureInfo.InvariantCulture);
-            Close = Single.Parse(row.close, CultureInfo.InvariantCulture);
+            Open = float.Parse(row.open, CultureInfo.InvariantCulture);
+            High = float.Parse(row.high, CultureInfo.InvariantCulture);
+            Low = float.Parse(row.low, CultureInfo.InvariantCulture);
+            Close = float.Parse(row.close, CultureInfo.InvariantCulture);
             // AdjClose = Decimal.Parse(row.close, CultureInfo.InvariantCulture);
 
             if (row.volume != "--")
@@ -335,7 +339,7 @@ namespace Data.Actions.Yahoo
         public float[] open { get; set; }
         public float[] high { get; set; }
         public float[] low { get; set; }
-        public float[] close { get; set; }
+        public float?[] close { get; set; }
         public long[] volume { get; set; }
     }
     #endregion
