@@ -202,7 +202,8 @@ namespace Data.Actions.Wikipedia
                                         RemovedName = removedName,
                                         TimeStamp = timeStamp
                                     };
-                                    changes.Add(item);
+                                    if (changes.Count(a => a.Symbols == item.Symbols && Equals(a.Date, item.Date)) == 0)
+                                        changes.Add(item);
                                 }
                             }
                         }
@@ -245,6 +246,13 @@ namespace Data.Actions.Wikipedia
                     sectorNo = k;
                 if (cell.IndexOf("industry", StringComparison.InvariantCultureIgnoreCase) != -1)
                     industryNo = k;
+            }
+
+            if (sectorNo != -1 && industryNo != -1 && sectorNo > industryNo)
+            {
+                var i1 = sectorNo;
+                sectorNo = industryNo;
+                industryNo = i1;
             }
 
             for (var k = 1; k < rows.Length; k++)
