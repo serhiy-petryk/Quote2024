@@ -89,6 +89,8 @@ namespace Quote2024.Forms
             // Data.Actions.Polygon.PolygonSplitsLoader.Start();
             // Data.Tests.WebSocketFiles.PrintPolygonLatency();
             // Data.Actions.Investing.InvestingSplitsLoader.ParseZipAndSaveToDb(@"E:\Quote\WebData\Splits\Investing\InvestingSplits_20260509.zip");
+            // Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\IndexComponents_20260817.zip");
+            // Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles();
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;
