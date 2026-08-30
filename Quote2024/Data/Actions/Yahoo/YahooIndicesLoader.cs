@@ -61,7 +61,7 @@ namespace Data.Actions.Yahoo
         #region ========  Yahoo Minute  ========
         public static void YahooMinuteStart()
         {
-            var maxDate = GetStartDate();
+            var maxDate = GetYahooIndicesStartDate();
             var fromUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(maxDate) / 1000;
             var toUnixSeconds = TimeHelper.GetUnixMillisecondsFromEstDateTime(DateTime.Today) / 1000 - 1; // last second of previous day
             var data = new List<DayYahoo>();
@@ -182,6 +182,24 @@ namespace Data.Actions.Yahoo
             {
                 conn.Open();
                 cmd.CommandText = "select max([date]) MaxDate from dbQ2024..TradingDays";
+                var o = cmd.ExecuteScalar();
+                if (o is DateTime) maxDate = (DateTime)o;
+            }
+
+            return maxDate;
+        }
+
+        private static DateTime GetYahooIndicesStartDate()
+        {
+            Logger.AddMessage($"Started");
+
+            var maxDate = new DateTime(2000, 1, 1);
+            using (var conn = new SqlConnection(Settings.DbConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+                cmd.CommandText = "select isnull(max([date]), (select max([date]) MaxDate from dbQ2024..TradingDays)) MaxDate "+
+                                  "from dbQ2024..DayYahooIndexes where date<='2028-01-01' and [close] is null";
                 var o = cmd.ExecuteScalar();
                 if (o is DateTime) maxDate = (DateTime)o;
             }
