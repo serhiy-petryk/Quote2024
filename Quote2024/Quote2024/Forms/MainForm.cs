@@ -91,6 +91,8 @@ namespace Quote2024.Forms
             // Data.Actions.Investing.InvestingSplitsLoader.ParseZipAndSaveToDb(@"E:\Quote\WebData\Splits\Investing\InvestingSplits_20260509.zip");
             // Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDb(@"E:\Quote\WebData\Indices\Wikipedia\IndexComponents\IndexComponents_20260817.zip");
             // Data.Actions.Wikipedia.WikipediaIndexLoader.ParseAndSaveToDbAllFiles();
+            // Data.Actions.Investing.InvestingSplitsLoader.ParseZipAndSaveToDb(@"E:\Quote\WebData\Splits\Investing\InvestingSplits_20260830.zip");
+            // Data.Actions.Investing.InvestingSplitsLoader.ParseZipAndSaveToDb(@"E:\Quote\WebData\Splits\Investing\InvestingSplits_20260814.zip");
 
             sw.Stop();
             var d1 = sw.ElapsedMilliseconds;

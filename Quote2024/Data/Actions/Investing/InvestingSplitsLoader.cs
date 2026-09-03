@@ -4,6 +4,10 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CefSharp;
+using CefSharp.OffScreen;
 using Data.Helpers;
 using Data.Models;
 
@@ -13,6 +17,45 @@ namespace Data.Actions.Investing
     {
         private const string URL = @"https://www.investing.com/stock-split-calendar/Service/getCalendarFilteredData";
         private const string POST_DATA_TEMPLATE = @"country%5B%5D=5&dateFrom={0}&dateTo={1}&currentTab=custom&limit_from=0";
+
+        #region CefSharp base
+        public static async void Start_CefSharp()
+        {
+            var timeStamp = TimeHelper.GetTimeStamp();
+            var postData = string.Format(POST_DATA_TEMPLATE,
+                timeStamp.Item1.AddDays(-90).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                timeStamp.Item1.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+            var zipFileName = Settings.DataFolder + $@"Splits\Investing\InvestingSplits_{timeStamp.Item2}.zip";
+
+            // Download data
+            Logger.AddMessage($"Download data from {URL}");
+            var jsonString = await Download_CefSharp(postData);
+
+            var entry = new VirtualFileEntry($"{Path.GetFileNameWithoutExtension(zipFileName)}.json", Encoding.UTF8.GetBytes(jsonString));
+            ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
+
+            // Parse and save to database
+            Logger.AddMessage($"Parse and save to database");
+            var itemCount = ParseZipAndSaveToDb(zipFileName);
+
+            Logger.AddMessage($"!Finished. Items: {itemCount:N0}. Zip file size: {CsUtils.GetFileSizeInKB(zipFileName):N0}KB. Filename: {zipFileName}");
+        }
+
+        private static async Task<string> Download_CefSharp(string postData)
+        {
+            using (var browser = new ChromiumWebBrowser(URL))
+            {
+                browser.RequestHandler = new CefSharpHelper.PostRequestHandler(URL, postData);
+
+                var loaded = await browser.WaitForInitialLoadAsync();
+                if (loaded.Success)
+                    return await browser.GetTextAsync();
+                else
+                    throw new Exception(
+                        $"InvestingSplitsLoader: Error while download from {URL}. Error code: {loaded.ErrorCode}");
+            }
+        }
+        #endregion
 
         public static void Start()
         {
@@ -24,12 +67,12 @@ namespace Data.Actions.Investing
 
             // Download data
             Logger.AddMessage($"Download data from {URL}");
-            var o = WebClientExt.PostToBytes(URL, postData, true, true, null, null ,true);
+            var o = WebClientExt.PostToBytes(URL, postData, true, true, null, null, true);
             if (o.Item3 is Exception ex)
                 throw new Exception($"InvestingSplitsLoader: Error while download from {URL}. Error message: {ex.Message}");
 
             var entry = new VirtualFileEntry($"{Path.GetFileNameWithoutExtension(zipFileName)}.json", o.Item1);
-            ZipUtils.ZipVirtualFileEntries(zipFileName, new []{entry});
+            ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
 
             // Parse and save to database
             Logger.AddMessage($"Parse and save to database");
@@ -87,7 +130,7 @@ namespace Data.Actions.Investing
             for (var k = 0; k < rows.Length; k++)
             {
                 var row = rows[k];
-                var cells = row.Trim().Split(new[] { "</td>" }, StringSplitOptions.RemoveEmptyEntries);
+                var cells = row.Trim().Split(new[] { "</td>" }, StringSplitOptions.None);
                 var sDateOriginal = GetCellValue(cells[0]);
                 var sDate = string.IsNullOrWhiteSpace(sDateOriginal) ? lastDate : sDateOriginal;
                 var date = DateTime.Parse(sDate, CultureInfo.InvariantCulture);
@@ -98,6 +141,8 @@ namespace Data.Actions.Investing
                 else
                     throw new Exception("Check InvestingSplitsLoader parser");
                 var symbol = GetCellValue(cells[1]);
+                if (symbol.StartsWith("("))
+                    symbol = symbol.Substring(1).Trim();
 
                 var i2 = cells[1].LastIndexOf("</span>", StringComparison.InvariantCulture);
                 var i1 = cells[1].LastIndexOf(">", i2 - 7, StringComparison.InvariantCulture);

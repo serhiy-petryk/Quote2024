@@ -1,14 +1,15 @@
-﻿using CefSharp;
+﻿using System;
+using CefSharp;
 
 namespace Data.Helpers
 {
     public class CefSharpHelper
     {
-        public class CustomRequestHandler : CefSharp.Handler.RequestHandler
+        public class PostRequestHandler : CefSharp.Handler.RequestHandler
         {
             private readonly string Url;
             internal readonly string PostData;
-            public CustomRequestHandler(string url, string postData) : base()
+            public PostRequestHandler(string url, string postData) : base()
             {
                 Url = url;
                 PostData = postData;
@@ -20,7 +21,7 @@ namespace Data.Helpers
                 //see the post data
                 if (request.Url == Url)
                 {
-                    return new CustomResourceRequestHandler();
+                    return new PostResourceRequestHandler();
                 }
 
                 //Default behaviour, url will be loaded normally.
@@ -28,16 +29,18 @@ namespace Data.Helpers
             }
         }
 
-        private class CustomResourceRequestHandler : CefSharp.Handler.ResourceRequestHandler
+        private class PostResourceRequestHandler : CefSharp.Handler.ResourceRequestHandler
         {
 
             protected override CefReturnValue OnBeforeResourceLoad(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IRequest request, IRequestCallback callback)
             {
                 //Modify the request to add post data
                 //Make sure to read https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST
+                var uri = new Uri(((CefSharp.Core.Request)request).Url);
+                var origin = uri.GetLeftPart(UriPartial.Authority);
 
                 var postData = new PostData();
-                postData.AddData(((CustomRequestHandler)chromiumWebBrowser.RequestHandler).PostData);
+                postData.AddData(((PostRequestHandler)chromiumWebBrowser.RequestHandler).PostData);
 
                 request.Method = "POST";
                 request.PostData = postData;
@@ -45,6 +48,11 @@ namespace Data.Helpers
                 //Set the Content-Type header to whatever suites your requirement
                 request.SetHeaderByName("Content-Type", "application/x-www-form-urlencoded", true);
                 request.SetHeaderByName("X-Requested-With", "XMLHttpRequest", true);
+
+                request.SetHeaderByName("Accept", "*/*", true);
+                request.SetHeaderByName("Origin", origin, true);
+                request.SetHeaderByName("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", true);
+                // request.SetReferrer("https://www.investing.com/stock-split-calendar/", ReferrerPolicy.Default);
 
                 return CefReturnValue.Continue;
             }
