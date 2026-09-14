@@ -19,17 +19,17 @@ namespace Data.Actions.Investing
         private const string POST_DATA_TEMPLATE = @"country%5B%5D=5&dateFrom={0}&dateTo={1}&currentTab=custom&limit_from=0";
 
         #region CefSharp base
-        public static async void Start_CefSharp()
+        public static void Start_CefSharp()
         {
             var timeStamp = TimeHelper.GetTimeStamp();
             var postData = string.Format(POST_DATA_TEMPLATE,
-                timeStamp.Item1.AddDays(-90).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                timeStamp.Item1.AddDays(-30).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 timeStamp.Item1.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             var zipFileName = Settings.DataFolder + $@"Splits\Investing\InvestingSplits_{timeStamp.Item2}.zip";
 
             // Download data
             Logger.AddMessage($"Download data from {URL}");
-            var jsonString = await Download_CefSharp(postData);
+            var jsonString = Task.Run(() => Download_CefSharp(postData)).GetAwaiter().GetResult();
 
             var entry = new VirtualFileEntry($"{Path.GetFileNameWithoutExtension(zipFileName)}.json", Encoding.UTF8.GetBytes(jsonString));
             ZipUtils.ZipVirtualFileEntries(zipFileName, new[] { entry });
