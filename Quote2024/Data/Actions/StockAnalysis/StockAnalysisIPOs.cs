@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using Data.Helpers;
@@ -40,14 +41,21 @@ namespace Data.Actions.StockAnalysis
                 foreach (var entry in zip.Entries.Where(a => a.Length > 0))
                 {
                     var oo = ZipUtils.DeserializeZipEntry<cRoot>(entry);
+
+                    var liveItems = new List<cItem>();
                     foreach (var item in oo.data.data)
+                    {
                         item.TimeStamp = entry.LastWriteTime.DateTime;
+                        if (liveItems.Count(a => a.pSymbol == item.pSymbol && a.ipoDate == item.pDate) == 0)
+                            liveItems.Add(item);
+                    }
+
                     itemCount += oo.data.data.Length;
 
                     // Save data to database
-                    if (oo.data.data.Length > 0)
+                    if (liveItems.Count > 0)
                     {
-                        DbHelper.ClearAndSaveToDbTable(oo.data.data, "dbQ2024..Bfr_IpoStockAnalysis", "pSymbol", "pDate", "pExchange",
+                        DbHelper.ClearAndSaveToDbTable(liveItems, "dbQ2024..Bfr_IpoStockAnalysis", "pSymbol", "pDate", "pExchange",
                             "pName", "pIpoPrice", "pCurrentPrice", "pSector", "pIndustry", "IEmployees", "TimeStamp");
 
                         DbHelper.RunProcedure("dbQ2024..pUpdateIpoStockAnalysis");
